@@ -20,3 +20,10 @@ alias btop='btop --force-utf'
 alias workspace='cd ~/Workspace'
 alias github='cd ~/Workspace/Github'
 alias aevum='cd ~/.config/aevum'
+
+# git aliases
+alias gs='git switch'
+alias gb='git branch'
+alias ga='git add .'
+alias gc='git commit -m'
+alias gm='git merge'
