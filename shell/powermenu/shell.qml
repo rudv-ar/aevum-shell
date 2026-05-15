@@ -12,7 +12,7 @@ PanelWindow {
     property real  notchHeight:       Properties.powerMenuHeight
     property real  cornerRadius:      Properties.powerMenuCornerRadius
     property real  shoulderRadius:    Properties.powerMenuShoulderRadius
-    property color fillColor:         Theme.background
+    property color fillColor:         Qt.lighter(Theme.background, 0.45)
     property color borderColor:       Qt.lighter(fillColor, 1.25)
     property real  borderWidth:       Properties.powerMenuBorderWidth
     property real  menuRightMargin:   10
