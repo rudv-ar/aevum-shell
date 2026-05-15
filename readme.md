@@ -52,8 +52,16 @@ The name comes from the Latin *aevum* — meaning age or era. A small nod to the
 │   ├── ranger/
 │   ├── vicinae/
 │   └── ...
-├── deps.sh          # dependency manager + installer
-└── linker.sh        # symlink manager
+├── install/          # primitive installations scripts
+│   ├── linker.sh
+│   ├── deps.sh 
+├── local/          # all local, bin and stuffs.
+│   ├── ...
+│   ├── ...
+├── shell/          # main shell structure
+│   ├── ...
+│   ├── ...
+
 ```
 
 
@@ -70,7 +78,7 @@ git switch main
 **2. install deps**
 
 ```
-bash ~/.config/aevum/deps.sh
+bash ~/.config/aevum/install/deps.sh
 ```
 
 Launches an interactive menu. Run option 1 first (repo + keyring), then 4 (install everything). Requires `yay` for AUR packages.
@@ -78,7 +86,7 @@ Launches an interactive menu. Run option 1 first (repo + keyring), then 4 (insta
 **3. link configs**
 
 ```
-bash ~/.config/aevum/linker.sh add-all
+bash ~/.config/aevum/install/linker.sh add-all
 ```
 
 Symlinks everything from `aevum/config/` into `~/.config/`. Safe to rerun — real directories get purged and relinked, existing symlinks are left alone unless you pass `-f`.
@@ -90,16 +98,15 @@ Symlinks everything from `aevum/config/` into `~/.config/`. Safe to rerun — re
 |---|---|
 | `main` | stable, daily-driver config |
 | `dev` | active development, experimental changes |
+| `stable` | slow releasing, major versions |
 
-Switching branches live-switches your entire config instantly since everything is symlinked into the source tree.
+Switching branches live-switches your entire config instantly since everything is symlinked into the source tree. So if you want to try different versions of this shell, just git switch to the branch via the following commands and optionally - ctrl + shift + r to hot reload everything. 
 
 ```
 git switch main   # stable rolling
 git switch dev    # experimental
 git switch stable # stable - slow releasing
 ```
-
-Some apps only pick up changes after a restart or reload.
 
 ## tools
 
