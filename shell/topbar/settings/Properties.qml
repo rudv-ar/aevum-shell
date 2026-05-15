@@ -48,6 +48,7 @@ QtObject {
     // "none" | "collapsed" | "expanded" | "always"
     readonly property string workspaceDotLabelMode:     "always"
     readonly property int    workspaceDotLabelFontSize: 8
+    readonly property bool workspaceHasGlyphIndicator: true
     readonly property string nerdFontFamily:      "JetBrainsMono Nerd Font"
     readonly property int    workspaceIconFontSize: 14
     readonly property real   workspaceIconGap:      6     // gap between icon pill and dots pill

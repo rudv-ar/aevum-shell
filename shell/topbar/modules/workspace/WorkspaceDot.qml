@@ -8,6 +8,10 @@ Item {
     required property string state
     required property bool   expanded
 
+    readonly property bool glyphMode: Properties.workspaceHasGlyphIndicator
+    readonly property string _glyph: root.state === "occupied"  ? "󰊠"   // nf-md-ghost
+                                : root.state === "focused" ? "󰮯"   // nf-md-pac_man
+                                                            : "•"   // U+2B24 big dot
     signal leftClicked(string name)
     signal rightClicked(string name)
 
@@ -65,9 +69,14 @@ Item {
 
         Text {
             anchors.centerIn: parent
-            text:             root.name
-            font.pixelSize:   Properties.workspaceDotLabelFontSize
-            font.family:      Properties.clockPillFontFamily
+            text:             root.glyphMode ? root._glyph : root.name
+            //font.pixelSize:   root.glyphMode ? Properties.workspaceDotLabelFontSize + 3 : Properties.workspaceDotLabelFontSize
+            font.pixelSize: root.glyphMode
+                ? (root.state === "empty"
+                   ? Properties.workspaceDotLabelFontSize + 10
+                   : Properties.workspaceDotLabelFontSize + 3)
+                : Properties.workspaceDotLabelFontSize
+            font.family:      Theme.fontAwesome6
             color:            root._dotColor === Theme.workspaceDotEmptyColor
                               ? Theme.primaryP90
                               : Theme.barBackground
