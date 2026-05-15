@@ -6,8 +6,8 @@ import qs.components
 
 Item {
     id: board
+    signal actionTriggered()
 
-    // ── Uptime ────────────────────────────────────────────────────
     property string uptimeText: "–"
     readonly property string currentUser: Quickshell.env("USER")
 
@@ -24,7 +24,9 @@ Item {
         interval: 60000
         running:  true
         repeat:   true
-        onTriggered: { if (!uptimeProc.running) uptimeProc.running = true }
+        onTriggered: {
+            if (!uptimeProc.running) uptimeProc.running = true
+        }
     }
 
     // ── Uptime strip (col 1) ──────────────────────────────────────
@@ -46,8 +48,7 @@ Item {
             font.bold:        false
             color:            Theme.primaryP100
             opacity:          0.55
-        }       
-
+        }
     }
 
     // ── Pill area (col 2) ─────────────────────────────────────────
@@ -65,11 +66,11 @@ Item {
             anchors.centerIn: parent
             spacing:          Properties.pillSpacing
 
-            PowerMenuPill { glyph: "lock";               command: Commands.powerLock()    }
-            PowerMenuPill { glyph: "bedtime";            command: Commands.powerSuspend() }
-            PowerMenuPill { glyph: "logout";             command: Commands.powerLogout()  }
-            PowerMenuPill { glyph: "restart_alt";        command: Commands.powerReboot()  }
-            PowerMenuPill { glyph: "power_settings_new"; command: Commands.powerOff()     }
+            PowerMenuPill { glyph: "lock";               command: Commands.powerLock();    onActionTriggered: board.actionTriggered() }
+            PowerMenuPill { glyph: "bedtime";            command: Commands.powerSuspend(); onActionTriggered: board.actionTriggered() }
+            PowerMenuPill { glyph: "logout";             command: Commands.powerLogout();  onActionTriggered: board.actionTriggered() }
+            PowerMenuPill { glyph: "restart_alt";        command: Commands.powerReboot();  onActionTriggered: board.actionTriggered() }
+            PowerMenuPill { glyph: "power_settings_new"; command: Commands.powerOff();     onActionTriggered: board.actionTriggered() }
         }
     }
 }

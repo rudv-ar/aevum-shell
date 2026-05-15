@@ -5,6 +5,9 @@ import qs.settings
 Rectangle {
     id: pill
 
+    signal actionTriggered()
+
+
     property string glyph:      ""
     property var    command:     []
     property color  accentColor: Theme.accent
@@ -46,6 +49,9 @@ Rectangle {
         onExited:   { pill.hovered = false; pill.pressed = false }
         onPressed:  { pill.pressed = true }
         onReleased: { pill.pressed = false }
-        onClicked:  { if (!proc.running) proc.running = true }
+        onClicked:  { 
+          if (!proc.running) proc.running = true 
+          actionTriggered()
+        }
     }
 }

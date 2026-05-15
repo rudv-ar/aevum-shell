@@ -2,4 +2,4 @@ module qs.settings
 singleton Theme 1.0 Theme.qml
 singleton Properties 1.0 Properties.qml
 singleton Commands 1.0 Commands.qml
-
+singleton PowerMenuState 1.0 PowerMenuState.qml
