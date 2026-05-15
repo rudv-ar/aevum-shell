@@ -76,13 +76,6 @@ else
     notify-send "Tor" "Tor not enabled. You are on public network." -t 30000 -u normal
 fi
 
-# ── Picom ─────────────────────────────────────────────────────────────────────
-if [[ $is_svc_picom == true ]]; then
-    "$BSPDIR/bspwm.d/picomrc" &
-else
-    notify-send "Compositor" "Compositor not enabled. Shaders unavailable." -u normal -t 20000
-fi
-
 # ── Snapserver ────────────────────────────────────────────────────────────────
 if [[ $is_svc_snapserver == true ]]; then
     pactl load-module module-pipe-sink sink_name=snapfifo file=/tmp/snapfifo
@@ -94,6 +87,14 @@ fi
 [[ $is_widget == true ]] && bash "$BSPDIR/widgets/$widget_bar/launch.sh" &
 [[ $is_plank == true ]] && plank &
 
+sleep 30
+
+# ── Picom ─────────────────────────────────────────────────────────────────────
+if [[ $is_svc_picom == true ]]; then
+    "$BSPDIR/bspwm.d/picomrc" &
+else
+    notify-send "Compositor" "Compositor not enabled. Shaders unavailable." -u normal -t 20000
+fi
 
 ##---------------------------------------- Manager Scripts : All those use bspc subscribe to bring about some action----------------------------
 bash "$BSPDIR/bspwm.d/exter_rules/raise_plank.sh" &
