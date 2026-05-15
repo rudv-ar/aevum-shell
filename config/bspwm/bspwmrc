@@ -1,0 +1,31 @@
+#!/bin/bash 
+
+####################### IMPORT THE EXPORTS ################################
+
+BSPDIRD="$HOME/.config/bspwm/bspwm.d"
+source "$BSPDIRD/monitor.sh"
+source "$BSPDIRD/config.sh"
+
+###################### COMMAND THE BSPWM ###################################
+
+#---------> set up the monitor : I use single monitor, so source from moitors.sh
+workspaces
+
+#---------> set up the configurations : Sourced from config.sh
+# configure the borders
+bspc_configure border
+# configure the windows
+bspc_configure windows
+# configure the scheme
+bspc_configure scheme 
+# configure the status prefix 
+bspc_configure status_prefix 
+# configure the monocle
+bspc_configure monocle 
+bspc config focus_follows_pointer "true"
+#---------> apply bspc rules from rules.sh 
+source "$BSPDIRD/rules.sh"
+
+#---------> start the applications from autostart.sh
+source "$BSPDIRD/autostart.sh"
+

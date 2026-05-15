@@ -1,0 +1,3 @@
+module qs.services.audio
+singleton AudioService 1.0 AudioService.qml
+

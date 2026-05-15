@@ -1,0 +1,559 @@
+#!/usr/bin/env bash
+# bspwm-slidefx - workspace switcher with Hyprland-style slide animations
+# via picom animation rules.
+#
+# Author  : Dhanush S M
+# License : MIT
+# Repo    : https://github.com/Dhanush-777x/bspwm-slidefx
+#
+# Usage:
+#   bspwm-slidefx -w <workspace|next|prev>
+#   bspwm-slidefx setup-picom [--config PATH] [--distance PX] [--force]
+#   bspwm-slidefx --print-picom-config-path
+#   bspwm-slidefx -h | --help
+set -euo pipefail
+
+# constants
+readonly PACKAGE_NAME="bspwm-slidefx"
+readonly PROPERTY_NAME="_MY_CUSTOM_WORKSPACE_SWITCH"
+readonly BLOCK_START="# >>> bspwm-slidefx picom animation >>>"
+readonly BLOCK_END="# <<< bspwm-slidefx picom animation <<<"
+readonly DEFAULT_DISTANCE=1920
+readonly DEFAULT_DURATION_SHOW=0.3
+readonly DEFAULT_DURATION_HIDE=0.2
+
+# helpers
+
+usage() {
+    cat <<USAGE
+Usage:
+  $PACKAGE_NAME -w <workspace|next|prev>
+  $PACKAGE_NAME setup-picom [--config PATH] [--distance PX] [--force]
+  $PACKAGE_NAME --print-picom-config-path
+  $PACKAGE_NAME -h | --help
+
+Options (setup-picom):
+  --config PATH    Path to the picom config file
+  --distance PX    Slide distance in pixels (default: widest monitor or $DEFAULT_DISTANCE)
+  --force          Overwrite the block even if it is already up to date
+
+Examples:
+  $PACKAGE_NAME -w 2
+  $PACKAGE_NAME -w next
+  $PACKAGE_NAME -w prev
+  $PACKAGE_NAME setup-picom
+  $PACKAGE_NAME setup-picom --distance 2560 --force
+USAGE
+}
+
+log()  { printf '%s\n' "$*"; }
+warn() { printf '%s: %s\n' "$PACKAGE_NAME" "$*" >&2; }
+die()  { warn "$*"; exit 1; }
+
+have_cmd() { command -v "$1" >/dev/null 2>&1; }
+
+# monitor detection
+
+current_monitor_width() {
+    local width
+
+    if have_cmd xrandr; then
+        width=$(xrandr --listactivemonitors 2>/dev/null | awk '
+            NR > 1 {
+                split($3, geometry, /[+\/]/)
+                if (geometry[1] + 0 > max) max = geometry[1] + 0
+            }
+            END { if (max > 0) print max }
+        ')
+        if [[ -n "$width" ]]; then
+            printf '%s\n' "$width"
+            return 0
+        fi
+    fi
+
+    printf '%s\n' "$DEFAULT_DISTANCE"
+}
+
+# config path resolution
+
+bspwmrc_candidates() {
+    local xdg=${XDG_CONFIG_HOME:-"$HOME/.config"}
+    printf '%s\n' \
+        "$xdg/bspwm/bspwmrc" \
+        "$HOME/.config/bspwm/bspwmrc" \
+        "$HOME/.bspwmrc"
+}
+
+picom_config_candidates() {
+    local xdg=${XDG_CONFIG_HOME:-"$HOME/.config"}
+    printf '%s\n' \
+        "$xdg/picom/picom.conf" \
+        "$xdg/picom.conf" \
+        "$HOME/.config/picom/picom.conf" \
+        "$HOME/.config/picom.conf" \
+        "$HOME/.picom.conf"
+}
+
+normalize_config_path() {
+    local path=$1
+    local xdg=${XDG_CONFIG_HOME:-"$HOME/.config"}
+
+    path=${path//\"/}
+    path=${path//\'/}
+    path=${path/#\~/$HOME}
+    path=${path//\$\{HOME\}/$HOME}
+    path=${path//\$HOME/$HOME}
+    path=${path//\$\{XDG_CONFIG_HOME\}/$xdg}
+    path=${path//\$XDG_CONFIG_HOME/$xdg}
+    printf '%s\n' "$path"
+}
+
+extract_config_path_from_command() {
+    local line=$1
+    local next_is_config=0
+    local token
+
+    for token in $line; do
+        if [[ $next_is_config -eq 1 ]]; then
+            normalize_config_path "$token"
+            return 0
+        fi
+        case "$token" in
+            --config)    next_is_config=1 ;;
+            --config=*)  normalize_config_path "${token#--config=}"; return 0 ;;
+        esac
+    done
+
+    return 1
+}
+
+picom_is_running() {
+    have_cmd pgrep && pgrep -x picom >/dev/null 2>&1
+}
+
+picom_config_from_running_process() {
+    local pid arg previous_arg=""
+
+    have_cmd pgrep || return 1
+
+    pid=$(pgrep -xo picom 2>/dev/null || true)
+    [[ -n "$pid" ]]            || return 1
+    [[ -r "/proc/$pid/cmdline" ]] || return 1
+
+    while IFS= read -r -d '' arg; do
+        if [[ "$previous_arg" == "--config" ]]; then
+            normalize_config_path "$arg"
+            return 0
+        fi
+        case "$arg" in
+            --config=*) normalize_config_path "${arg#--config=}"; return 0 ;;
+        esac
+        previous_arg=$arg
+    done < "/proc/$pid/cmdline"
+
+    return 1
+}
+
+picom_config_from_bspwmrc() {
+    local file line path
+
+    while IFS= read -r file; do
+        [[ -f "$file" ]] || continue
+        while IFS= read -r line; do
+            case "$line" in
+                *picom*)
+                    if path=$(extract_config_path_from_command "$line"); then
+                        printf '%s\n' "$path"
+                        return 0
+                    fi
+                    ;;
+            esac
+        done < "$file"
+    done < <(bspwmrc_candidates)
+
+    return 1
+}
+
+resolve_picom_config_path() {
+    local candidate
+
+    if candidate=$(picom_config_from_running_process); then
+        printf '%s\n' "$candidate"; return 0
+    fi
+
+    while IFS= read -r candidate; do
+        [[ -f "$candidate" ]] || continue
+        printf '%s\n' "$candidate"; return 0
+    done < <(picom_config_candidates)
+
+    if candidate=$(picom_config_from_bspwmrc); then
+        printf '%s\n' "$candidate"; return 0
+    fi
+
+    # No existing config found — return the preferred default path so the
+    # caller can create it there.
+    picom_config_candidates | head -n 1
+}
+
+# picom block management
+
+build_picom_block() {
+    local distance=$1
+    cat <<EOF_BLOCK
+$BLOCK_START
+# Managed by $PACKAGE_NAME. Re-run '$PACKAGE_NAME setup-picom' to update values.
+{
+    match = "$PROPERTY_NAME@ = 1 && window_type = 'normal' && !class_g = 'Polybar' && !class_g = 'eww-bar' && !class_g = 'Dunst'";
+    animations = (
+        {
+            triggers = ["show"];
+            offset-x = {
+                curve = "cubic-bezier(0.25, 0.46, 0.45, 0.94)";
+                start = "-${distance}";
+                end = "0";
+                duration = $DEFAULT_DURATION_SHOW;
+            };
+            shadow-offset-x = "offset-x";
+        },
+        {
+            triggers = ["hide"];
+            opacity = {
+                curve = "linear";
+                duration = $DEFAULT_DURATION_SHOW;
+                start = "window-raw-opacity-before";
+                end = "window-raw-opacity-before";
+            };
+            blur-opacity = 0;
+            shadow-opacity = "opacity";
+            offset-x = {
+                curve = "cubic-bezier(0.25, 0.46, 0.45, 0.94)";
+                start = "0";
+                end = "-${distance}";
+                duration = $DEFAULT_DURATION_HIDE;
+            };
+            shadow-offset-x = "offset-x";
+        }
+    );
+},
+
+{
+    match = "$PROPERTY_NAME@ = 2 && window_type = 'normal' && !class_g = 'Polybar' && !class_g = 'eww-bar' && !class_g = 'Dunst'";
+    animations = (
+        {
+            triggers = ["show"];
+            offset-x = {
+                curve = "cubic-bezier(0.25, 0.46, 0.45, 0.94)";
+                start = "${distance}";
+                end = "0";
+                duration = $DEFAULT_DURATION_SHOW;
+            };
+            shadow-offset-x = "offset-x";
+        },
+        {
+            triggers = ["hide"];
+            opacity = {
+                curve = "linear";
+                duration = $DEFAULT_DURATION_SHOW;
+                start = "window-raw-opacity-before";
+                end = "window-raw-opacity-before";
+            };
+            blur-opacity = 0;
+            shadow-opacity = "opacity";
+            offset-x = {
+                curve = "cubic-bezier(0.25, 0.46, 0.45, 0.94)";
+                start = "0";
+                end = "${distance}";
+                duration = $DEFAULT_DURATION_HIDE;
+            };
+            shadow-offset-x = "offset-x";
+        }
+    );
+}
+$BLOCK_END
+EOF_BLOCK
+}
+
+# Returns 0 if the exact block is already present in the file, 1 otherwise.
+block_is_current() {
+    local file=$1
+    local block=$2
+
+    [[ -f "$file" ]] || return 1
+
+    # Extract the section between BLOCK_START and BLOCK_END (inclusive).
+    local existing
+    existing=$(awk -v start="$BLOCK_START" -v end="$BLOCK_END" '
+        $0 == start { found=1 }
+        found        { buf = buf $0 "\n" }
+        $0 == end    { if (found) { printf "%s", buf }; found=0; buf="" }
+    ' "$file")
+
+    [[ -n "$existing" ]] || return 1
+    [[ "$existing" == "$block"$'\n' ]] || return 1
+    return 0
+}
+
+upsert_block() {
+    local file=$1
+    local block=$2
+    # Initialize to empty so the EXIT trap never hits an unbound variable,
+    # even if mktemp fails or set -u is active.
+    local tmp="" cleaned=""
+
+    # Ensure temp files are always removed on return, success or failure.
+    trap 'rm -f "${tmp:-}" "${cleaned:-}"' RETURN
+
+    mkdir -p "$(dirname "$file")"
+    tmp=$(mktemp)
+    cleaned=$(mktemp)
+
+    # Strip any existing managed block from the file.
+    if [[ -f "$file" ]]; then
+        awk -v start="$BLOCK_START" -v end="$BLOCK_END" '
+            $0 == start { skipping=1; next }
+            $0 == end   { skipping=0; next }
+            !skipping   { print }
+        ' "$file" > "$cleaned"
+    fi
+
+    # Try to insert inside an existing rules: (...) section; fall back to
+    # appending at end of file if no such section exists.
+    if [[ -s "$cleaned" ]] && awk -v block="$block" '
+        function emit_block(    i, lines, n) {
+            if (inserted) return
+            n = split(block, lines, "\n")
+            print ""
+            for (i = 1; i <= n; i++) print lines[i]
+            inserted = 1
+        }
+        {
+            line = $0
+            if (!in_rules && line ~ /^[[:space:]]*rules[[:space:]]*:[[:space:]]*\(/) {
+                in_rules = 1; paren_depth = 1; print line; next
+            }
+            if (in_rules) {
+                open_count  = split(line, a, "(") - 1
+                close_count = split(line, b, ")") - 1
+                next_depth  = paren_depth + open_count - close_count
+                if (next_depth == 0 && line ~ /^[[:space:]]*\)[[:space:]]*,?[[:space:]]*$/) {
+                    emit_block(); print line; in_rules=0; paren_depth=0; next
+                }
+                paren_depth = next_depth
+            }
+            print line
+        }
+        END { exit(inserted ? 0 : 1) }
+    ' "$cleaned" > "$tmp"; then
+        : # inserted inside rules block
+    else
+        # Append — preserve a trailing newline if the file already has one.
+        {
+            cat "$cleaned"
+            [[ -s "$cleaned" ]] && printf '\n'
+            printf '%s\n' "$block"
+        } > "$tmp"
+    fi
+
+    # Atomic replace.
+    mv "$tmp" "$file"
+}
+
+setup_picom() {
+    local config_path=$1
+    local distance=$2
+    local force=$3
+    local block
+
+    block=$(build_picom_block "$distance")
+
+    if [[ "$force" -eq 0 ]] && block_is_current "$config_path" "$block"; then
+        log "Picom animation config is already up to date in: $config_path"
+        return 0
+    fi
+
+    upsert_block "$config_path" "$block"
+    log "Picom animation config written to: $config_path"
+
+    if ! have_cmd picom; then
+        warn "picom is not installed. The config is ready but animations need picom to run."
+        return 0
+    fi
+
+    if picom_is_running; then
+        log "Picom is running — restart it to pick up the new animation block."
+    else
+        log "Picom is not running. Start it to activate the animations."
+    fi
+}
+
+# bspwm workspace switching
+
+require_bspwm() {
+    have_cmd bspc || die "bspc not found — is bspwm installed and running?"
+}
+
+get_desktops() {
+    mapfile -t DESKTOPS < <(bspc query -D --names 2>/dev/null)
+    [[ ${#DESKTOPS[@]} -gt 0 ]] || die "no bspwm desktops found — is bspwm running?"
+}
+
+find_desktop_index() {
+    local target=$1
+    local index
+
+    for index in "${!DESKTOPS[@]}"; do
+        [[ "${DESKTOPS[$index]}" == "$target" ]] && { printf '%s\n' $((index + 1)); return 0; }
+    done
+
+    return 1
+}
+
+resolve_target_desktop() {
+    local spec=$1
+    local current_name current_index target_index
+
+    current_name=$(bspc query -D -d focused --names 2>/dev/null) \
+        || die "could not query focused desktop"
+    [[ -n "$current_name" ]] || die "focused desktop has no name"
+
+    current_index=$(find_desktop_index "$current_name") \
+        || die "focused desktop '$current_name' not found in desktop list"
+
+    case "$spec" in
+        next)
+            target_index=$(( current_index % ${#DESKTOPS[@]} + 1 ))
+            ;;
+        prev)
+            target_index=$(( (current_index - 2 + ${#DESKTOPS[@]}) % ${#DESKTOPS[@]} + 1 ))
+            ;;
+        ''|*[!0-9]*)
+            target_index=$(find_desktop_index "$spec") \
+                || die "unknown desktop name '$spec'"
+            ;;
+        *)
+            (( spec >= 1 && spec <= ${#DESKTOPS[@]} )) \
+                || die "desktop index '$spec' out of range (1–${#DESKTOPS[@]})"
+            target_index=$spec
+            ;;
+    esac
+
+    TARGET_DESKTOP=${DESKTOPS[$((target_index - 1))]}
+    CURRENT_DESKTOP=$current_name
+    CURRENT_INDEX=$current_index
+    TARGET_INDEX=$target_index
+}
+
+set_window_property() {
+    local desktop=$1
+    local value=$2
+    local window_id
+
+    while IFS= read -r window_id; do
+        [[ -n "$window_id" ]] || continue
+        xprop -id "$window_id" -f "$PROPERTY_NAME" 32i \
+            -set "$PROPERTY_NAME" "$value" >/dev/null 2>&1 || true
+    done < <(bspc query -N -d "$desktop" -n .window 2>/dev/null || true)
+}
+
+clear_window_properties() {
+    have_cmd xprop || return 0
+
+    local window_id
+    while IFS= read -r window_id; do
+        [[ -n "$window_id" ]] || continue
+        xprop -id "$window_id" -remove "$PROPERTY_NAME" >/dev/null 2>&1 || true
+    done < <(bspc query -N -n .window 2>/dev/null || true)
+}
+
+switch_workspace() {
+    local spec=$1
+    local current_switch_value target_switch_value
+    local animate=0
+
+    require_bspwm
+    get_desktops
+    resolve_target_desktop "$spec"
+
+    [[ "$CURRENT_DESKTOP" != "$TARGET_DESKTOP" ]] || exit 0
+
+    if (( TARGET_INDEX > CURRENT_INDEX )); then
+        current_switch_value=1
+        target_switch_value=2
+    else
+        current_switch_value=2
+        target_switch_value=1
+    fi
+
+    if have_cmd xprop && picom_is_running; then
+        animate=1
+        trap clear_window_properties EXIT
+        set_window_property "$CURRENT_DESKTOP" "$current_switch_value"
+        set_window_property "$TARGET_DESKTOP"  "$target_switch_value"
+    fi
+
+    bspc desktop -f "$TARGET_DESKTOP"
+
+    (( animate )) && sleep 0.05
+}
+
+# entry point
+
+main() {
+    local workspace_spec=""
+    local action="switch"
+    local picom_config_path=""
+    local distance=""
+    local force=0
+
+    [[ $# -gt 0 ]] || { usage; exit 0; }
+
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            -w|--workspace)
+                [[ $# -ge 2 ]] || die "missing value for $1"
+                workspace_spec=$2; shift 2
+                ;;
+            setup-picom)
+                action="setup-picom"; shift
+                ;;
+            --config)
+                [[ $# -ge 2 ]] || die "missing value for --config"
+                picom_config_path=$2; shift 2
+                ;;
+            --distance)
+                [[ $# -ge 2 ]] || die "missing value for --distance"
+                distance=$2; shift 2
+                ;;
+            --force)
+                force=1; shift
+                ;;
+            --print-picom-config-path)
+                resolve_picom_config_path; exit 0
+                ;;
+            -h|--help)
+                usage; exit 0
+                ;;
+            *)
+                die "unknown argument '$1'"
+                ;;
+        esac
+    done
+
+    case "$action" in
+        setup-picom)
+            [[ -n "$picom_config_path" ]] || picom_config_path=$(resolve_picom_config_path)
+            [[ -n "$distance"          ]] || distance=$(current_monitor_width)
+            [[ "$distance" =~ ^[0-9]+$ ]] || die "--distance must be a positive integer, got: '$distance'"
+            setup_picom "$picom_config_path" "$distance" "$force"
+            ;;
+        switch)
+            [[ -n "$workspace_spec" ]] || die "use -w/--workspace to specify a desktop"
+            switch_workspace "$workspace_spec"
+            ;;
+        *)
+            die "internal error: unsupported action '$action'"
+            ;;
+    esac
+}
+
+main "$@"

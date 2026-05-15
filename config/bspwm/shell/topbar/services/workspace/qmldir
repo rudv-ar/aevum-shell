@@ -1,0 +1,3 @@
+module qs.services.workspace
+singleton WorkspaceService 1.0 WorkspaceService.qml
+

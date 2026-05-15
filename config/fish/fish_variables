@@ -1,0 +1,4 @@
+# This file contains fish universal variable definitions.
+# VERSION: 3.0
+SETUVAR __fish_initialized:4300
+SETUVAR fish_user_paths:/home/cobra/\x2ecargo/bin\x1e/home/cobra/\x2econfig/bspwm/scripts\x1e/usr/local/bin\x1e/usr/bin\x1e/bin\x1e/usr/sbin\x1e/sbin\x1e/home/cobra/\x2elocal/bin

@@ -1,0 +1,6 @@
+module qs.components
+PillHover 1.0 PillHover.qml
+PillStatic 1.0 PillStatic.qml
+BasePill 1.0 BasePill.qml
+DualPill 1.0 DualPill.qml
+

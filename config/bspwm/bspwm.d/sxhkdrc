@@ -1,0 +1,230 @@
+
+#################################################
+# rudv-ar - 2026
+##################################################
+
+
+##---------- Keybindings for bspwm ----------##
+
+# Terminal (alacritty)
+super + Return
+	alacritty --config-file ~/.config/bspwm/apps/alacritty/alacritty.toml
+
+# Terminal (floating)
+super + shift + Return
+	bspterm --float
+
+
+# Terminal (fullscreen)
+super + alt + Return
+	bspterm --full
+
+# Terminal (kitty)
+# ctrl + alt + t
+#    kitty
+
+
+##---------- Applications ----------##
+
+# Launch Apps
+super + shift + {w,e}
+	{firefox,geany}
+
+# Terminal Apps
+ctrl + alt + {v,r,h}
+	alacritty --config-file ~/.config/bspwm/apps/alacritty/alacritty.toml -e {nvim,ranger,btop}
+
+# Color Picker
+super + p
+	bspcolorpicker
+
+# Music
+ctrl + alt + m
+	bspmusic
+
+# Lockscreen
+super + l
+    betterlockscreen --lock
+
+##---------- System Keys ----------##
+
+###################################UTILS##########################################
+# Brighness control
+XF86MonBrightness{Up,Down}
+	bspbrightness{ --inc, --dec}
+	
+# Speaker Volume control
+XF86Audio{RaiseVolume,LowerVolume}
+	bspvolume{ --inc, --dec}
+
+# Mic Volume control
+XF86Audio{Mute,MicMute}
+	bspvolume{ --toggle, --toggle-mic}
+	
+# Music control
+XF86Audio{Next,Prev,Play,Stop}
+	mpc {next,prev,toggle,stop}
+
+##---------- Bspwm ----------##
+
+# Hide/Unhide Window
+F8
+    bspwinmask
+
+# Close App
+super + {_,shift + }c
+	bspc node -{c,k}
+
+# kill window
+ctrl + alt + Escape
+	xkill
+
+# Quit/Restart bspwm
+ctrl + shift + {q,r}
+    bspc {quit,wm -r}
+	
+# Reload Keybindings
+super + Escape
+    pkill -USR1 -x sxhkd 
+
+# Switch workspace
+ctrl + alt + {Left,Right}
+	bspc desktop -f {prev.local,next.local}
+
+# Switch workspace or Send focused Node to another workspace
+super + shift + {1-8}
+	bspc node -d '^{1-8}' '--follow'
+
+super + {1-8}
+  bspwm-slidefx -w {1-8}
+
+# Send focused Node to workspace directionally
+super + ctrl + shift + {Left,Right}
+	bspc node -d {prev,next} '--follow'
+
+# Change focus of the Node or Swap Nodes
+super + {_,shift + }{Left,Down,Up,Right}
+	bspc node -{f,s} {west,south,north,east}
+
+# Move floating windows
+super + alt + shift + {Left,Down,Up,Right}
+	bspc node -v {-20 0,0 20,0 -20,20 0}
+
+# Expanding windows
+super + control + {Left,Right,Up,Down}
+	bspc node -z {left -20 0,right 20 0,top 0 -20,bottom 0 20}
+	
+# Shrinking windows
+super + alt + {Left,Right,Up,Down}
+	bspc node -z {left 20 0,right -20 0,top 0 20,bottom 0 -20}
+
+# Split horizontal, vertical or cancel
+super + {h,v,q}
+	bspc node -p {south,east,cancel}
+
+# Preselect the ratio
+super + ctrl + {1-9}
+	bspc node -o 0.{1-9}
+
+# Toggle Layout (Tiled/Monocle)
+F9
+	bspc desktop -l next
+
+# Toggle Fullscreen
+F10
+    bspc node -t "~"fullscreen
+
+# Toggle beetwen floating & tiled
+F11
+    bspc node -t "~"{floating,tiled}
+
+# Pseudo Tiled & tiled mode
+F12
+    bspc node -t "~"{pseudo_tiled,tiled}
+
+# Set the node flags
+super + ctrl + {m,x,y,z}
+	bspc node -g {marked,locked,sticky,private}
+
+# Change focus to next window, including floating window
+alt + {_,shift + }Tab
+	bspc node -f {next.local,prev.local}
+
+# Switch to last opened workspace
+super + {Tab,grave}
+	bspc {node,desktop} -f last
+
+######################## SCREENSHOTS ###################################
+# Take a screenshot
+Print
+	bspscreenshot --now
+	
+# Take screenshot in 5 second
+alt + Print	
+	bspscreenshot --in5
+
+# Take screenshot in 10 second
+shift + Print	
+	bspscreenshot --in10
+
+# Take screenshot of active window
+ctrl + Print
+	bspscreenshot --win
+
+# Take screenshot of area
+super + Print
+	rofi_screenshot
+
+
+##----------CUSTOM-MADE----##
+
+F1
+    thunar
+
+super + ctrl + F1
+    thunar_pseudo
+super + shift + F1
+    bspc rule -a Thunar --one-shot state=floating center=true rectangle=800x600+0+0 &&thunar
+
+super + space
+    vicinae toggle
+    
+super + x
+    vicinae deeplink vicinae://launch/clipboard/history
+
+super + a
+    vicinae deeplink vicinae://extensions/rithvikvibhu/arch-packages/search-arch-packages
+
+ctrl + alt + w
+    vicinae deeplink vicinae://extensions/tonka3000/weather/index
+
+super + n
+    vicinae deeplink vicinae://launch/@dagimg-dot/store.vicinae.wifi-commander/scan-wifi
+
+super + o
+    vicinae deeplink vicinae://extensions/vicinae/wm/switch-windows
+
+super + r
+    ~/.config/bspwm/scripts/rofi_runner
+
+super + w
+    wallpicker
+
+################# POWER MANAGEMENT #############################################
+
+alt + Delete + s
+    systemctl poweroff
+
+alt + Delete + r
+    systemctl reboot
+
+alt + Delete + l
+    bspc quit
+
+alt + F4
+    rofi_powermenu
+
+
+################ YAD Windows ####################################################
+
+
