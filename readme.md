@@ -1,4 +1,4 @@
 # Aevum Shell 
 
 >[!NOTE]
-> This is the main branch - if you want to keep up to date with the stable releases - you can use this.
+> This is the stable branch - if you want to keep up to date with the most stable, slow releasing versions of the shell, use this. 
