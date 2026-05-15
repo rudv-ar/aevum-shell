@@ -6,12 +6,14 @@ aevum is a personal bspwm shell for Arch Linux. It is not a desktop environment,
 
 The name comes from the Latin *aevum* — meaning age or era. A small nod to the `revolution-18` idea this started from.
 
-## Preview Video 
+## Preview
 
 >[!NOTE]
 > This is in a low ram environment - so video can be lagging; ignore the lagging video and see the features alone. 
 
 [Video Here](./assets/shell.mp4)
+
+![View](./assets/view.png)
 
 ## stack
 
