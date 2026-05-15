@@ -1,3 +1,4 @@
 ./config/bspwm/apps/tor-instance 
 config/bspwm/apps/tor-instance
-
+config/geany/session.conf 
+./config/geany/session.conf
