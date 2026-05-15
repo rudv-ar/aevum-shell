@@ -2,7 +2,7 @@
 
 ## what is aevum
 
-aevum is a personal bspwm shell for Arch Linux. It is not a desktop environment, not a framework, and not meant to be generic. It is a tightly configured, opinionated rice built around a specific workflow — keyboard-driven, minimal, fast, and visually deliberate.
+aevum is a personal bspwm shell for Arch Linux. It is not a desktop environment, not a framework, and not meant to be generic. It is a tightly configured, opinionated rice built around a specific workflow — keyboard-driven, minimal, fast, and visually deliberate. I ported this from my previous project - [rudv-shell-1.0](https://github.com/rudv-ar/rudv-shell-1.0).
 
 The name comes from the Latin *aevum* — meaning age or era. A small nod to the `revolution-18` idea this started from.
 
@@ -124,3 +124,14 @@ Built on constrained hardware — Intel GMA 900 (i915, GLES2 only), 2GB DDR2, BI
 ## status
 
 early dev. structure is stable, configs are being migrated and tuned. not ready for anyone else to use completely - but only working stuffs are pushed - so you can try it.
+
+## for developers 
+
+While switching the git branches in the ~/.config/aevum, the picom compositor and quickshell may apply changes immeditately. If you feel that the UI is somewhat misalligned, either of the following should fix it : 
+
+```bash
+pkill qs && ~/.config/bspwm/widgets/quickshell/launch.sh & 
+# or, reload the wm 
+hotkey : press ctrl + shift + r
+
+```
