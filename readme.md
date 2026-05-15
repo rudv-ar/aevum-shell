@@ -11,7 +11,7 @@ The name comes from the Latin *aevum* — meaning age or era. A small nod to the
 >[!NOTE]
 > This is in a row ram environment - so video can be lagging; ignore the lagging video and see the features alone. 
 
-<video src="./assets/shell.mp4" controls="controls" style="max-width: 100%"></video>
+./assets/shell.mp4
 
 ## stack
 
