@@ -9,7 +9,7 @@ The name comes from the Latin *aevum* — meaning age or era. A small nod to the
 ## Preview Video 
 
 >[!NOTE]
-> This is in a row ram environment - so video can be lagging; ignore the lagging video and see the features alone. 
+> This is in a low ram environment - so video can be lagging; ignore the lagging video and see the features alone. 
 
 [Video Here](./assets/shell.mp4)
 
