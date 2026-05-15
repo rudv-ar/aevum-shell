@@ -87,7 +87,7 @@ fi
 [[ $is_widget == true ]] && bash "$BSPDIR/widgets/$widget_bar/launch.sh" &
 [[ $is_plank == true ]] && plank &
 
-sleep 2
+sleep 5
 # ── Picom ─────────────────────────────────────────────────────────────────────
 if [[ $is_svc_picom == true ]]; then
     "$BSPDIR/bspwm.d/picomrc" &
