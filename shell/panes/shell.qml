@@ -4,29 +4,15 @@ import QtQuick.Effects
 import Quickshell
 import qs.settings
 import qs.services
-import qs.components
 
 ShellRoot {
 
-    // ── Pane windows (one per direction) ───────────────────────────
-    RightPane  {}
-    LeftPane   {}
-    TopPane    {}
-    BottomPane {}
-
-    // ── Border / frame window ───────────────────────────────────────
     PanelWindow {
         id: win
 
         implicitWidth:  Screen.width
         implicitHeight: Screen.height
         color:          "transparent"
-        mask:           Region { item:contentRect}       // entire window is click-through
-
-        // ── Animated hole margins ───────────────────────────────────
-        //    Each direction independently drives its own margin.
-        //    Only one can be non-base at a time because PaneState.activePane
-        //    is a single string.
 
         property real _rightMargin: PaneState.activePane === "right"
             ? Properties.borderThickness + Properties.panelWidth + Properties.panelRightMargin
@@ -44,11 +30,11 @@ ShellRoot {
             ? Properties.borderThickness + Properties.panelHeight + Properties.panelBottomMargin
             : Properties.borderThickness
 
-Behavior on _rightMargin  { SpringAnimation { spring: 5; damping: 0.8; epsilon: 0.5 } }
-Behavior on _leftMargin   { SpringAnimation { spring: 5; damping: 0.8; epsilon: 0.5 } }
-Behavior on _topMargin    { SpringAnimation { spring: 5; damping: 0.8; epsilon: 0.5 } }
-Behavior on _bottomMargin { SpringAnimation { spring: 5; damping: 0.8; epsilon: 0.5 } }
-        // ── Visible border rectangle ────────────────────────────────
+        Behavior on _rightMargin  { SpringAnimation { spring: 5; damping: 0.8; epsilon: 0.5 } }
+        Behavior on _leftMargin   { SpringAnimation { spring: 5; damping: 0.8; epsilon: 0.5 } }
+        Behavior on _topMargin    { SpringAnimation { spring: 5; damping: 0.8; epsilon: 0.5 } }
+        Behavior on _bottomMargin { SpringAnimation { spring: 5; damping: 0.8; epsilon: 0.5 } }
+
         Rectangle {
             anchors.fill:      parent
             anchors.topMargin: Properties.marginCover
@@ -64,12 +50,11 @@ Behavior on _bottomMargin { SpringAnimation { spring: 5; damping: 0.8; epsilon: 
             }
         }
 
-        // ── Mask: punches the hole ──────────────────────────────────
         Item {
             id: innerMask
-            anchors.fill: parent
+            anchors.fill:  parent
             layer.enabled: true
-            opacity: 0
+            opacity:       0
 
             Rectangle {
                 anchors.fill:         parent
