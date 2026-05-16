@@ -11,21 +11,41 @@ PanelWindow {
 
     implicitHeight: Properties.panelHeight
     color:          "transparent"
+    visible:        PaneState.activePane === "top" || slideY > -Properties.panelHeight
 
-    visible: PaneState.activePane === "top"
-
-    // slideY: 0 = fully in, -panelHeight = fully off above
     property real slideY: -Properties.panelHeight
 
-    onVisibleChanged: if (visible) slideY = 0
+    onVisibleChanged: {
+        if (visible) {
+            anim.enabled = false
+            slideY = -Properties.panelHeight
+            anim.enabled = true
+            slideY = 0
+        }
+    }
 
     Behavior on slideY {
-        NumberAnimation { duration: Properties.animDuration; easing.type: Easing.OutCubic }
+        id: anim
+        SpringAnimation {
+            spring:  5
+            damping: 0.8
+            epsilon: 0.5
+        }
+    }
+
+    Connections {
+        target: PaneState
+        function onActivePaneChanged() {
+            if (PaneState.activePane !== "top") {
+                anim.enabled = true
+                slideY = -Properties.panelHeight
+            }
+        }
     }
 
     Rectangle {
         anchors.fill:        parent
-        anchors.topMargin:   Properties.topOffset + Properties.marginCover
+        anchors.topMargin:   Properties.marginCover + Properties.topOffset
         anchors.leftMargin:  Properties.borderThickness
         anchors.rightMargin: Properties.borderThickness
         color:               Theme.panelBg

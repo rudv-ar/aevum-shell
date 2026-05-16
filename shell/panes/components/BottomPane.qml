@@ -11,34 +11,59 @@ PanelWindow {
 
     implicitHeight: Properties.panelHeight
     color:          "transparent"
+    visible:        PaneState.activePane === "bottom" || slideY < Properties.panelHeight
 
-    visible: PaneState.activePane === "bottom"
-
-    // slideY: 0 = fully in, panelHeight = fully off below
     property real slideY: Properties.panelHeight
 
-    onVisibleChanged: if (visible) slideY = 0
-
-    Behavior on slideY {
-        NumberAnimation { duration: Properties.animDuration; easing.type: Easing.OutCubic }
+    onVisibleChanged: {
+        if (visible) {
+            anim.enabled = false
+            slideY = Properties.panelHeight
+            anim.enabled = true
+            slideY = 0
+        }
     }
 
-    Rectangle {
+    Behavior on slideY {
+        id: anim
+        SpringAnimation {
+            spring:  5
+            damping: 0.8
+            epsilon: 0.5
+        }
+    }
+
+    Connections {
+        target: PaneState
+        function onActivePaneChanged() {
+            if (PaneState.activePane !== "bottom") {
+                anim.enabled = true
+                slideY = Properties.panelHeight
+            }
+        }
+    }
+
+    Item {
         anchors.fill:         parent
         anchors.bottomMargin: Properties.panelBottomMargin
         anchors.leftMargin:   Properties.borderThickness
         anchors.rightMargin:  Properties.borderThickness
-        color:                Theme.panelBg
-        radius:               Properties.cornerRadius
         clip:                 true
 
-        transform: Translate { y: slideY }
+        Rectangle {
+            width:  parent.width
+            height: Properties.panelHeight
+            color:  Theme.panelBg
+            radius: Properties.cornerRadius
 
-        Text {
-            anchors.centerIn: parent
-            text:             "Bottom Pane"
-            color:            Theme.panelFg
-            font.pixelSize:   16
+            transform: Translate { y: slideY }
+
+            Text {
+                anchors.centerIn: parent
+                text:             "Bottom Pane"
+                color:            Theme.panelFg
+                font.pixelSize:   16
+            }
         }
     }
 }

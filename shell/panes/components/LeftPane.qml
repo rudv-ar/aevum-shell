@@ -11,26 +11,46 @@ PanelWindow {
 
     implicitWidth: Properties.panelWidth
     color:         "transparent"
+    visible:       PaneState.activePane === "left" || slideX > -Properties.panelWidth
 
-    visible: PaneState.activePane === "left"
-
-    // slideX: 0 = fully in, -panelWidth = fully off to the left
     property real slideX: -Properties.panelWidth
 
-    onVisibleChanged: if (visible) slideX = 0
+    onVisibleChanged: {
+        if (visible) {
+            anim.enabled = false
+            slideX = -Properties.panelWidth
+            anim.enabled = true
+            slideX = 0
+        }
+    }
 
     Behavior on slideX {
-        NumberAnimation { duration: Properties.animDuration; easing.type: Easing.OutCubic }
+        id: anim
+        SpringAnimation {
+            spring:  5
+            damping: 0.8
+            epsilon: 0.5
+        }
+    }
+
+    Connections {
+        target: PaneState
+        function onActivePaneChanged() {
+            if (PaneState.activePane !== "left") {
+                anim.enabled = true
+                slideX = -Properties.panelWidth
+            }
+        }
     }
 
     Rectangle {
-        anchors.fill:        parent
-        anchors.leftMargin:  Properties.panelLeftMargin
-        anchors.topMargin:   Properties.topOffset + Properties.marginCover
+        anchors.fill:         parent
+        anchors.leftMargin:   Properties.panelLeftMargin
+        anchors.topMargin:    Properties.marginCover + Properties.topOffset
         anchors.bottomMargin: Properties.borderThickness
-        color:               Theme.panelBg
-        radius:              Properties.cornerRadius
-        clip:                true
+        color:                Theme.panelBg
+        radius:               Properties.cornerRadius
+        clip:                 true
 
         transform: Translate { x: slideX }
 

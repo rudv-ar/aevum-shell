@@ -44,11 +44,10 @@ ShellRoot {
             ? Properties.borderThickness + Properties.panelHeight + Properties.panelBottomMargin
             : Properties.borderThickness
 
-        Behavior on _rightMargin  { NumberAnimation { duration: Properties.animDuration; easing.type: Easing.OutCubic } }
-        Behavior on _leftMargin   { NumberAnimation { duration: Properties.animDuration; easing.type: Easing.OutCubic } }
-        Behavior on _topMargin    { NumberAnimation { duration: Properties.animDuration; easing.type: Easing.OutCubic } }
-        Behavior on _bottomMargin { NumberAnimation { duration: Properties.animDuration; easing.type: Easing.OutCubic } }
-
+Behavior on _rightMargin  { SpringAnimation { spring: 5; damping: 0.8; epsilon: 0.5 } }
+Behavior on _leftMargin   { SpringAnimation { spring: 5; damping: 0.8; epsilon: 0.5 } }
+Behavior on _topMargin    { SpringAnimation { spring: 5; damping: 0.8; epsilon: 0.5 } }
+Behavior on _bottomMargin { SpringAnimation { spring: 5; damping: 0.8; epsilon: 0.5 } }
         // ── Visible border rectangle ────────────────────────────────
         Rectangle {
             anchors.fill:      parent

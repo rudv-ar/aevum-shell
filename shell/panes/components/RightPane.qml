@@ -11,22 +11,38 @@ PanelWindow {
 
     implicitWidth: Properties.panelWidth
     color:         "transparent"
+    visible:       PaneState.activePane === "right" || slideX < Properties.panelWidth
 
-    // Visible only when this direction is active.
-    // The inner content slides in from the right on show.
-    visible: PaneState.activePane === "right"
-
-    // slideX: 0 = fully in, panelWidth = fully off to the right
     property real slideX: Properties.panelWidth
 
-    // Trigger slide-in as soon as the window becomes visible
-    onVisibleChanged: if (visible) slideX = 0
-
-    Behavior on slideX {
-        NumberAnimation { duration: Properties.animDuration; easing.type: Easing.OutCubic }
+    onVisibleChanged: {
+        if (visible) {
+            anim.enabled = false
+            slideX = Properties.panelWidth
+            anim.enabled = true
+            slideX = 0
+        }
     }
 
-    // ── Content ─────────────────────────────────────────────────────
+    Behavior on slideX {
+        id: anim
+        SpringAnimation {
+            spring:  5
+            damping: 0.8
+            epsilon: 0.5
+        }
+    }
+
+    Connections {
+        target: PaneState
+        function onActivePaneChanged() {
+            if (PaneState.activePane !== "right") {
+                anim.enabled = true
+                slideX = Properties.panelWidth   // slide out, visible stays true until this finishes
+            }
+        }
+    }
+
     Rectangle {
         anchors.fill:         parent
         anchors.rightMargin:  Properties.panelRightMargin
@@ -38,11 +54,10 @@ PanelWindow {
 
         transform: Translate { x: slideX }
 
-        // ── Put your right-pane content here ────────────────────────
         Text {
             anchors.centerIn: parent
             text:             "Right Pane"
-            color:            Theme.panelFg
+            color:            Theme.primary
             font.pixelSize:   16
         }
     }

@@ -2,10 +2,10 @@
 
 qs -p ~/.config/bspwm/shell/topbar/shell.qml > /dev/null 2>&1 &
 topbar_pid=$!
-qs -p ~/.config/bspwm/shell/panes/shell.qml > /dev/null 2>&1 &
-panes_pid=$!
 qs -p ~/.config/bspwm/shell/notifications/shell.qml > /dev/null 2>&1 &
 notifications_pid=$!
+qs -p ~/.config/bspwm/shell/panes/shell.qml > /dev/null 2>&1 &
+panes_pid=$!
 qs -p ~/.config/bspwm/shell/powermenu/shell.qml > /dev/null 2>&1 & 
 powermenu_pid=$!
 
