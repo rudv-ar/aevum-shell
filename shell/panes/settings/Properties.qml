@@ -1,18 +1,23 @@
 pragma Singleton
+pragma ComponentBehavior: Bound
 import QtQuick
+import Quickshell
 
-QtObject {
-    readonly property int  borderThickness: 10
-    readonly property int  topOffset:       4    // offset
-    readonly property real cornerRadius:    18.0
-    readonly property int marginCover: 32 // the thing behind the topbar
-        readonly property int   panelWidth:        380
-        readonly property int   panelRadius:       20
-        readonly property int   panelTopMargin:    10
-        readonly property int   panelBottomMargin: 10
-        readonly property int   panelRightMargin:  10
-        readonly property int   animDuration:      340
-        property bool isOpen: false
-    
+Singleton {
+    // ── Border frame ────────────────────────────────────────────────
+    readonly property real borderThickness:   10
+    readonly property real cornerRadius:      18
+    readonly property real marginCover:       32   // px from top where frame begins (bar height)
+    readonly property real topOffset:         4   // top of the hole (bar + small gap)
+    readonly property int  animDuration:      300
+
+    // ── Pane dimensions ─────────────────────────────────────────────
+    readonly property real panelWidth:        320  // left / right panes
+    readonly property real panelHeight:       280  // top  / bottom panes
+
+    // Gap between pane content and the screen edge, inside the border
+    readonly property real panelRightMargin:  10
+    readonly property real panelLeftMargin:   10
+    readonly property real panelTopMargin:    10
+    readonly property real panelBottomMargin: 10
 }
-

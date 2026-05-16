@@ -3,28 +3,53 @@ import QtQuick
 import QtQuick.Effects
 import Quickshell
 import qs.settings
+import qs.services
+import qs.components
 
 ShellRoot {
 
+    // ── Pane windows (one per direction) ───────────────────────────
+    RightPane  {}
+    LeftPane   {}
+    TopPane    {}
+    BottomPane {}
+
+    // ── Border / frame window ───────────────────────────────────────
     PanelWindow {
         id: win
 
         implicitWidth:  Screen.width
         implicitHeight: Screen.height
         color:          "transparent"
-        mask:           Region {}
+        mask:           Region {}       // entire window is click-through
 
-        property bool open: Properties.isOpen
+        // ── Animated hole margins ───────────────────────────────────
+        //    Each direction independently drives its own margin.
+        //    Only one can be non-base at a time because PaneState.activePane
+        //    is a single string.
 
-        // grows rightMargin to shrink hole from the right
-        property real _rightMargin: open
+        property real _rightMargin: PaneState.activePane === "right"
             ? Properties.borderThickness + Properties.panelWidth + Properties.panelRightMargin
             : Properties.borderThickness
 
-        Behavior on _rightMargin {
-            NumberAnimation { duration: Properties.animDuration; easing.type: Easing.OutCubic }
-        }
+        property real _leftMargin: PaneState.activePane === "left"
+            ? Properties.borderThickness + Properties.panelWidth + Properties.panelLeftMargin
+            : Properties.borderThickness
 
+        property real _topMargin: PaneState.activePane === "top"
+            ? Properties.topOffset + Properties.panelHeight + Properties.panelTopMargin
+            : Properties.topOffset
+
+        property real _bottomMargin: PaneState.activePane === "bottom"
+            ? Properties.borderThickness + Properties.panelHeight + Properties.panelBottomMargin
+            : Properties.borderThickness
+
+        Behavior on _rightMargin  { NumberAnimation { duration: Properties.animDuration; easing.type: Easing.OutCubic } }
+        Behavior on _leftMargin   { NumberAnimation { duration: Properties.animDuration; easing.type: Easing.OutCubic } }
+        Behavior on _topMargin    { NumberAnimation { duration: Properties.animDuration; easing.type: Easing.OutCubic } }
+        Behavior on _bottomMargin { NumberAnimation { duration: Properties.animDuration; easing.type: Easing.OutCubic } }
+
+        // ── Visible border rectangle ────────────────────────────────
         Rectangle {
             anchors.fill:      parent
             anchors.topMargin: Properties.marginCover
@@ -40,6 +65,7 @@ ShellRoot {
             }
         }
 
+        // ── Mask: punches the hole ──────────────────────────────────
         Item {
             id: innerMask
             anchors.fill: parent
@@ -48,10 +74,10 @@ ShellRoot {
 
             Rectangle {
                 anchors.fill:         parent
-                anchors.topMargin:    Properties.topOffset
-                anchors.leftMargin:   Properties.borderThickness
-                anchors.rightMargin:  win._rightMargin   // ← only this changes
-                anchors.bottomMargin: Properties.borderThickness
+                anchors.topMargin:    win._topMargin
+                anchors.leftMargin:   win._leftMargin
+                anchors.rightMargin:  win._rightMargin
+                anchors.bottomMargin: win._bottomMargin
                 radius:               Properties.cornerRadius
             }
         }

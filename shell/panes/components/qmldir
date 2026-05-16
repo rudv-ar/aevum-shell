@@ -1,0 +1,5 @@
+module qs.components
+RightPane 1.0 RightPane.qml 
+LeftPane 1.0 LeftPane.qml 
+TopPane 1.0 TopPane.qml 
+BottomPane 1.0 BottomPane.qml

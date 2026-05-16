@@ -352,5 +352,9 @@ Singleton {
         readonly property real  scrimOpacity:      0.52
         readonly property color textColor:         "#cdd6f4"
         readonly property color subtextColor:      "#a6adc8"
-    
+
+    // Pane background — used by all four pane components
+    readonly property color panelBg:      background
+    readonly property color panelAccent:  primary
+    readonly property color panelFg:      secondaryP30
 }
