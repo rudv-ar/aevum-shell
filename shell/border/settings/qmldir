@@ -1,4 +1,0 @@
-module qs.settings
-singleton Theme      1.0 Theme.qml
-singleton Properties 1.0 Properties.qml
-
