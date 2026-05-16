@@ -21,7 +21,7 @@ ShellRoot {
         implicitWidth:  Screen.width
         implicitHeight: Screen.height
         color:          "transparent"
-        mask:           Region {}       // entire window is click-through
+        mask:           Region { item:contentRect}       // entire window is click-through
 
         // ── Animated hole margins ───────────────────────────────────
         //    Each direction independently drives its own margin.

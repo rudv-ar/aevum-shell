@@ -57,7 +57,7 @@ PanelWindow {
         Text {
             anchors.centerIn: parent
             text:             "Left Pane"
-            color:            Theme.panelFg
+            color:            Theme.primary
             font.pixelSize:   16
         }
     }
