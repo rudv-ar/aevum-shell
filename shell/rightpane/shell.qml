@@ -13,19 +13,22 @@ ShellRoot {
         implicitWidth:  Screen.width
         implicitHeight: Screen.height
         color:          "transparent"
-        mask:           Region{}
+        mask:           Region{
+            x:      Screen.width - win.animatedRight - 20
+            y:      Properties.marginCover
+            width:  win.animatedRight + 20
+            height: Screen.height - Properties.marginCover          
+        }
 
         property bool paneOpen: false
 
         property real animatedRight: paneOpen ? Properties.paneWidth : Properties.borderThickness
 
         Behavior on animatedRight {
-            SpringAnimation {
-                spring:  7
-                damping: 0.6
-                mass:    1
-                epsilon: 0.5
-            }
+          NumberAnimation {
+            duration: 30
+            easing.type: Easing.OutQuart
+          }
         }
 
         IpcHandler {
