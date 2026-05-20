@@ -10,6 +10,6 @@ is_widget=true
 # what widget bar is the system using?
 widget_bar='quickshell'
 
-is_plank=true
+is_plank=false
 
 # [ tip : the other bars include : polybar, eww, quickshell, lemonbar, etc]
