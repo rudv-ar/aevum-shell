@@ -3,6 +3,9 @@ import Quickshell
 import QtQuick
 import QtQuick.Effects
 import qs.settings
+import qs.components 
+import qs.modules.quicktiles
+
 
 Rectangle {
     anchors.top:          parent.top
@@ -60,4 +63,5 @@ Rectangle {
             }
         }
     }
+    QuickTileRow {}
 }

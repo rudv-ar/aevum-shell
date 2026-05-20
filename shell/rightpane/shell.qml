@@ -4,7 +4,7 @@ import QtQuick.Effects
 import Quickshell
 import Quickshell.Io
 import qs.settings
-import qs.modules
+import qs.modules.container
 
 ShellRoot {
 
