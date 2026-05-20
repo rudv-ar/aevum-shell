@@ -6,6 +6,6 @@ QtObject {
     readonly property int  topOffset:       4    // offset
     readonly property real cornerRadius:    18.0
     readonly property int marginCover: 32 // the thing behind the topbar
-    readonly property int paneWidth: 300
+    readonly property int paneWidth: 350
 }
 
