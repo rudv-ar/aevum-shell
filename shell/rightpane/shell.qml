@@ -13,7 +13,6 @@ ShellRoot {
         implicitWidth:  Screen.width
         implicitHeight: Screen.height
         color:          "transparent"
-        mask:           Region{}
 
         property bool paneOpen: false
 
@@ -23,9 +22,22 @@ ShellRoot {
             SpringAnimation {
                 spring:  10
                 damping: 0.5
-                mass:    0.5
+                mass:    1
                 epsilon: 0.5
             }
+        }
+
+        // ── Input mask ────────────────────────────────────────
+        // Clickable only where pane is visible:
+        //   - skips topOffset + marginCover at top
+        //   - skips borderThickness at bottom
+        //   - skips borderThickness at right
+        //   - skips 20px from hole's right edge (matches opacity ramp)
+        mask: Region {
+            x:      Screen.width - Math.max(0, win.animatedRight + 20)
+            y:      Properties.marginCover + Properties.topOffset
+            width:  Math.max(0, win.animatedRight - Properties.borderThickness + 20)
+            height: Screen.height - Properties.marginCover - Properties.topOffset - Properties.borderThickness
         }
 
         IpcHandler {
@@ -79,8 +91,8 @@ ShellRoot {
             anchors.rightMargin:  Properties.borderThickness
 
             width:   win.animatedRight - Properties.borderThickness - 10
-            color:   Theme.surfaceColor
-            radius: Properties.cornerRadius
+            color:   "transparent"
+            radius:  Properties.cornerRadius
             clip:    true
             enabled: win.paneOpen
             opacity: Math.max(0, (win.animatedRight - Properties.borderThickness - 20) / (Properties.paneWidth - Properties.borderThickness - 20))
