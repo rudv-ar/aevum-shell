@@ -1,4 +1,3 @@
 module qs.modules.audio
 AudioPill        1.0 AudioPill.qml
-NotificationPill 1.0 NotificationPill.qml
 

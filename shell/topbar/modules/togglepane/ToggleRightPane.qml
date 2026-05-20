@@ -13,7 +13,7 @@ Item {
 
         glyph:      Properties.rightbarNotificationGlyph
         fontFamily: Properties.nerdFontFamily
-        label:      "notify-center"
+        label:      "actions"
 
         onClicked:  function(mouse) {}
         onScrolled: function(delta) {}

@@ -7,6 +7,7 @@ import qs.modules.workspace
 import qs.modules.audio
 import qs.modules.network
 import qs.modules.powermenu
+import qs.modules.togglepane
 
 ShellRoot {
     Variants {
@@ -75,7 +76,7 @@ ShellRoot {
                                 spacing: Properties.rightbarChipSpacing
 
                                 NetworkPill      {}
-                                NotificationPill {}
+                                ToggleRightPane {}
                                 AudioPill        {}
                                 PowerPill        {}
                             }
