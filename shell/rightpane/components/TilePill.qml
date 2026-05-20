@@ -32,7 +32,7 @@ Rectangle {
     color: pill.isDisabled ? Theme.neutralP80
          : pill.pressed    ? Theme.secondaryP50
          : pill.hovered    ? Theme.secondaryP60
-         : pill.isOn       ? Theme.primaryP100
+         : pill.isOn       ? Theme.primaryP40
          :                   Theme.neutralP20
 
     Behavior on color { ColorAnimation { duration: 130 } }

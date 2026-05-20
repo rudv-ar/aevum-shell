@@ -35,8 +35,8 @@ Rectangle {
         height:              220
         radius:              15
 
-        color:        Theme.neutralP5
-        border.color: Qt.lighter(card.color, 1.45)
+        color:        Qt.lighter(Theme.neutralP5, 1.20)
+        border.color: Qt.lighter(Theme.neutralP5, 1.50)
         border.width: 1
 
         Column {
