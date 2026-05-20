@@ -5,7 +5,7 @@ Item {
     id: root
 
     property string glyph:        "\uf128"
-    property string fontFamily:   Properties.nerdFontFamily
+    property string fontFamily:   Properties.fontAwesome6
     property string label:        ""
     property bool   popoutOpen:   false
     property bool   muted:        false

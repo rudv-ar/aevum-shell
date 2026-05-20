@@ -42,6 +42,10 @@ QtObject {
   function powerMenu() {
       return ["qs", "-p", Quickshell.env("HOME") + "/.config/bspwm/shell/powermenu/shell.qml", "ipc", "call", "powermenu", "toggle"]
   }      
+  function openActions() {
+      return ["bash", Quickshell.env("HOME") + "/.config/bspwm/shell/scripts/toggleRightPane.sh"]
+  }      
+
 }
 
 

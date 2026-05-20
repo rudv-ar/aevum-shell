@@ -92,6 +92,7 @@ QtObject {
     readonly property real   rightbarChipSpacing:        6
     readonly property string rightbarNetworkGlyph:       "\uf1eb"
     readonly property string rightbarNotificationGlyph:  "\uf0f3"
+    readonly property string rightbarPaneGlyph: "\uf03b"
     readonly property string rightbarPowerGlyph:         "\uf011"
     readonly property string rightbarSettingsGlyph:      "\uf013"
 
