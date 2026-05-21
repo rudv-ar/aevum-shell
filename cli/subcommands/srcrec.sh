@@ -234,6 +234,10 @@ echo ""
 # ── Record ───────────────────────────────────────────────────────
 # Use a FIFO so ffmpeg runs as a direct child (gives us its real PID),
 # and we can still read its -progress output from the other end.
+
+# close any actions pane before recording beings in case it is called from the pane 
+
+qs -p ~/.config/bspwm/shell/rightpane/shell.qml ipc call rightpane close
 progress_fifo=$(mktemp -u /tmp/srcrec_progress.XXXXXX)
 mkfifo "$progress_fifo"
 trap 'rm -f "$progress_fifo"; rm -f "$state_file"' EXIT
