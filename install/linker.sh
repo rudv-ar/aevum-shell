@@ -4,8 +4,7 @@
 AEVUM="$HOME/.config/aevum/config"
 CONFIG="$HOME/.config"
 
-DIRS=(bspwm btop dunst fish geany mpv neofetch nvim plank ranger rofi vicinae)
-
+mapfile -t DIRS < <(find "$AEVUM" -mindepth 1 -maxdepth 1 -type d -printf '%f\n')
 # ── Helpers ───────────────────────────────────────────────────────────────────
 info()    { echo -e "  \033[0;34m::\033[0m $1"; }
 success() { echo -e "  \033[0;32m✓\033[0m  $1"; }
