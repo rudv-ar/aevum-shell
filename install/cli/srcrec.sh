@@ -16,6 +16,42 @@ dry_run=0
 display=":0.0"
 region=0        # 0 = fullscreen, 1 = mouse-select region via slop
 
+# ── State file ───────────────────────────────────────────────────
+state_file="${HOME}/.cache/srcrec.state"
+
+kill_previous() {
+    if [[ -f "$state_file" ]]; then
+        old_pid=$(grep '^pid=' "$state_file" | cut -d= -f2)
+        if [[ -n "$old_pid" ]] && kill -0 "$old_pid" 2>/dev/null; then
+            echo "[srcrec] killing previous recording (pid $old_pid)"
+            kill -INT "$old_pid"
+            # wait up to 2s for clean exit
+            for i in {1..4}; do
+                sleep 0.5
+                kill -0 "$old_pid" 2>/dev/null || break
+            done
+            # force kill if still alive
+            kill -0 "$old_pid" 2>/dev/null && kill -KILL "$old_pid"
+        fi
+        rm -f "$state_file"
+    fi
+}
+
+write_state() {
+    local ffmpeg_pid="$1"
+    mkdir -p "$(dirname "$state_file")"
+    cat > "$state_file" <<EOF
+pid=$ffmpeg_pid
+file=$output
+started=$(date +%s)
+EOF
+}
+
+cleanup() {
+    rm -f "$state_file"
+}
+trap cleanup EXIT
+
 # ── Usage ────────────────────────────────────────────────────────
 usage() {
     cat <<HELP
@@ -106,7 +142,7 @@ if [[ "$region" -eq 1 ]]; then
 
     read -r rx ry rw rh <<< "$slop_out"
 
-    # important fix here : dimensions cannot be odd, so fix them if odd by incrementing one pixel for that specific dimension.  
+    # dimensions cannot be odd — increment by one pixel if needed
     (( rw % 2 != 0 )) && (( rw++ ))
     (( rh % 2 != 0 )) && (( rh++ ))
 
@@ -179,6 +215,9 @@ if [[ "$dry_run" -eq 1 ]]; then
     exit 0
 fi
 
+# ── Kill any previous recording ──────────────────────────────────
+kill_previous
+
 # ── Info banner ──────────────────────────────────────────────────
 echo "[srcrec] starting recording"
 echo "  mode      : $([ "$region" -eq 1 ] && echo region || echo fullscreen)"
@@ -192,18 +231,33 @@ echo "  duration  : $([ "$duration" -gt 0 ] && echo "${duration}s" || echo unlim
 echo "  press Ctrl+C to stop"
 echo ""
 
-# ── Record + live counter ─────────────────────────────────────────
+# ── Record ───────────────────────────────────────────────────────
+# Use a FIFO so ffmpeg runs as a direct child (gives us its real PID),
+# and we can still read its -progress output from the other end.
+progress_fifo=$(mktemp -u /tmp/srcrec_progress.XXXXXX)
+mkfifo "$progress_fifo"
+trap 'rm -f "$progress_fifo"; rm -f "$state_file"' EXIT
+
 start_time=$(date +%s)
 
-"${cmd[@]}" 2>/dev/null | while IFS= read -r line; do
+# Launch ffmpeg with stdout → FIFO, capture PID immediately
+"${cmd[@]}" > "$progress_fifo" 2>/dev/null &
+ffmpeg_pid=$!
+write_state "$ffmpeg_pid"
+
+# Read progress from the FIFO in the foreground
+while IFS= read -r line; do
     if [[ "$line" == out_time=* ]]; then
         t="${line#out_time=}"
         t="${t%.*}"
         printf "\r[srcrec] REC %s" "$t"
     fi
-done
+done < "$progress_fifo"
 
-ffmpeg_exit="${PIPESTATUS[0]}"
+wait "$ffmpeg_pid"
+ffmpeg_exit=$?
+
+rm -f "$progress_fifo"
 end_time=$(date +%s)
 elapsed=$(( end_time - start_time ))
 echo ""
@@ -222,3 +276,4 @@ else
 fi
 
 exit "$ffmpeg_exit"
+

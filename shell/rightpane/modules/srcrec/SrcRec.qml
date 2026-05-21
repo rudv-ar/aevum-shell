@@ -8,7 +8,7 @@ Rectangle {
     id: srcrecCard
     anchors.left:        parent.left
     anchors.right:       parent.right
-    anchors.bottom:      parent.bottom 
+    anchors.bottom:      parent.bottom
     anchors.bottomMargin: Properties.pillHeight + 70
     anchors.leftMargin:  10
     anchors.rightMargin: 10
@@ -17,71 +17,100 @@ Rectangle {
     color:               Qt.lighter(Theme.neutralP5, 1.50)
     clip:                true
 
-    property string recState:    "idle"
-    property string currentFile: ""
-    property string elapsedTime: "00:00:00"
-    property string recMode:     "fullscreen"
-    property int    elapsedSecs: 0
-    // FIX: track which file mpv is playing so we can remove it on exit
-    property string playingFile: ""
+    // ── Properties ───────────────────────────────────────────
+    property string recState:      "idle"
+    property string recMode:       "fullscreen"
+    property string elapsedTime:   "00:00:00"
+    property string currentFile:   ""
+    property string activePid:     ""
+    property int    activeStarted: 0
+    property string playingFile:   ""
+    property var    recordings:    []
 
-    property var recordings: []
-
-    // ── Elapsed timer ────────────────────────────────────────
+    // ── State file poller (1 Hz) ─────────────────────────────
     Timer {
-        id: elapsedTimer
+        id: statePollTimer
         interval: 1000
         repeat:   true
-        running:  srcrecCard.recState === "recording"
+        running:  true
         onTriggered: {
-            srcrecCard.elapsedSecs++
-            let s   = srcrecCard.elapsedSecs
-            let h   = Math.floor(s / 3600)
-            let m   = Math.floor((s % 3600) / 60)
-            let sec = s % 60
-            srcrecCard.elapsedTime = String(h).padStart(2,"0") + ":"
-                                   + String(m).padStart(2,"0") + ":"
-                                   + String(sec).padStart(2,"0")
+            stateReader._pid     = ""
+            stateReader._file    = ""
+            stateReader._started = ""
+            stateReader.running  = true
+        }
+    }
+
+    Process {
+        id: stateReader
+        property string _pid:     ""
+        property string _file:    ""
+        property string _started: ""
+
+        command: ["cat", Quickshell.env("HOME") + "/.cache/srcrec.state"]
+
+        stdout: SplitParser {
+            onRead: function(line) {
+                if (line.startsWith("pid="))     stateReader._pid     = line.slice(4).trim()
+                if (line.startsWith("file="))    stateReader._file    = line.slice(5).trim()
+                if (line.startsWith("started=")) stateReader._started = line.slice(8).trim()
+            }
+        }
+
+        onExited: function(code, status) {
+            if (code === 0 && stateReader._pid !== "") {
+                let file    = Quickshell.env("HOME") + "/Videos/" + stateReader._file
+                let started = parseInt(stateReader._started)
+                let s       = Math.max(0, Math.floor(Date.now() / 1000) - started)
+                let h       = Math.floor(s / 3600)
+                let m       = Math.floor((s % 3600) / 60)
+                let sec     = s % 60
+
+                srcrecCard.activePid     = stateReader._pid
+                srcrecCard.activeStarted = started
+                srcrecCard.currentFile   = file
+                srcrecCard.elapsedTime   = String(h).padStart(2, "0") + ":"
+                                         + String(m).padStart(2, "0") + ":"
+                                         + String(sec).padStart(2, "0")
+
+                if (srcrecCard.recState === "idle" || srcrecCard.recState === "selecting") {
+                    srcrecCard.recState = "recording"
+                    let recs = srcrecCard.recordings.slice()
+                    if (!recs.some(r => r.file === file))
+                        recs.unshift({ file: file, duration: "00:00:00", active: true })
+                    srcrecCard.recordings = recs
+                }
+            } else {
+                if (srcrecCard.recState !== "idle") {
+                    let recs = srcrecCard.recordings.slice()
+                    for (let i = 0; i < recs.length; i++) {
+                        if (recs[i].active) {
+                            recs[i].active   = false
+                            recs[i].duration = srcrecCard.elapsedTime
+                            break
+                        }
+                    }
+                    srcrecCard.recordings    = recs
+                    srcrecCard.recState      = "idle"
+                    srcrecCard.activePid     = ""
+                    srcrecCard.activeStarted = 0
+                    srcrecCard.elapsedTime   = "00:00:00"
+                    srcrecCard.currentFile   = ""
+                }
+            }
         }
     }
 
     // ── Recorder process ─────────────────────────────────────
     Process {
         id: recProcess
-        command: ["srcrec"]
-
-        stdout: SplitParser {
-            onRead: function(line) {
-                if (line.indexOf("starting recording") !== -1
-                    && srcrecCard.recState === "selecting") {
-                    srcrecCard.recState    = "recording"
-                    srcrecCard.elapsedSecs = 0
-                    srcrecCard.elapsedTime = "00:00:00"
-                }
-            }
-        }
-
-        onExited: function(code, status) {
-            let recs = srcrecCard.recordings.slice()
-            for (let i = 0; i < recs.length; i++) {
-                if (recs[i].active) {
-                    recs[i].active   = false
-                    recs[i].duration = srcrecCard.elapsedTime
-                    break
-                }
-            }
-            srcrecCard.recordings  = recs
-            srcrecCard.recState    = "idle"
-            srcrecCard.elapsedSecs = 0
-            srcrecCard.elapsedTime = "00:00:00"
-        }
     }
 
+    // ── MPV process ───────────────────────────────────────────
     Process {
         id: mpvProcess
         command: ["mpv", "--really-quiet", ""]
 
-        // FIX: when mpv exits, remove the played entry from the list
         onExited: function(code, status) {
             if (srcrecCard.playingFile !== "") {
                 let recs = srcrecCard.recordings.slice()
@@ -102,7 +131,6 @@ Rectangle {
         let ts    = Qt.formatDateTime(new Date(), "yyyyMMdd_hhmmss")
         let home  = Quickshell.env("HOME")
         let fname = home + "/Videos/output_" + ts + ".mp4"
-        srcrecCard.currentFile = fname
 
         let cmd = ["srcrec", "-o", fname]
         if (srcrecCard.recMode === "region") cmd.push("-R")
@@ -110,22 +138,24 @@ Rectangle {
         recProcess.command = cmd
         recProcess.running = true
 
-        let recs = srcrecCard.recordings.slice()
-        recs.unshift({ file: fname, duration: "00:00:00", active: true })
-        srcrecCard.recordings = recs
+        srcrecCard.recState = srcrecCard.recMode === "region" ? "selecting" : "recording"
 
         if (srcrecCard.recMode === "fullscreen") {
-            srcrecCard.elapsedSecs = 0
-            srcrecCard.elapsedTime = "00:00:00"
-            srcrecCard.recState    = "recording"
-        } else {
-            srcrecCard.recState = "selecting"
+            let recs = srcrecCard.recordings.slice()
+            recs.unshift({ file: fname, duration: "00:00:00", active: true })
+            srcrecCard.recordings  = recs
+            srcrecCard.currentFile = fname
         }
+        // region: poller injects the entry once state file appears
     }
 
     function stopRecording() {
-        Quickshell.execDetached(["pkill", "-INT", "ffmpeg"])
+        if (srcrecCard.activePid !== "")
+            Quickshell.execDetached(["kill", "-INT", srcrecCard.activePid])
+        else
+            Quickshell.execDetached(["pkill", "-INT", "ffmpeg"])
     }
+
     function playFile(path) {
         mpvProcess.running     = false
         srcrecCard.playingFile = path
@@ -193,7 +223,7 @@ Rectangle {
                 text:           "Screen Recorder"
                 color:          Theme.primaryP90
                 font.pixelSize: 12
-                font.family: Theme.fontPoppins
+                font.family:    Theme.fontPoppins
             }
 
             Row {
@@ -241,78 +271,79 @@ Rectangle {
         }
 
         Row {
-          spacing: 2
-          // Mode display pill
-          Rectangle {
-              id: modeDisplay
-              anchors.verticalCenter: parent.verticalCenter
-              width:  94
-              height: 26
-              topLeftRadius: 15 
-              bottomLeftRadius: 15
-              topRightRadius: 5
-              bottomRightRadius: 5
-              color:  Theme.primaryP40
+            spacing: 2
 
-              Row {
-                  anchors.centerIn: parent
-                  spacing: 6
+            // Mode display pill
+            Rectangle {
+                id: modeDisplay
+                anchors.verticalCenter: parent.verticalCenter
+                width:             94
+                height:            26
+                topLeftRadius:     15
+                bottomLeftRadius:  15
+                topRightRadius:    5
+                bottomRightRadius: 5
+                color:             Theme.primaryP40
 
-                  Text {
-                      text:           srcrecCard.recMode === "fullscreen" ? "\uf065" : "\uf248"
-                      font.family:    Theme.fontAwesome6
-                      font.pointSize: 8
-                      color:          Theme.neutralP5
-                      anchors.verticalCenter: parent.verticalCenter
-                  }
-                  Text {
-                      text:           srcrecCard.recMode === "fullscreen" ? "Fullscreen" : "Region"
-                      font.pointSize: 8
-                      color:          Theme.neutralP5
-                      anchors.verticalCenter: parent.verticalCenter
-                  }
-              }
-          }
+                Row {
+                    anchors.centerIn: parent
+                    spacing: 6
 
-          // Dropdown trigger
-          Rectangle {
-              id: dropTrigger
-              anchors.verticalCenter: parent.verticalCenter
-              width:   26
-              height:  26
-              topLeftRadius: 5 
-              bottomLeftRadius: 5
-              topRightRadius: 15 
-              bottomRightRadius: 15 
-              color:   dropMenu.visible
-                       ? Qt.lighter(Theme.neutralP5, 2.50)
-                       : Theme.primaryP40
-              enabled: srcrecCard.recState === "idle"
-              opacity: enabled ? 1.0 : 0.4
-              Behavior on color { ColorAnimation { duration: 150 } }
+                    Text {
+                        text:           srcrecCard.recMode === "fullscreen" ? "\uf065" : "\uf248"
+                        font.family:    Theme.fontAwesome6
+                        font.pointSize: 8
+                        color:          Theme.neutralP5
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
+                    Text {
+                        text:           srcrecCard.recMode === "fullscreen" ? "Fullscreen" : "Region"
+                        font.pointSize: 8
+                        color:          Theme.neutralP5
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
+                }
+            }
 
-              Text {
-                  anchors.centerIn: parent
-                  text:           "\uf078"
-                  font.family:    Theme.fontAwesome6
-                  font.pointSize: 7
-                  color:          Theme.neutralP5
-                  rotation:       dropMenu.visible ? 180 : 0
-                  Behavior on rotation {
-                      NumberAnimation { duration: 180; easing.type: Easing.InOutQuad }
-                  }
-              }
+            // Dropdown trigger
+            Rectangle {
+                id: dropTrigger
+                anchors.verticalCenter: parent.verticalCenter
+                width:             26
+                height:            26
+                topLeftRadius:     5
+                bottomLeftRadius:  5
+                topRightRadius:    15
+                bottomRightRadius: 15
+                color:   dropMenu.visible
+                         ? Qt.lighter(Theme.neutralP5, 2.50)
+                         : Theme.primaryP40
+                enabled: srcrecCard.recState === "idle"
+                opacity: enabled ? 1.0 : 0.4
+                Behavior on color { ColorAnimation { duration: 150 } }
 
-              MouseArea {
-                  anchors.fill: parent
-                  cursorShape:  Qt.PointingHandCursor
-                  onClicked:    dropMenu.visible = !dropMenu.visible
-              }
-          }
+                Text {
+                    anchors.centerIn: parent
+                    text:           "\uf078"
+                    font.family:    Theme.fontAwesome6
+                    font.pointSize: 7
+                    color:          Theme.neutralP5
+                    rotation:       dropMenu.visible ? 180 : 0
+                    Behavior on rotation {
+                        NumberAnimation { duration: 180; easing.type: Easing.InOutQuad }
+                    }
+                }
+
+                MouseArea {
+                    anchors.fill: parent
+                    cursorShape:  Qt.PointingHandCursor
+                    onClicked:    dropMenu.visible = !dropMenu.visible
+                }
+            }
         }
     }
 
-    // ── Dropdown (child of card to avoid clip) ───────────────
+    // ── Dropdown ─────────────────────────────────────────────
     Rectangle {
         id: dropMenu
         visible:      false
@@ -421,17 +452,16 @@ Rectangle {
             text:           "\uf03a   Recordings"
             font.family:    Theme.fontPoppins
             font.pixelSize: 12
-            font.bold: false
+            font.bold:      false
             color:          Theme.secondaryP80
             anchors.verticalCenter: parent.verticalCenter
-        } 
-
-        Item {
-          width: 170
-          height: 1
         }
 
-        // FIX: added font.family so glyphs render correctly
+        Item {
+            width:  170
+            height: 1
+        }
+
         Column {
             id: scrollCol
             anchors.verticalCenter: parent.verticalCenter
@@ -471,7 +501,6 @@ Rectangle {
         anchors.topMargin:   6
         anchors.leftMargin:  16
         anchors.rightMargin: 16
-        // FIX: always show exactly one row (44px); 30px slot for empty state
         height: recListView.count === 0 ? 30 : 44
 
         ListView {
@@ -480,7 +509,6 @@ Rectangle {
             clip:                    true
             spacing:                 0
             model:                   srcrecCard.recordings
-            // FIX: disable touch/wheel scrolling — chevrons are the only nav
             interactive:             false
             snapMode:                ListView.SnapToItem
             highlightRangeMode:      ListView.StrictlyEnforceRange
@@ -515,7 +543,7 @@ Rectangle {
                     spacing:                2
 
                     Text {
-                        width:          parent.width
+                        width: parent.width
                         text: {
                             let parts = recEntry.entry.file.split("/")
                             return parts[parts.length - 1]
@@ -547,7 +575,7 @@ Rectangle {
                         text:           "\uf28d"
                         font.family:    Theme.fontAwesome6
                         font.pixelSize: 15
-                        color:         Theme.error
+                        color:          Theme.error
                         anchors.verticalCenter: parent.verticalCenter
                         MouseArea {
                             anchors.fill: parent
@@ -556,8 +584,7 @@ Rectangle {
                         }
                     }
 
-                    // FIX: dedicated play button — completed recordings only
-                    // plays in mpv; entry auto-removes when mpv exits
+                    // Play button — completed recordings only
                     Text {
                         visible:        !recEntry.entry.active
                         text:           "\uf144"
@@ -590,7 +617,6 @@ Rectangle {
             }
         }
 
-        // FIX: emptyText fills listSection; Row is centered inside it
         Item {
             id: emptyText
             anchors.fill: parent
@@ -618,4 +644,3 @@ Rectangle {
         }
     }
 }
-
