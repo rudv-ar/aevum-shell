@@ -22,6 +22,8 @@ Rectangle {
     property string elapsedTime: "00:00:00"
     property string recMode:     "fullscreen"
     property int    elapsedSecs: 0
+    // FIX: track which file mpv is playing so we can remove it on exit
+    property string playingFile: ""
 
     property var recordings: []
 
@@ -78,6 +80,21 @@ Rectangle {
     Process {
         id: mpvProcess
         command: ["mpv", "--really-quiet", ""]
+
+        // FIX: when mpv exits, remove the played entry from the list
+        onExited: function(code, status) {
+            if (srcrecCard.playingFile !== "") {
+                let recs = srcrecCard.recordings.slice()
+                for (let i = 0; i < recs.length; i++) {
+                    if (recs[i].file === srcrecCard.playingFile) {
+                        recs.splice(i, 1)
+                        break
+                    }
+                }
+                srcrecCard.recordings  = recs
+                srcrecCard.playingFile = ""
+            }
+        }
     }
 
     // ── Helpers ──────────────────────────────────────────────
@@ -109,26 +126,18 @@ Rectangle {
     function stopRecording() {
         let pid = recProcess.pid
         if (pid != null) {
-            // FIX #1: removed the leading "-" — negating the PID sends
-            // SIGINT to the process GROUP whose PGID == pid, which is
-            // Quickshell's own group (bash inherits it). That either
-            // does nothing (ESRCH) or kills Quickshell itself.
-            // Signal bash directly; pkill -P catches the ffmpeg child too.
+            // FIX: send SIGINT only to children of srcrec (catches ffmpeg/region
+            // selector without touching the rest of the system or Quickshell's pgroup).
+            // SIGINT lets ffmpeg flush and write the moov atom cleanly.
             Quickshell.execDetached(["pkill", "ffmpeg"])
         }
-        // FIX #2: removed recProcess.running = false here.
-        // QProcess::kill() fires before ffmpeg can flush and write the
-        // moov atom, producing a corrupted, unplayable MP4.
-        // onExited handles all state cleanup when the process exits cleanly.
     }
 
     function playFile(path) {
-        // FIX #3: stop any currently running mpv before starting a new one.
-        // Setting running = true on an already-running Process is undefined
-        // behaviour (no-op or restart depending on Quickshell version).
-        mpvProcess.running = false
-        mpvProcess.command = ["mpv", "--really-quiet", path]
-        mpvProcess.running = true
+        mpvProcess.running     = false
+        srcrecCard.playingFile = path
+        mpvProcess.command     = ["mpv", "--really-quiet", path]
+        mpvProcess.running     = true
     }
 
     function removeEntry(idx) {
@@ -240,73 +249,73 @@ Rectangle {
 
         Row {
           spacing: 2
-        // Mode display pill
-        Rectangle {
-            id: modeDisplay
-            anchors.verticalCenter: parent.verticalCenter
-            width:  94
-            height: 26
-            topLeftRadius: 15 
-            bottomLeftRadius: 15
-            topRightRadius: 5
-            bottomRightRadius: 5
-            color:  Theme.primaryP40
+          // Mode display pill
+          Rectangle {
+              id: modeDisplay
+              anchors.verticalCenter: parent.verticalCenter
+              width:  94
+              height: 26
+              topLeftRadius: 15 
+              bottomLeftRadius: 15
+              topRightRadius: 5
+              bottomRightRadius: 5
+              color:  Theme.primaryP40
 
-            Row {
-                anchors.centerIn: parent
-                spacing: 6
+              Row {
+                  anchors.centerIn: parent
+                  spacing: 6
 
-                Text {
-                    text:           srcrecCard.recMode === "fullscreen" ? "\uf065" : "\uf248"
-                    font.family:    Theme.fontAwesome6
-                    font.pointSize: 8
-                    color:          Theme.neutralP5
-                    anchors.verticalCenter: parent.verticalCenter
-                }
-                Text {
-                    text:           srcrecCard.recMode === "fullscreen" ? "Fullscreen" : "Region"
-                    font.pointSize: 8
-                    color:          Theme.neutralP5
-                    anchors.verticalCenter: parent.verticalCenter
-                }
-            }
-        }
+                  Text {
+                      text:           srcrecCard.recMode === "fullscreen" ? "\uf065" : "\uf248"
+                      font.family:    Theme.fontAwesome6
+                      font.pointSize: 8
+                      color:          Theme.neutralP5
+                      anchors.verticalCenter: parent.verticalCenter
+                  }
+                  Text {
+                      text:           srcrecCard.recMode === "fullscreen" ? "Fullscreen" : "Region"
+                      font.pointSize: 8
+                      color:          Theme.neutralP5
+                      anchors.verticalCenter: parent.verticalCenter
+                  }
+              }
+          }
 
-        // Dropdown trigger
-        Rectangle {
-            id: dropTrigger
-            anchors.verticalCenter: parent.verticalCenter
-            width:   26
-            height:  26
-            topLeftRadius: 5 
-            bottomLeftRadius: 5
-            topRightRadius: 15 
-            bottomRightRadius: 15 
-            color:   dropMenu.visible
-                     ? Qt.lighter(Theme.neutralP5, 2.50)
-                     : Theme.primaryP40
-            enabled: srcrecCard.recState === "idle"
-            opacity: enabled ? 1.0 : 0.4
-            Behavior on color { ColorAnimation { duration: 150 } }
+          // Dropdown trigger
+          Rectangle {
+              id: dropTrigger
+              anchors.verticalCenter: parent.verticalCenter
+              width:   26
+              height:  26
+              topLeftRadius: 5 
+              bottomLeftRadius: 5
+              topRightRadius: 15 
+              bottomRightRadius: 15 
+              color:   dropMenu.visible
+                       ? Qt.lighter(Theme.neutralP5, 2.50)
+                       : Theme.primaryP40
+              enabled: srcrecCard.recState === "idle"
+              opacity: enabled ? 1.0 : 0.4
+              Behavior on color { ColorAnimation { duration: 150 } }
 
-            Text {
-                anchors.centerIn: parent
-                text:           "\uf078"
-                font.family:    Theme.fontAwesome6
-                font.pointSize: 7
-                color:          Theme.neutralP5
-                rotation:       dropMenu.visible ? 180 : 0
-                Behavior on rotation {
-                    NumberAnimation { duration: 180; easing.type: Easing.InOutQuad }
-                }
-            }
+              Text {
+                  anchors.centerIn: parent
+                  text:           "\uf078"
+                  font.family:    Theme.fontAwesome6
+                  font.pointSize: 7
+                  color:          Theme.neutralP5
+                  rotation:       dropMenu.visible ? 180 : 0
+                  Behavior on rotation {
+                      NumberAnimation { duration: 180; easing.type: Easing.InOutQuad }
+                  }
+              }
 
-            MouseArea {
-                anchors.fill: parent
-                cursorShape:  Qt.PointingHandCursor
-                onClicked:    dropMenu.visible = !dropMenu.visible
-            }
-        }
+              MouseArea {
+                  anchors.fill: parent
+                  cursorShape:  Qt.PointingHandCursor
+                  onClicked:    dropMenu.visible = !dropMenu.visible
+              }
+          }
         }
     }
 
@@ -325,7 +334,7 @@ Rectangle {
         border.width: 1
 
         Column {
-            anchors.fill:         parent
+            anchors.fill: parent
 
             Repeater {
                 model: [
@@ -420,7 +429,7 @@ Rectangle {
             font.family:    Theme.fontPoppins
             font.pixelSize: 12
             font.bold: false
-            color:          Theme.secondaryP70
+            color:          Theme.secondaryP80
             anchors.verticalCenter: parent.verticalCenter
         } 
 
@@ -428,6 +437,8 @@ Rectangle {
           width: 170
           height: 1
         }
+
+        // FIX: added font.family so glyphs render correctly
         Column {
             id: scrollCol
             anchors.verticalCenter: parent.verticalCenter
@@ -435,6 +446,7 @@ Rectangle {
 
             Text {
                 text:           "\uf077"
+                font.family:    Theme.fontAwesome6
                 font.pixelSize: 7
                 color:          Theme.secondaryP70
                 MouseArea {
@@ -445,6 +457,7 @@ Rectangle {
             }
             Text {
                 text:           "\uf078"
+                font.family:    Theme.fontAwesome6
                 font.pixelSize: 7
                 color:          Theme.secondaryP70
                 MouseArea {
@@ -465,16 +478,17 @@ Rectangle {
         anchors.topMargin:   6
         anchors.leftMargin:  16
         anchors.rightMargin: 16
-        height: recListView.count === 0
-                ? emptyText.height + 16
-                : Math.min(recListView.contentHeight, 3 * (44 + 4))
+        // FIX: always show exactly one row (44px); 30px slot for empty state
+        height: recListView.count === 0 ? 30 : 44
 
         ListView {
             id: recListView
             anchors.fill:            parent
             clip:                    true
-            spacing:                 4
+            spacing:                 0
             model:                   srcrecCard.recordings
+            // FIX: disable touch/wheel scrolling — chevrons are the only nav
+            interactive:             false
             snapMode:                ListView.SnapToItem
             highlightRangeMode:      ListView.StrictlyEnforceRange
             preferredHighlightBegin: 0
@@ -498,11 +512,6 @@ Rectangle {
                     id:           entryMouse
                     anchors.fill: parent
                     hoverEnabled: true
-                    cursorShape:  Qt.PointingHandCursor
-                    onClicked: {
-                        if (!recEntry.entry.active)
-                            srcrecCard.playFile(recEntry.entry.file)
-                    }
                 }
 
                 Column {
@@ -518,8 +527,8 @@ Rectangle {
                             let parts = recEntry.entry.file.split("/")
                             return parts[parts.length - 1]
                         }
-                        color:          Theme.textPrimary
-                        font.pointSize: 9
+                        color:          Theme.primaryP80
+                        font.pixelSize: 10
                         elide:          Text.ElideMiddle
                     }
 
@@ -527,8 +536,8 @@ Rectangle {
                         text:           recEntry.entry.active
                                         ? srcrecCard.elapsedTime
                                         : recEntry.entry.duration
-                        color:          recEntry.entry.active ? "#ff5555" : Theme.textSubtle
-                        font.pointSize: 8
+                        color:          recEntry.entry.active ? Theme.error : Theme.secondaryP70
+                        font.pixelSize: 10
                     }
                 }
 
@@ -537,14 +546,15 @@ Rectangle {
                     anchors.right:          parent.right
                     anchors.verticalCenter: parent.verticalCenter
                     anchors.rightMargin:    10
-                    spacing:                12
+                    spacing:                10
 
+                    // Stop button — active recording only
                     Text {
                         visible:        recEntry.entry.active
-                        text:           "\uf04d"
-                        font.family:    "Font Awesome 6 Free Solid"
-                        font.pointSize: 11
-                        color:          "#ff5555"
+                        text:           "\uf28d"
+                        font.family:    Theme.fontAwesome6
+                        font.pixelSize: 15
+                        color:         Theme.error
                         anchors.verticalCenter: parent.verticalCenter
                         MouseArea {
                             anchors.fill: parent
@@ -553,12 +563,29 @@ Rectangle {
                         }
                     }
 
+                    // FIX: dedicated play button — completed recordings only
+                    // plays in mpv; entry auto-removes when mpv exits
                     Text {
                         visible:        !recEntry.entry.active
-                        text:           "\uf00d"
-                        font.family:    "Font Awesome 6 Free Solid"
-                        font.pointSize: 11
-                        color:          Theme.textSubtle
+                        text:           "\uf144"
+                        font.family:    Theme.fontAwesome6
+                        font.pixelSize: 15
+                        color:          Theme.secondaryP70
+                        anchors.verticalCenter: parent.verticalCenter
+                        MouseArea {
+                            anchors.fill: parent
+                            cursorShape:  Qt.PointingHandCursor
+                            onClicked:    srcrecCard.playFile(recEntry.entry.file)
+                        }
+                    }
+
+                    // Remove button — completed recordings only
+                    Text {
+                        visible:        !recEntry.entry.active
+                        text:           "\uf056"
+                        font.family:    Theme.fontAwesome6
+                        font.pixelSize: 15
+                        color:          Theme.secondaryP70
                         anchors.verticalCenter: parent.verticalCenter
                         MouseArea {
                             anchors.fill: parent
@@ -568,30 +595,34 @@ Rectangle {
                     }
                 }
             }
-        } 
+        }
 
+        // FIX: emptyText fills listSection; Row is centered inside it
         Item {
-          id: emptyText
-          anchors.centerIn: parent
-          visible: recListView.count === 0 
-        Row {
-            spacing: 2
-            anchors.fill: parent.fill
-        Text {
-            text:             "\ue494"
-            color:            Theme.secondaryP80
-            font.family: Theme.fontAwesome6
-            font.pixelSize:   10
-        }
-        Text {
-          text: "No recordings found"
-          color: Theme.secondaryP80 
-          font.family: Theme.fontPoppins 
-          font.pixelSize: 10
-        }
-        }
-        }
+            id: emptyText
+            anchors.fill: parent
+            visible: recListView.count === 0
 
+            Row {
+                anchors.centerIn: parent
+                spacing: 6
+
+                Text {
+                    text:           "\ue494"
+                    color:          Theme.secondaryP60
+                    font.family:    Theme.fontAwesome6
+                    font.pixelSize: 12
+                    anchors.verticalCenter: parent.verticalCenter
+                }
+                Text {
+                    text:           "No recordings found"
+                    color:          Theme.secondaryP60
+                    font.family:    Theme.fontPoppins
+                    font.pixelSize: 12
+                    anchors.verticalCenter: parent.verticalCenter
+                }
+            }
+        }
     }
 }
 
