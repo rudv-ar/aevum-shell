@@ -18,7 +18,6 @@ This is specifically designed with constraints in mind — for low end systems, 
 > [!NOTE]
 > I was inspired to build **Aevum** mainly because I needed to use **caelestia shell** — but as I am on *X11* and not *Wayland* (constraints: OpenGL), I was in need of building a caelestia-style shell specifically for x11 usage. It is rare — you would not have seen a quickshell config for x11.
 
----
 
 ## Is Quickshell Usable in X11?
 
@@ -41,8 +40,6 @@ I am not going to assure you that animations will be very fluid like water on yo
 
 > [!NOTE]
 > All the above are a baseline — and I am on a baseline system. Animations are not as fluid as in caelestia shell, but they are smooth enough to be visually processed.
-
----
 
 ## Installation Process
 
@@ -93,9 +90,10 @@ aevum link-local add-all      # symlink local bin/share
 aevum deps verify all         # verify all deps
 ```
 
-**4. Restart your session** and launch BSPWM.
+>[!WARNING]
+> The syntax for `aevum` is `aevum <subcommand> <option> <flag>`. For getting help for each subcommand, you can use `aevum <subcommand> help`. Use the `-f` flag only if everything else fails during linking of configs via `link-config` and local files `link-local` subcommands.
 
----
+**4. Restart your session** and launch BSPWM.
 
 ## CLI — `aevum`
 
@@ -108,10 +106,41 @@ aevum deps verify all         # verify all deps
 | `aevum srcrec <args>` | screen recorder |
 | `aevum help` | show usage |
 
----
-
 ## Credits
 
 - [Quickshell](https://quickshell.org) — the shell framework that made this possible on X11
 - [Caelestia Shell](https://github.com/caelestia-dots/shell) — the original inspiration
 - [Archcraft](https://archcraft.io) — for the themes, icons, and fonts
+
+## FAQS
+
+### Why is my screen black on login?
+
+
+1) *Missing Wallpaper* - If you are able to see the `aevum` shell initialised after login (i.e, the bars are visible) but the screen is black, you need to set wallpaper. 
+- Every wallpaper is in ~/Workspace/Wallpapers by default. 
+- If that directory does not exist, create it by `mkdir -p ~/Workspace/Wallpapers` and add wallpapers there. 
+- Then open terminal by pressing `super + shift + enter`. 
+- Run the following commands to get a wallpaper. 
+
+```bash 
+# create the workspace directory 
+mkdir -p ~/Workspace/Wallpapers 
+
+# add some wallpapers to that location. (add exactly 4 wallpapers for now for better wallpaper picker visuals.)
+
+# generate the cache for wallpapers 
+bash ~/.config/bspwm/apps/wallpicker/generate-cache.sh ~/.config/bspwm/apps/wallpicker/config.json
+
+# now press super + w to open the wallpaper picker or just type the following in terminal.
+
+wallpicker 
+
+# then select the wallpaper using enter key and navigate using arrow keys.
+```
+
+>[!NOTE]
+> Steps for manual path configurations will be added soon after a **settings GUI** has been built. If you need custom paths immediately, navigate to `~/.config/aevum/shell`. Each directory there is a component in this shell having a `settings` folder in there. Each `settings` folder has three or two(in some cases) files : `Theme.qml` (edit colors there), `Commands.qml` (decide what command executes and some paths), `Properties.qml` (sizes, width, file paths, etc). Edit them freely. 
+
+>[!IMPORTANT]
+> Make sure to run the above command while setting the wallpaper. The generate-cache.sh script utilises parallel processing using parallel. In case you generate cache for 5 or 10 + newly added wallpapers, it may hang brutally. So advised to generate cache after every new wallpaper is added. If you add it as a bunch, add maximum of **5 to 10** wallpaper and then generate cache. 
