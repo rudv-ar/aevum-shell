@@ -73,11 +73,11 @@ Rectangle {
                 commandOff:    ["dunstctl", "set-paused", "false"]
             }
 
-            // Light / Dark — redshift toggle (X11)
+            // Reading mode - reduced blue rays via redshift.
             TilePill {
-                glyphOn:       "\uf185"
-                glyphOff:      "\uf186"
-                glyphDisabled: "\uf186"
+                glyphOn:       "\uf06e"
+                glyphOff:      "\uf070"
+                glyphDisabled: "\uf070"
                 pillState:     TilePill.State.Off
                 commandOn:     ["redshift", "-O", "3500"]
                 commandOff:    ["redshift", "-x"]
@@ -98,7 +98,7 @@ Rectangle {
                 glyphOn:       "\uf130"
                 glyphOff:      "\uf131"
                 glyphDisabled: "\uf131"
-                pillState:     TilePill.State.On
+                pillState:     TilePill.State.Off
                 commandOn:     ["pactl", "set-source-mute", "@DEFAULT_SOURCE@", "0"]
                 commandOff:    ["pactl", "set-source-mute", "@DEFAULT_SOURCE@", "1"]
             }
