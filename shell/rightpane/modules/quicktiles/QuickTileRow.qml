@@ -13,7 +13,7 @@ Rectangle {
     anchors.bottomMargin: 10
     anchors.leftMargin:   10
     anchors.rightMargin:  10
-    height:               80
+    height:               Properties.pillHeight + 50
     radius:               15
 
     color:        Qt.lighter(Theme.neutralP5, 1.50)

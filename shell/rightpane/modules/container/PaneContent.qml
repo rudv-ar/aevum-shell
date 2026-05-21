@@ -5,8 +5,7 @@ import QtQuick.Effects
 import qs.settings
 import qs.components 
 import qs.modules.quicktiles
-import qs.modules.calendar
-
+import qs.modules.srcrec
 
 Rectangle {
     anchors.top:          parent.top
@@ -25,5 +24,6 @@ Rectangle {
     visible: opacity > 0
 
     //Calendar {}
+    SrcRec{}
     QuickTileRow {}
 }
