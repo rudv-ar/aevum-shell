@@ -110,12 +110,16 @@ PACMAN_DEPS=(
     archcraft-cursor-qogirr   archcraft-cursor-simple
     archcraft-cursor-sweet    archcraft-cursor-vimix
     archcraft-cursor-windows
+
+    redshift
+    slop 
 )
 
 AUR_DEPS=(
     vicinae-bin
     neofetch
-    cmatrix
+    cmatrix-git
+    caffeine-ng
 )
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
