@@ -106,6 +106,10 @@ if [[ "$region" -eq 1 ]]; then
 
     read -r rx ry rw rh <<< "$slop_out"
 
+    # important fix here : dimensions cannot be odd, so fix them if odd by incrementing one pixel for that specific dimension.  
+    (( rw % 2 != 0 )) && (( rw++ ))
+    (( rh % 2 != 0 )) && (( rh++ ))
+
     if [[ "$rw" -lt 16 || "$rh" -lt 16 ]]; then
         echo "[srcrec] error: selected region too small (${rw}x${rh})" >&2
         exit 1
