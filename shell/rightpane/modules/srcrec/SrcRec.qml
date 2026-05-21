@@ -132,7 +132,7 @@ Rectangle {
         let home  = Quickshell.env("HOME")
         let fname = home + "/Videos/output_" + ts + ".mp4"
 
-        let cmd = ["srcrec", "-o", fname]
+        let cmd = ["srcrec", "-r", "18", "-c", "26", "-o", fname]
         if (srcrecCard.recMode === "region") cmd.push("-R")
 
         recProcess.command = cmd
