@@ -124,15 +124,8 @@ Rectangle {
     }
 
     function stopRecording() {
-        let pid = recProcess.pid
-        if (pid != null) {
-            // FIX: send SIGINT only to children of srcrec (catches ffmpeg/region
-            // selector without touching the rest of the system or Quickshell's pgroup).
-            // SIGINT lets ffmpeg flush and write the moov atom cleanly.
-            Quickshell.execDetached(["pkill", "ffmpeg"])
-        }
+        Quickshell.execDetached(["pkill", "-INT", "ffmpeg"])
     }
-
     function playFile(path) {
         mpvProcess.running     = false
         srcrecCard.playingFile = path
@@ -356,7 +349,7 @@ Rectangle {
                         width:            3
                         height:           16
                         radius:           2
-                        color:            Theme.textPrimary
+                        color:            Theme.secondaryP60
                         anchors.left:     parent.left
                         anchors.verticalCenter: parent.verticalCenter
                         anchors.leftMargin: 4
