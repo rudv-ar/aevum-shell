@@ -24,6 +24,6 @@ Rectangle {
     opacity: Math.max(0, (win.animatedRight - Properties.borderThickness - 20) / (Properties.paneWidth - Properties.borderThickness - 20))
     visible: opacity > 0
 
-    Calendar {}
+    //Calendar {}
     QuickTileRow {}
 }

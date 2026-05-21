@@ -13,18 +13,32 @@ Rectangle {
     anchors.bottomMargin: 10
     anchors.leftMargin:   10
     anchors.rightMargin:  10
-    height:               130
+    height:               80
     radius:               15
 
-    color:        Qt.lighter(Theme.neutralP5, 1.20)
-    border.color: Qt.lighter(Theme.neutralP5, 1.50)
-    border.width: 1
+    color:        Qt.lighter(Theme.neutralP5, 1.50)
+    //border.color: Qt.lighter(Theme.neutralP5, 1.50)
+    //border.width: 1
 
     Column {
-        anchors.centerIn: parent
-        spacing:          10
+        anchors.fill:          parent
+        anchors.leftMargin:    14
+        anchors.rightMargin:   14
+        anchors.topMargin:     12
+        anchors.bottomMargin:  12
+        spacing:               10
 
-        // ── Row 1: Active toggles ──────────────────
+        // ── Label ─────────────────────────────────
+        Text {
+            text:  "Quick Toggles"
+            font.bold:        false
+            font.pixelSize:   12
+            font.family:      Theme.fontPoppins
+            color:            Theme.primaryP90
+            horizontalAlignment: Text.AlignLeft
+        }
+
+        // ── Single row of 6 toggles ────────────────
         Row {
             anchors.horizontalCenter: parent.horizontalCenter
             spacing: 10
@@ -39,100 +53,54 @@ Rectangle {
                 commandOff:    ["nmcli", "radio", "wifi", "off"]
             }
 
-            // Night light (wlsunset — Wayland)
+            // Bluetooth
             TilePill {
-                glyphOn:       "\uf185"
-                glyphOff:      "\uf186"
-                glyphDisabled: "\uf186"
+                glyphOn:       "\uf294"
+                glyphOff:      "\uf294"
+                glyphDisabled: "\uf294"
                 pillState:     TilePill.State.Off
-                commandOn:     ["wlsunset", "-l", "40", "-L", "20"]
-                commandOff:    ["pkill", "wlsunset"]
+                commandOn:     ["bluetoothctl", "power", "on"]
+                commandOff:    ["bluetoothctl", "power", "off"]
             }
 
-            // Lock screen
-            TilePill {
-                glyphOn:       "\uf3ed"
-                glyphOff:      "\uf3ed"
-                glyphDisabled: "\uf3ed"
-                pillState:     TilePill.State.Off
-                commandOn:     ["hyprlock"]
-                commandOff:    []
-            }
-
-            // Notifications
+            // DND — silence dunst
             TilePill {
                 glyphOn:       "\uf1f6"
                 glyphOff:      "\uf0a2"
                 glyphDisabled: "\uf0a2"
                 pillState:     TilePill.State.Off
-                commandOn:     []
-                commandOff:    []
+                commandOn:     ["dunstctl", "set-paused", "true"]
+                commandOff:    ["dunstctl", "set-paused", "false"]
             }
 
-            // Color picker
+            // Light / Dark — redshift toggle (X11)
             TilePill {
-                glyphOn:       "\uf493"
-                glyphOff:      "\uf493"
-                glyphDisabled: "\uf493"
-                pillState:     TilePill.State.Off
-                commandOn:     ["hyprpicker", "-a"]
-                commandOff:    []
-            }
-        }
-
-        // ── Row 2: X11-compat + disabled ──────────
-        Row {
-            anchors.horizontalCenter: parent.horizontalCenter
-            spacing: 10
-
-            // Picom compositor (X11) — \uf5aa = layer-group
-            TilePill {
-                glyphOn:       "\uf5aa"
-                glyphOff:      "\uf5aa"
-                glyphDisabled: "\uf5aa"
-                pillState:     TilePill.State.Off
-                commandOn:     ["picom", "--daemon"]
-                commandOff:    ["pkill", "picom"]
-            }
-
-            // Redshift color temp (X11) — \uf7e0 = temperature-low
-            TilePill {
-                glyphOn:       "\uf7e0"
-                glyphOff:      "\uf7e4"
-                glyphDisabled: "\uf7e4"
+                glyphOn:       "\uf185"
+                glyphOff:      "\uf186"
+                glyphDisabled: "\uf186"
                 pillState:     TilePill.State.Off
                 commandOn:     ["redshift", "-O", "3500"]
                 commandOff:    ["redshift", "-x"]
             }
 
-            // Audio mute (disabled — placeholder)
+            // VPN — nmcli connection
             TilePill {
-                glyphOn:       "\uf028"
-                glyphOff:      "\uf6a9"
-                glyphDisabled: "\uf6a9"
-                pillState:     TilePill.State.Disabled
-                commandOn:     []
-                commandOff:    []
+                glyphOn:       "\uf505"
+                glyphOff:      "\uf505"
+                glyphDisabled: "\uf505"
+                pillState:     TilePill.State.Off
+                commandOn:     ["nmcli", "connection", "up", "vpn"]
+                commandOff:    ["nmcli", "connection", "down", "vpn"]
             }
 
-            // Bluetooth (disabled — last)
+            // Microphone mute — pactl (PulseAudio/Pipewire)
             TilePill {
-                glyphOn:       "\uf294"
-                glyphOff:      "\uf294"
-                glyphDisabled: "\uf294"
-                pillState:     TilePill.State.Disabled
-                commandOn:     ["bluetoothctl", "power", "on"]
-                commandOff:    ["bluetoothctl", "power", "off"]
-            }
-
-            // Aeroplane mode (disabled — last)
-            TilePill {
-                glyphOn:       "\uf072"
-                glyphOff:      "\uf072"
-                glyphDisabled: "\uf072"
-                pillState:     TilePill.State.Disabled
-                commandOn:     []
-                commandOff:    []
+                glyphOn:       "\uf130"
+                glyphOff:      "\uf131"
+                glyphDisabled: "\uf131"
+                pillState:     TilePill.State.On
+                commandOn:     ["pactl", "set-source-mute", "@DEFAULT_SOURCE@", "0"]
+                commandOff:    ["pactl", "set-source-mute", "@DEFAULT_SOURCE@", "1"]
             }
         }
     }

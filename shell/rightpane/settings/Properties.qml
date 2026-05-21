@@ -9,10 +9,10 @@ QtObject {
     readonly property int paneWidth: 350
 
     readonly property real pillWidth:    40
-    readonly property real pillHeight:   40
-    readonly property real pillRadius:   20
-    readonly property real pillIconSize: 18
-    readonly property real pillSpacing:  8    
+    readonly property real pillHeight:   30
+    readonly property real pillRadius:   10
+    readonly property real pillIconSize: 14
+    readonly property real pillSpacing:  0    
     
 }
 
