@@ -297,7 +297,11 @@ Rectangle {
                 bottomLeftRadius:  15
                 topRightRadius:    5
                 bottomRightRadius: 5
-                color:             Theme.primaryP40
+                color:   dropMenu.visible
+                         ? Qt.lighter(Theme.neutralP5, 2.50)
+                         : Theme.primaryP40
+                enabled: srcrecCard.recState === "idle"
+                opacity: enabled ? 1.0 : 0.4
 
                 Row {
                     anchors.centerIn: parent
