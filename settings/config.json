@@ -86,6 +86,18 @@
         "hoverMode": "ssid"
       },
       "nerdFontFamily": "JetBrainsMono Nerd Font"
-    }
+    },
+    "rightPane": {
+      "pane": {
+        "width": 350
+      },
+      "quickToggles": {
+        "pillWidth": 40,
+        "pillHeight": 30,
+        "pillRadius": 10,
+        "pillIconSize": 14,
+        "pillSpacing": 0
+      }
+    }    
   }
 }
