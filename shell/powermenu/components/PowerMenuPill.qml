@@ -32,7 +32,7 @@ Rectangle {
         anchors.centerIn: parent
         text:             pill.glyph
         font.pixelSize:   Properties.pillIconSize
-        font.family:      Properties.iconFont
+        font.family:      Theme.iconFont
         color:            pill.hovered ? pill.accentColor : Theme.primaryP100
         Behavior on color { ColorAnimation { duration: 130 } }
     }

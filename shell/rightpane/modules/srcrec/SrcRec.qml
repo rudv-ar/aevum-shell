@@ -47,7 +47,7 @@ Rectangle {
         property string _file:    ""
         property string _started: ""
 
-        command: ["cat", Quickshell.env("HOME") + "/.cache/srcrec.state"]
+        command: ["cat", Quickshell.env("HOME") + "/.config/aevum/settings/states/srcrec.state"]
 
         stdout: SplitParser {
             onRead: function(line) {

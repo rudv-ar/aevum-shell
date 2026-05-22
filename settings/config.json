@@ -98,6 +98,26 @@
         "pillIconSize": 14,
         "pillSpacing": 0
       }
+    },
+    "powerMenu": {
+      "menu": {
+        "normalWidth": 0,
+        "expandedWidth": 75,
+        "normalHeight": 280,
+        "borderWidth": 0.0,
+        "implicitWidth": 80
+      },
+      "board": {
+        "uptimeStripWidth": 38,
+        "uptimeFontSize": 13
+      },
+      "pill": {
+        "width": 46,
+        "height": 46,
+        "radius": 14,
+        "iconSize": 20,
+        "spacing": 8
+      }
     }    
   }
 }
