@@ -83,7 +83,7 @@
       },
       "network": {
         "pollInterval": 10000,
-        "hoverMode": "ssid"
+        "hoverMode": "ip"
       },
       "nerdFontFamily": "JetBrainsMono Nerd Font"
     },
