@@ -22,30 +22,33 @@ Rectangle {
     property bool isCaffeinated: false
     property string stateFile: Quickshell.env("HOME") + "/.config/aevum/settings/states/.caffeine.state"
 
-    // Initial check on load
+    // Initial check on load — trust the PID, not just the flag
     Process {
         id: initCaffeine
         command: ["bash", "-c", `
             STATE_FILE="${stateFile}"
+            mkdir -p "$(dirname "$STATE_FILE")"
+
             if [ ! -f "$STATE_FILE" ]; then
-                mkdir -p "$(dirname "$STATE_FILE")"
-                echo "false" > "$STATE_FILE"
-                pkill caffeine || true
+                printf "running=false\npid=null\n" > "$STATE_FILE"
                 echo "false"
             else
-                cat "$STATE_FILE"
+                PID=$(grep '^pid=' "$STATE_FILE" | cut -d= -f2)
+                if [ "$PID" != "null" ] && kill -0 "$PID" 2>/dev/null; then
+                    echo "true"
+                else
+                    # PID is gone — correct the state file
+                    printf "running=false\npid=null\n" > "$STATE_FILE"
+                    echo "false"
+                fi
             fi
         `]
         running: true
 
         onStdoutChanged: {
             if (stdout) {
-                let outStr = Array.isArray(stdout) ? stdout.join("") : stdout.toString();
-                if (outStr.includes("true")) {
-                    isCaffeinated = true;
-                } else if (outStr.includes("false")) {
-                    isCaffeinated = false;
-                }
+                let outStr = Array.isArray(stdout) ? stdout.join("") : stdout.toString()
+                isCaffeinated = outStr.includes("true")
             }
         }
     }
@@ -84,7 +87,6 @@ Rectangle {
         Column {
             anchors.verticalCenter: parent.verticalCenter
             spacing: 2
-            // Stretch to fill space between icon and toggle pill
             width: caffeineCard.width - 14 - 30 - 12 - 44 - 14 - 12
 
             Text {
@@ -132,9 +134,13 @@ Rectangle {
                 cursorShape: Qt.PointingHandCursor
                 onClicked: {
                     isCaffeinated = !isCaffeinated
+
                     let bashCmd = isCaffeinated
-                        ? `echo "true" > "${stateFile}" && caffeine &`
-                        : `echo "false" > "${stateFile}" && pkill caffeine || true`
+                        ? `caffeine & PID=$! && printf "running=true\npid=$PID\n" > "${stateFile}"`
+                        : `PID=$(grep '^pid=' "${stateFile}" | cut -d= -f2)
+                           [ "$PID" != "null" ] && kill "$PID" 2>/dev/null || true
+                           printf "running=false\npid=null\n" > "${stateFile}"`
+
                     toggleCaffeineAction.command = ["bash", "-c", bashCmd]
                     toggleCaffeineAction.running = true
                 }
