@@ -20,7 +20,7 @@ Item {
         id: _pill
 
         glyph:      Properties.rightbarPaneGlyph
-        fontFamily: Properties.fontAwesome6
+        fontFamily: Theme.fontAwesome6
         label:      "actions"
 
         onClicked: function(mouse) {
