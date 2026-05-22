@@ -1,2 +1,2 @@
-modules qs.modules.srcrec
+module qs.modules.srcrec
 SrcRec 1.0 SrcRec.qml
