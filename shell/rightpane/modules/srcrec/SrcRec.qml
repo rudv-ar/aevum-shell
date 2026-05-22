@@ -278,6 +278,12 @@ Rectangle {
             height: 1
         }
 
+        Item {
+          width: 10 
+          height: 1 
+        }
+
+
         Row {
             spacing: 2
 
