@@ -10,7 +10,7 @@
     ask either to overwrite |
     ask to record in new file | 
 
-: SrcRec.qml - fix the mpv play logic 
+: SrcRec.qml - fix the mpv play logic for region as well as record from cli
     it should be able to play even when the recording is done via cmd line | 
     it should use the statefile for this purpose to play |
     it should be able to play from any rec, not just from videos directory |
