@@ -346,5 +346,7 @@ Singleton {
 
     readonly property color accent: primaryP80
 
+    property string iconFont:              "Material Symbols Rounded"
+
     
 }

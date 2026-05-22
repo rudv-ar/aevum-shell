@@ -17,7 +17,7 @@ display=":0.0"
 region=0        # 0 = fullscreen, 1 = mouse-select region via slop
 
 # ── State file ───────────────────────────────────────────────────
-state_file="${HOME}/.cache/srcrec.state"
+state_file="${HOME}/.config/aevum/settings/states/srcrec.state"
 
 kill_previous() {
     if [[ -f "$state_file" ]]; then

@@ -1,0 +1,123 @@
+{
+  "shell": {
+    "borders": {
+      "thickness": 10,
+      "cornerRadius": 18.0,
+      "topOffset": 4
+    },
+    "topbar": {
+      "bar": {
+        "floating": false,
+        "height": 32,
+        "paddingX": 12
+      },
+      "pillHover": {
+        "radius": 15,
+        "paddingX": 10,
+        "paddingY": 4,
+        "spacing": 6,
+        "animDuration": 180
+      },
+      "pillStatic": {
+        "radius": 15,
+        "paddingX": 10,
+        "paddingY": 4
+      },
+      "clock": {
+        "use24h": true,
+        "showSeconds": false,
+        "pillShowTimeFirst": true,
+        "pillIsExpanded": true,
+        "pillTimeFontSize": 13,
+        "pillDateFontSize": 12,
+        "pillFontFamily": "Sans"
+      },
+      "workspace": {
+        "names": ["1","2","3","4","5","6","7","8"],
+        "dotSize": 14,
+        "dotFocusedWidth": 28,
+        "dotRadius": 10,
+        "dotSpacing": 5,
+        "dotAnimDuration": 150,
+        "dotLabelMode": "always",
+        "dotLabelFontSize": 8,
+        "indicatorPaddingX": 10,
+        "indicatorPaddingY": 4,
+        "indicatorRadius": 15,
+        "indicatorAlwaysExpanded": true,
+        "hasGlyphIndicator": true,
+        "iconFontSize": 14,
+        "iconGap": 6,
+        "iconGlyphs": {
+          "1": "\uf303",
+          "2": "\uf303",
+          "3": "\uf303",
+          "4": "\uf303",
+          "5": "\uf303",
+          "6": "\uf303",
+          "7": "\uf303",
+          "8": "\uf303"
+        }
+      },
+      "basePill": {
+        "height": 24,
+        "radius": 15,
+        "padding": 4,
+        "iconBgSize": 18,
+        "iconBgRadius": 15,
+        "iconSize": 12,
+        "spacing": 6,
+        "fontSize": 12,
+        "expandDuration": 180,
+        "iconRotateDuration": 400,
+        "hoverEnabled": true,
+        "iconRotateEnabled": true
+      },
+      "rightSection": {
+        "chipSpacing": 6,
+        "networkGlyph": "\uf1eb",
+        "notificationGlyph": "\uf0f3",
+        "paneGlyph": "\uf03b",
+        "powerGlyph": "\uf011",
+        "settingsGlyph": "\uf013"
+      },
+      "network": {
+        "pollInterval": 10000,
+        "hoverMode": "ip"
+      },
+      "nerdFontFamily": "JetBrainsMono Nerd Font"
+    },
+    "rightPane": {
+      "pane": {
+        "width": 350
+      },
+      "quickToggles": {
+        "pillWidth": 40,
+        "pillHeight": 30,
+        "pillRadius": 10,
+        "pillIconSize": 14,
+        "pillSpacing": 0
+      }
+    },
+    "powerMenu": {
+      "menu": {
+        "normalWidth": 0,
+        "expandedWidth": 75,
+        "normalHeight": 280,
+        "borderWidth": 0.0,
+        "implicitWidth": 80
+      },
+      "board": {
+        "uptimeStripWidth": 38,
+        "uptimeFontSize": 13
+      },
+      "pill": {
+        "width": 46,
+        "height": 46,
+        "radius": 14,
+        "iconSize": 20,
+        "spacing": 8
+      }
+    }    
+  }
+}

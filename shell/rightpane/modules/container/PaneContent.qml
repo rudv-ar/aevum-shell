@@ -6,6 +6,7 @@ import qs.settings
 import qs.components 
 import qs.modules.quicktiles
 import qs.modules.srcrec
+import qs.modules.caffeine
 
 Rectangle {
     anchors.top:          parent.top
@@ -23,7 +24,7 @@ Rectangle {
     opacity: Math.max(0, (win.animatedRight - Properties.borderThickness - 20) / (Properties.paneWidth - Properties.borderThickness - 20))
     visible: opacity > 0
 
-    //Calendar {}
+    Caffeine{}
     SrcRec{}
     QuickTileRow {}
 }

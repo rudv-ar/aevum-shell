@@ -47,7 +47,7 @@ Rectangle {
         property string _file:    ""
         property string _started: ""
 
-        command: ["cat", Quickshell.env("HOME") + "/.cache/srcrec.state"]
+        command: ["cat", Quickshell.env("HOME") + "/.config/aevum/settings/states/srcrec.state"]
 
         stdout: SplitParser {
             onRead: function(line) {
@@ -59,7 +59,12 @@ Rectangle {
 
         onExited: function(code, status) {
             if (code === 0 && stateReader._pid !== "") {
-                let file    = Quickshell.env("HOME") + "/Videos/" + stateReader._file
+                // Support absolute paths from CLI recordings; fall back to ~/Videos/ for bare names
+                let rawFile = stateReader._file
+                let file    = rawFile.startsWith("/")
+                              ? rawFile
+                              : Quickshell.env("HOME") + "/Videos/" + rawFile
+
                 let started = parseInt(stateReader._started)
                 let s       = Math.max(0, Math.floor(Date.now() / 1000) - started)
                 let h       = Math.floor(s / 3600)
@@ -109,20 +114,11 @@ Rectangle {
     // ── MPV process ───────────────────────────────────────────
     Process {
         id: mpvProcess
-        command: ["mpv", "--really-quiet", ""]
+        // Command is set dynamically in playFile(); no static default
 
         onExited: function(code, status) {
-            if (srcrecCard.playingFile !== "") {
-                let recs = srcrecCard.recordings.slice()
-                for (let i = 0; i < recs.length; i++) {
-                    if (recs[i].file === srcrecCard.playingFile) {
-                        recs.splice(i, 1)
-                        break
-                    }
-                }
-                srcrecCard.recordings  = recs
-                srcrecCard.playingFile = ""
-            }
+            // Only clear the playing marker — do NOT remove the list entry
+            srcrecCard.playingFile = ""
         }
     }
 
@@ -157,7 +153,17 @@ Rectangle {
     }
 
     function playFile(path) {
-        mpvProcess.running     = false
+        // Don't play a file that is still actively recording
+        let recs = srcrecCard.recordings
+        for (let i = 0; i < recs.length; i++) {
+            if (recs[i].file === path && recs[i].active) return
+        }
+
+        // Stop any current playback before starting new one
+        if (srcrecCard.playingFile !== "") {
+            mpvProcess.running = false
+        }
+
         srcrecCard.playingFile = path
         mpvProcess.command     = ["mpv", "--really-quiet", path]
         mpvProcess.running     = true
@@ -165,6 +171,8 @@ Rectangle {
 
     function removeEntry(idx) {
         let recs = srcrecCard.recordings.slice()
+        // Don't allow removing an active recording entry
+        if (recs[idx] && recs[idx].active) return
         recs.splice(idx, 1)
         srcrecCard.recordings = recs
     }
@@ -587,15 +595,27 @@ Rectangle {
                     // Play button — completed recordings only
                     Text {
                         visible:        !recEntry.entry.active
-                        text:           "\uf144"
+                        text:           srcrecCard.playingFile === recEntry.entry.file
+                                        ? "\uf28b"   // pause/stop glyph while playing
+                                        : "\uf144"
                         font.family:    Theme.fontAwesome6
                         font.pixelSize: 15
-                        color:          Theme.secondaryP70
+                        color:          srcrecCard.playingFile === recEntry.entry.file
+                                        ? Theme.primaryP60
+                                        : Theme.secondaryP70
                         anchors.verticalCenter: parent.verticalCenter
                         MouseArea {
                             anchors.fill: parent
                             cursorShape:  Qt.PointingHandCursor
-                            onClicked:    srcrecCard.playFile(recEntry.entry.file)
+                            onClicked: {
+                                if (srcrecCard.playingFile === recEntry.entry.file) {
+                                    // Stop playback if already playing this file
+                                    mpvProcess.running     = false
+                                    srcrecCard.playingFile = ""
+                                } else {
+                                    srcrecCard.playFile(recEntry.entry.file)
+                                }
+                            }
                         }
                     }
 
