@@ -7,7 +7,7 @@ PanelWindow {
     id: root
 
     implicitWidth:  animator.animWidth
-    implicitHeight: 0
+    implicitHeight: root.popoutHeight
     color:          "transparent"
 
     anchors {
@@ -19,10 +19,10 @@ PanelWindow {
     exclusionMode: ExclusionMode.Ignore
 
     // ── Configuration ─────────────────────────────────────────────
-    property real  popoutWidth:    60
+    property real  popoutWidth:    50
     property real  popoutHeight:   300
-    property real  shoulderRadius: 10
-    property real  cornerRadius:   30
+    property real  shoulderRadius: 18
+    property real  cornerRadius:   18
     property color surfaceColor:   "#131315"
     property real  barWidth:       10
 
@@ -154,6 +154,12 @@ PanelWindow {
             width:                  root.barWidth
             height:                 root.popoutHeight + (root.shoulderRadius * 2)
             color:                  root.surfaceColor
+
+            MouseArea {
+              anchors.fill : parent 
+              hoverEnabled: true
+              onEntered: root.windowOverlapsDock = false
+            }
         }
 
         // ── Dock shape ────────────────────────────────────────────
@@ -171,6 +177,12 @@ PanelWindow {
 
             layer.enabled: true
             layer.samples: 4
+
+            MouseArea {
+              anchors.fill: parent 
+              hoverEnabled: true 
+              onEntered: root.windowOverlapsDock = false
+            }
 
             ShapePath {
                 fillColor:   root.surfaceColor
