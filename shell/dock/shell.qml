@@ -28,7 +28,7 @@ PanelWindow {
 
     // ── Autohide ──────────────────────────────────────────────────
     property string mode: "autohide"
-    property bool windowOverlapsDock: !(root.mode === "visible") || root.mode === "autohide"
+    property bool windowOverlapsDock: !(root.mode === "visible")
     readonly property real dockLeft:   0
     readonly property real dockRight:  root.barWidth + root.popoutWidth
     readonly property real dockTop:    (root.height - root.popoutHeight) / 2
@@ -36,7 +36,7 @@ PanelWindow {
 
     // ── Process ───────────────────────────────────────────────────
     Timer {
-        interval: 200
+        interval: 100
         running:  root.mode === "intellihide"
         repeat:   true
         onTriggered: overlapProc.running = true
@@ -84,6 +84,7 @@ PanelWindow {
     Item {
         id: animator
         anchors.fill: parent
+        clip: true
 
         property real animWidth: root.barWidth + root.popoutWidth + root.shoulderRadius
 
@@ -91,55 +92,59 @@ PanelWindow {
             State {
                 name: "visible"
                 when: !root.windowOverlapsDock
-                PropertyChanges { target: animator; animWidth: root.barWidth + root.popoutWidth + root.shoulderRadius }
-                PropertyChanges { target: dockShape; opacity: 1.0; scale: 1.0 }
+                PropertyChanges { target: animator;   animWidth: root.barWidth + root.popoutWidth + root.shoulderRadius }
+                PropertyChanges { target: dockSlide;  x: 0 }
+                PropertyChanges { target: dockShape;  opacity: 1.0 }
             },
             State {
                 name: "hidden"
                 when: root.windowOverlapsDock
-                PropertyChanges { target: animator; animWidth: root.barWidth }
-                PropertyChanges { target: dockShape; opacity: 0.0; scale: 0.88 }
+                PropertyChanges { target: animator;   animWidth: root.barWidth }
+                PropertyChanges { target: dockSlide;  x: -(root.popoutWidth + root.shoulderRadius) }
+                PropertyChanges { target: dockShape;  opacity: 0.0 }
             }
         ]
 
         transitions: [
-            // Show: width opens first, then shape springs in
+            // Show: width opens, then shape slides in with spring
             Transition {
                 from: "hidden"; to: "visible"
                 SequentialAnimation {
                     SmoothedAnimation {
                         target: animator; property: "animWidth"
-                        velocity: 600
+                        velocity: 700
                     }
                     ParallelAnimation {
                         SpringAnimation {
-                            target: dockShape; property: "opacity"
-                            to: 1.0; spring: 3.0; damping: 0.55; epsilon: 0.01
+                            target: dockSlide; property: "x"
+                            to: 0
+                            spring: 5.0; damping: 0.62; mass: 0.75; epsilon: 0.5
                         }
-                        SpringAnimation {
-                            target: dockShape; property: "scale"
-                            to: 1.0; spring: 3.5; damping: 0.5; epsilon: 0.005; mass: 0.8
+                        NumberAnimation {
+                            target: dockShape; property: "opacity"
+                            to: 1.0; duration: 55; easing.type: Easing.OutCubic
                         }
                     }
                 }
             },
-            // Hide: shape snaps out, then width collapses
+            // Hide: shape slides back, then width collapses
             Transition {
                 from: "visible"; to: "hidden"
                 SequentialAnimation {
                     ParallelAnimation {
                         NumberAnimation {
-                            target: dockShape; property: "opacity"
-                            to: 0.0; duration: 90; easing.type: Easing.InQuart
+                            target: dockSlide; property: "x"
+                            to: -(root.popoutWidth + root.shoulderRadius)
+                            duration: 100; easing.type: Easing.InCubic
                         }
                         NumberAnimation {
-                            target: dockShape; property: "scale"
-                            to: 0.88; duration: 90; easing.type: Easing.InQuart
+                            target: dockShape; property: "opacity"
+                            to: 0.0; duration: 65; easing.type: Easing.InQuart
                         }
                     }
                     NumberAnimation {
                         target: animator; property: "animWidth"
-                        to: root.barWidth; duration: 130; easing.type: Easing.InCubic
+                        to: root.barWidth; duration: 120; easing.type: Easing.InCubic
                     }
                 }
             }
@@ -156,9 +161,9 @@ PanelWindow {
             color:                  root.surfaceColor
 
             MouseArea {
-              anchors.fill : parent 
-              hoverEnabled: true
-              onEntered: root.windowOverlapsDock = false
+                anchors.fill: parent
+                hoverEnabled: true
+                onEntered: root.windowOverlapsDock = false
             }
         }
 
@@ -169,8 +174,9 @@ PanelWindow {
             anchors.verticalCenter: parent.verticalCenter
 
             opacity:         1.0
-            scale:           1.0
             transformOrigin: Item.Left
+
+            transform: Translate { id: dockSlide; x: 0 }
 
             width:  root.popoutWidth + root.shoulderRadius
             height: root.popoutHeight + (root.shoulderRadius * 2)
@@ -179,10 +185,10 @@ PanelWindow {
             layer.samples: 4
 
             MouseArea {
-              anchors.fill: parent 
-              hoverEnabled: true 
-              onEntered: root.windowOverlapsDock = false
-              onExited: root.windowOverlapsDock = root.mode === "autohide"
+                anchors.fill: parent
+                hoverEnabled: true
+                onEntered: root.windowOverlapsDock = false
+                onExited:  root.windowOverlapsDock = root.mode === "autohide"
             }
 
             ShapePath {
