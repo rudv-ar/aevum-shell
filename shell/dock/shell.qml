@@ -27,8 +27,8 @@ PanelWindow {
     property real  barWidth:       10
 
     // ── Autohide ──────────────────────────────────────────────────
-    property bool windowOverlapsDock: false
-
+    property string mode: "autohide"
+    property bool windowOverlapsDock: !(root.mode === "visible") || root.mode === "autohide"
     readonly property real dockLeft:   0
     readonly property real dockRight:  root.barWidth + root.popoutWidth
     readonly property real dockTop:    (root.height - root.popoutHeight) / 2
@@ -37,7 +37,7 @@ PanelWindow {
     // ── Process ───────────────────────────────────────────────────
     Timer {
         interval: 200
-        running:  true
+        running:  root.mode === "intellihide"
         repeat:   true
         onTriggered: overlapProc.running = true
     }
@@ -182,6 +182,7 @@ PanelWindow {
               anchors.fill: parent 
               hoverEnabled: true 
               onEntered: root.windowOverlapsDock = false
+              onExited: root.windowOverlapsDock = root.mode === "autohide"
             }
 
             ShapePath {
