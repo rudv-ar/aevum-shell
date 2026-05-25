@@ -17,6 +17,8 @@ xdotool set_window --classname "qs-topbar" --class "qs-topbar" $topbar_wid
 #xprop -id $topbar_wid -f WM_CLASS 8s -set WM_CLASS "qs-topbar\000qs-topbar"
 border_wid=$(xdotool search --pid $border_pid)
 xdotool set_window --classname "qs-border" --class "qs-border" $border_wid
+
+
 #xprop -id $border_wid -f WM_CLASS 8s -set WM_CLASS "qs-border\000qs-border"
 rightpane_wid=$(xdotool search --pid $rightpane_pid)
 xdotool set_window --classname "qs-right-pane" --class "qs-right-pane" $rightpane_wid

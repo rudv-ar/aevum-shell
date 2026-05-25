@@ -118,8 +118,13 @@ for i in ${floating[@]}; do
    bspc rule -a $i state=floating follow=on focus=on; done
 
 ############################# vicinae, toml-gui position, etc #######################################
-bspc rule -a vicinae state=floating follow=on focus=on border=false rectangle=700x500+350+768
-bspc rule -a command state=floating follow=on focus=on border=false rectangle=700x500+350+768
+#bspc rule -a vicinae state=floating follow=on focus=on border=false rectangle=700x500+350+768
+#bspc rule -a command state=floating follow=on focus=on border=false rectangle=700x500+350+768
+
+bspc rule -a vicinae state=floating follow=on focus=on border=false
+bspc rule -a command state=floating follow=on focus=on border=false
+
+
 #bspc rule -a toml-gui state=floating follow=on focus=on border=false sticky=true rectangle=700x500+350+768
 #bspc rule -a ty-wall state=floating follow=on focus=on border=false sticky=true rectangle=700x253+350+768
 bspc rule -a Plank manage=off

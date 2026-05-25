@@ -14,10 +14,10 @@ ShellRoot {
         implicitHeight: Screen.height
         color:          "transparent"
         mask:           Region{
-            x:      Screen.width - win.animatedRight - 20
-            y:      Properties.marginCover
-            width:  win.animatedRight + 20
-            height: Screen.height - Properties.marginCover          
+            x:      Screen.width - win.animatedRight - Properties.borderThickness - Properties.borderThickness
+            y:      Properties.marginCover + Properties.topOffset
+            width:  win.animatedRight + Properties.borderThickness + Properties.borderThickness
+            height: Screen.height - Properties.marginCover
         }
 
         property bool paneOpen: false
@@ -43,8 +43,12 @@ ShellRoot {
         Rectangle {
             anchors.fill:      parent
             anchors.topMargin: Properties.marginCover
+            anchors.rightMargin: Properties.borderThickness
+            anchors.bottomMargin: Properties.borderThickness
             color:             Theme.borderColor
-
+            visible: win.paneOpen
+            topRightRadius: Properties.cornerRadius + 1
+            bottomRightRadius: Properties.cornerRadius - 3
             layer.enabled: true
             layer.effect: MultiEffect {
                 maskSource:       innerMask
@@ -69,7 +73,7 @@ ShellRoot {
                 anchors.topMargin:    Properties.topOffset
                 anchors.leftMargin:   Properties.borderThickness
                 anchors.rightMargin:  win.animatedRight
-                anchors.bottomMargin: Properties.borderThickness
+                anchors.bottomMargin: 0
                 radius:               Properties.cornerRadius
             }
         }

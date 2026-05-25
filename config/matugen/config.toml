@@ -1,0 +1,5 @@
+[config]
+
+[templates.alacritty]
+input_path  = '~/.config/matugen/templates/alacritty.toml'
+output_path = '~/.config/alacritty/theme.toml'
