@@ -2,12 +2,13 @@ import QtQuick
 import QtQuick.Layouts
 import QtQuick.Shapes
 import Quickshell
+import Quickshell.Io          // ← needed for IpcHandler
 
 PanelWindow {
     id: root
     implicitWidth: 600
     implicitHeight: 450
-    
+
     color: "transparent"
 
     anchors { bottom: true; left: true; right: true }
@@ -21,16 +22,53 @@ PanelWindow {
     property real rectHeight:     10
     property color surfaceColor:  "#161619"
 
-    // Shoulders morph organically as targetHeight animates each frame
     property real effectiveShoulder: shoulderRadius
         + Math.max(0, (160.0 - targetHeight) / 160.0) * 18
 
-    // ── State host — Item is required; PanelWindow/Window doesn't have states ─
+    // ── Click mask: only the trigger strip is live when dock is closed ────────
+    mask: Region {
+        item: maskHelper
+    }
+
+    Item {
+        id: maskHelper
+        anchors.bottom:           parent.bottom
+        anchors.horizontalCenter: parent.horizontalCenter
+        width:  root.shapeWidth
+        // When closed: only the 10 px trigger strip intercepts clicks.
+        // When open:   grows with targetHeight so the whole dock body is covered.
+        height: root.targetHeight < 1
+                    ? root.rectHeight
+                    : root.targetHeight + root.effectiveShoulder + root.rectHeight
+    }
+
+    // ── IPC handler ───────────────────────────────────────────────────────────
+    // Usage:
+    //   qs ipc call dock toggle
+    //   qs ipc call dock open
+    //   qs ipc call dock close
+    IpcHandler {
+        target: "dock"
+
+        function toggle(): void {
+            shell.state = (shell.state === "revealed") ? "" : "revealed"
+        }
+
+        function open(): void {
+            shell.state = "revealed"
+        }
+
+        function close(): void {
+            shell.state = ""
+        }
+    }
+
+    // ── State host ────────────────────────────────────────────────────────────
     Item {
         id: shell
         anchors.fill: parent
 
-        state: ""   // "" = hidden, "revealed" = shown
+        state: ""
 
         states: [
             State {
@@ -40,7 +78,6 @@ PanelWindow {
         ]
 
         transitions: [
-            // ENTRY: springy organic pop-up
             Transition {
                 from: ""; to: "revealed"
                 NumberAnimation {
@@ -51,7 +88,6 @@ PanelWindow {
                     easing.overshoot: 1.55
                 }
             },
-            // EXIT: brief windup flinch then sharp collapse
             Transition {
                 from: "revealed"; to: ""
                 NumberAnimation {
@@ -64,7 +100,7 @@ PanelWindow {
             }
         ]
 
-        // ── Invisible trigger strip (always at bottom, 10 px tall) ───────────
+        // ── Invisible trigger strip ───────────────────────────────────────────
         Item {
             id: triggerStrip
             anchors.bottom:           parent.bottom
@@ -85,7 +121,7 @@ PanelWindow {
             }
         }
 
-        // ── Dock body — grows upward from triggerStrip ────────────────────────
+        // ── Dock body ─────────────────────────────────────────────────────────
         Item {
             id: dockBody
             anchors.bottom:           triggerStrip.top
@@ -94,10 +130,7 @@ PanelWindow {
             width:  root.shapeWidth
             height: root.targetHeight + root.effectiveShoulder
 
-            // Disable entire subtree when hidden so the volume is click-through
             enabled: root.targetHeight > 0.5
-
-            // Opacity is a binding — front-loads fade-in, back-loads fade-out
             opacity: Math.min(1.0, root.targetHeight / 35.0)
 
             Shape {
@@ -113,7 +146,6 @@ PanelWindow {
                     startX: 0
                     startY: liquidShape.height
 
-                    // 1 ── LEFT SHOULDER (concave)
                     PathArc {
                         relativeX: root.effectiveShoulder
                         relativeY: -root.effectiveShoulder
@@ -121,16 +153,12 @@ PanelWindow {
                         radiusY:   root.effectiveShoulder
                         direction: PathArc.Counterclockwise
                     }
-
-                    // 2 ── LEFT WALL
                     PathLine {
                         relativeX: 0
                         relativeY: -Math.max(0, root.targetHeight
                                                 - root.effectiveShoulder
                                                 - root.cornerRadius)
                     }
-
-                    // 3 ── TOP-LEFT CORNER (convex)
                     PathArc {
                         relativeX: root.cornerRadius
                         relativeY: -root.cornerRadius
@@ -138,16 +166,12 @@ PanelWindow {
                         radiusY:   root.cornerRadius
                         direction: PathArc.Clockwise
                     }
-
-                    // 4 ── TOP EDGE
                     PathLine {
                         relativeX: Math.max(0, liquidShape.width
                                               - root.effectiveShoulder * 2
                                               - root.cornerRadius * 2)
                         relativeY: 0
                     }
-
-                    // 5 ── TOP-RIGHT CORNER (convex)
                     PathArc {
                         relativeX: root.cornerRadius
                         relativeY: root.cornerRadius
@@ -155,16 +179,12 @@ PanelWindow {
                         radiusY:   root.cornerRadius
                         direction: PathArc.Clockwise
                     }
-
-                    // 6 ── RIGHT WALL
                     PathLine {
                         relativeX: 0
                         relativeY: Math.max(0, root.targetHeight
                                                - root.effectiveShoulder
                                                - root.cornerRadius)
                     }
-
-                    // 7 ── RIGHT SHOULDER (concave)
                     PathArc {
                         relativeX: root.effectiveShoulder
                         relativeY: root.effectiveShoulder
@@ -176,7 +196,6 @@ PanelWindow {
                     PathLine { x: 0; y: liquidShape.height }
                 }
 
-                // ── Clipped content ───────────────────────────────────────────
                 Item {
                     anchors.bottom:           parent.bottom
                     anchors.bottomMargin:     root.effectiveShoulder
@@ -185,7 +204,6 @@ PanelWindow {
                     height: Math.max(0, root.targetHeight - root.effectiveShoulder)
                     clip:   true
 
-                    // Appears late in reveal, vanishes early on exit
                     opacity: Math.min(1.0, Math.max(0.0,
                                  (root.targetHeight - 110.0) / 70.0))
 
@@ -212,7 +230,6 @@ PanelWindow {
                 }
             }
 
-            // Dismiss — only active while fully revealed
             MouseArea {
                 anchors.fill: liquidShape
                 enabled:      shell.state === "revealed"
