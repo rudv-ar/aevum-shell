@@ -11,7 +11,7 @@
 
 [general]
 ## Import additional configuration files.
-import = ["~/.config/bspwm/apps/alacritty/themes/nord.toml", "~/.config/bspwm/apps/alacritty/fonts.toml"]
+import = ["~/.config/bspwm/apps/alacritty/theme.toml", "~/.config/bspwm/apps/alacritty/fonts.toml"]
 
 ## You can set shell.program to the path of your favorite shell, e.g. /bin/zsh.
 ## Entries in shell.args are passed as arguments to the shell.
