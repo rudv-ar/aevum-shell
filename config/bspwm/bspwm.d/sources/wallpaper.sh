@@ -18,4 +18,4 @@ wall_disfree_dir="$HOME/Workspace/Wallpapers"
 wall_single=true
 
 # the path of that single wallpaper
-wall_wallpaper="$wall_dir/ign_yourName.png"
+wall_wallpaper="$wall_dir/ign_unsplash46.png"

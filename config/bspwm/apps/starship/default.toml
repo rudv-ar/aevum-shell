@@ -1,28 +1,28 @@
 "$schema" = 'https://starship.rs/config-schema.json'
 
 format = """
-[░▒▓](bg:#b3c5ff)\
-[ 󰣇 ](bg:#b3c5ff fg:#101114)\
-[](bg:#718ee0 fg:#b3c5ff)\
+[░▒▓](bg:#94ccff)\
+[ 󰣇 ](bg:#94ccff fg:#0f1113)\
+[](bg:#4397d6 fg:#94ccff)\
 $directory\
-[](fg:#718ee0 bg:#21428f)\
+[](fg:#4397d6 bg:#004b74)\
 $git_branch\
 $git_status\
-[](fg:#21428f bg:#303034)\
+[](fg:#004b74 bg:#2f3033)\
 $nodejs\
 $rust\
 $golang\
 $php\
-[](fg:#303034 bg:#252629)\
+[](fg:#2f3033 bg:#242628)\
 $time\
-[ ](fg:#252629)\
+[ ](fg:#242628)\
 \n$character"""
 
 scan_timeout = 500
 command_timeout = 2000
 
 [directory]
-style = "fg:#e4e2e6 bg:#718ee0"
+style = "fg:#e2e2e5 bg:#4397d6"
 format = "[ $path ]($style)"
 truncation_length = 3
 truncation_symbol = "…/"
@@ -35,35 +35,35 @@ truncation_symbol = "…/"
 
 [git_branch]
 symbol = ""
-style = "bg:#21428f"
-format = '[[ $symbol $branch ](fg:#718ee0 bg:#21428f)]($style)'
+style = "bg:#004b74"
+format = '[[ $symbol $branch ](fg:#4397d6 bg:#004b74)]($style)'
 
 [git_status]
-style = "bg:#21428f"
-format = '[[($all_status$ahead_behind )](fg:#718ee0 bg:#21428f)]($style)'
+style = "bg:#004b74"
+format = '[[($all_status$ahead_behind )](fg:#4397d6 bg:#004b74)]($style)'
 
 [nodejs]
 symbol = ""
-style = "bg:#303034"
-format = '[[ $symbol ($version) ](fg:#718ee0 bg:#303034)]($style)'
+style = "bg:#2f3033"
+format = '[[ $symbol ($version) ](fg:#4397d6 bg:#2f3033)]($style)'
 
 [rust]
 symbol = ""
-style = "bg:#303034"
-format = '[[ $symbol ($version) ](fg:#718ee0 bg:#303034)]($style)'
+style = "bg:#2f3033"
+format = '[[ $symbol ($version) ](fg:#4397d6 bg:#2f3033)]($style)'
 
 [golang]
 symbol = ""
-style = "bg:#303034"
-format = '[[ $symbol ($version) ](fg:#718ee0 bg:#303034)]($style)'
+style = "bg:#2f3033"
+format = '[[ $symbol ($version) ](fg:#4397d6 bg:#2f3033)]($style)'
 
 [php]
 symbol = ""
-style = "bg:#303034"
-format = '[[ $symbol ($version) ](fg:#718ee0 bg:#303034)]($style)'
+style = "bg:#2f3033"
+format = '[[ $symbol ($version) ](fg:#4397d6 bg:#2f3033)]($style)'
 
 [time]
 disabled = false
 time_format = "%R"
-style = "bg:#252629"
-format = '[[  $time ](fg:#aaaab4 bg:#252629)]($style)'
+style = "bg:#242628"
+format = '[[  $time ](fg:#a6acb3 bg:#242628)]($style)'
