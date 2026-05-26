@@ -26,6 +26,86 @@ PanelWindow {
     property real effectiveShoulder: shoulderRadius
         + Math.max(0, (160.0 - targetHeight) / 160.0) * 18
 
+    // ── X11 focus state ────────────────────────────────────────────────────
+    // Holds the window ID that was active before the launcher opened.
+    property string prevWindowId: ""
+
+    // ── Convenience: open / close logic used everywhere ───────────────────
+    function doOpen(): void {
+        if (shell.state !== "revealed")
+            captureWindowProc.running = true   // chains into reveal after stdout
+    }
+
+    function doClose(): void {
+        if (shell.state === "revealed") {
+            restoreFocusProc.running   = true
+            writeStateClosed.running   = true
+            shell.state                = ""
+        }
+    }
+
+    // ── State-file writers ─────────────────────────────────────────────────
+    Process {
+        id: writeStateOpen
+        command: [
+            "bash", "-c",
+            "mkdir -p \"${HOME}/.config/aevum/settings/states\" && " +
+            "printf 'open\\n' > \"${HOME}/.config/aevum/settings/states/.launcher.state\""
+        ]
+    }
+
+    Process {
+        id: writeStateClosed
+        command: [
+            "bash", "-c",
+            "mkdir -p \"${HOME}/.config/aevum/settings/states\" && " +
+            "printf 'closed\\n' > \"${HOME}/.config/aevum/settings/states/.launcher.state\""
+        ]
+    }
+
+    // ── X11 focus: capture active window, then open ────────────────────────
+    // Running this process is the single entry-point for opening the launcher.
+    // After stdout is collected the prevWindowId is stored and reveal happens.
+    Process {
+        id: captureWindowProc
+        command: ["xdotool", "getactivewindow"]
+        stdout: StdioCollector {
+            onStreamFinished: {
+                var wid = this.text.trim()
+                if (wid !== "") root.prevWindowId = wid
+                shell.state = "revealed"    // triggers onStateChanged below
+            }
+        }
+    }
+
+    // Short delay so the qs-launcher window has time to map before we focus it.
+    Timer {
+        id: focusDelayTimer
+        interval: 120
+        repeat:   false
+        onTriggered: focusLauncherProc.running = true
+    }
+
+    // Focus the Quickshell launcher window via its WM_CLASS.
+    Process {
+        id: focusLauncherProc
+        command: [
+            "bash", "-c",
+            "xdotool windowfocus $(xdotool search --class 'qs-launcher' | head -1)"
+        ]
+    }
+
+    // Restore focus to whatever window was active before the launcher opened.
+    Process {
+        id: restoreFocusProc
+        // Binding re-evaluates whenever prevWindowId changes, so the right ID
+        // is always used when running is set to true.
+        command: root.prevWindowId !== ""
+            ? ["xdotool", "windowfocus", "--sync", root.prevWindowId]
+            : ["bash", "-c", ":"]
+    }
+
+    // ─────────────────────────────────────────────────────────────────────
     mask: Region { item: maskHelper }
 
     Item {
@@ -39,10 +119,13 @@ PanelWindow {
     }
 
     IpcHandler {
-        target: "dock"
-        function toggle(): void { shell.state = (shell.state === "revealed") ? "" : "revealed" }
-        function open(): void   { shell.state = "revealed" }
-        function close(): void  { shell.state = "" }
+        target: "launcher"
+        function toggle(): void {
+            if (shell.state === "revealed") root.doClose()
+            else                            root.doOpen()
+        }
+        function open(): void  { root.doOpen()  }
+        function close(): void { root.doClose() }
     }
 
     Item {
@@ -52,8 +135,13 @@ PanelWindow {
 
         onStateChanged: {
             if (state === "revealed") {
+                // Qt-level focus for keyboard input
                 shell.Window.window.requestActivate()
                 searchInput.forceActiveFocus()
+                // X11-level focus (slight delay for window to map)
+                focusDelayTimer.restart()
+                // Persist state
+                writeStateOpen.running = true
             }
         }
 
@@ -81,7 +169,7 @@ PanelWindow {
             }
         ]
 
-        // ── Trigger strip ─────────────────────────────────────────────────────
+        // ── Trigger strip ──────────────────────────────────────────────────
         Item {
             id: triggerStrip
             anchors.bottom:           parent.bottom
@@ -94,13 +182,13 @@ PanelWindow {
             MouseArea {
                 anchors.fill: parent
                 cursorShape:  Qt.PointingHandCursor
-                onClicked:    if (shell.state === "") shell.state = "revealed"
+                onClicked:    root.doOpen()
             }
         }
 
-        // ── Dock body ─────────────────────────────────────────────────────────
+        // ── launcher body ──────────────────────────────────────────────────────
         Item {
-            id: dockBody
+            id: launcherBody
             anchors.bottom:           triggerStrip.top
             anchors.horizontalCenter: parent.horizontalCenter
             width:  root.shapeWidth
@@ -157,7 +245,7 @@ PanelWindow {
                     PathLine { x: 0; y: liquidShape.height }
                 }
 
-                // ── Content inside dock ───────────────────────────────────────
+                // ── Content inside launcher ───────────────────────────────────
                 Item {
                     anchors.bottom:           parent.bottom
                     anchors.bottomMargin:     root.effectiveShoulder
@@ -174,7 +262,7 @@ PanelWindow {
                         spacing: 10
 
                         Text {
-                            text:  "LIQUID DOCK"
+                            text:  "LIQUID launcher"
                             color: "#00ffff"
                             font.bold: true
                             Layout.alignment: Qt.AlignHCenter
@@ -182,7 +270,7 @@ PanelWindow {
 
                         Item { Layout.fillHeight: true }
 
-                        // ── Input bar ─────────────────────────────────────────
+                        // ── Input bar ─────────────────────────────────────
                         Rectangle {
                             Layout.fillWidth: true
                             height: 36
@@ -217,12 +305,12 @@ PanelWindow {
                                 Keys.onReturnPressed: {
                                     console.log("Input submitted:", text)
                                     text = ""
-                                    shell.state = ""
+                                    root.doClose()
                                 }
 
                                 Keys.onEscapePressed: {
                                     text = ""
-                                    shell.state = ""
+                                    root.doClose()
                                 }
                             }
                         }
@@ -237,7 +325,7 @@ PanelWindow {
                 cursorShape:             Qt.PointingHandCursor
                 onClicked: (mouse) => {
                     if (!searchInput.contains(mapToItem(searchInput, mouse.x, mouse.y)))
-                        shell.state = ""
+                        root.doClose()
                     else
                         mouse.accepted = false
                 }
