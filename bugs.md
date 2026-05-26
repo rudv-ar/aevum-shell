@@ -10,11 +10,12 @@
     ask either to overwrite |
     ask to record in new file | 
 
+
+[status : fixed]
+
 : SrcRec.qml - fix the layout bug
     the mode selector in screen record should be same level as in other sections | 
     that is, right align the mode selector |
-
-[status : fixed]
 
 : *Properties.qml - migrate to config logic 
     now users can change the settings via ~/.config/aevum/settings/config.json | 
