@@ -1,6 +1,6 @@
 [colors.primary]
 background = '{{colors.background.default.hex}}'
-foreground = '{{colors.on_surface.default.hex}}'
+foreground = '{{palettes.primary._70.hex}}'
  
 [colors.cursor]
 text = '{{colors.on_surface.default.hex}}'

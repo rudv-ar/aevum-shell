@@ -3,3 +3,13 @@
 [templates.alacritty]
 input_path  = '~/.config/matugen/templates/alacritty.toml'
 output_path = '~/.config/alacritty/theme.toml'
+
+[templates.btop]
+input_path = '~/.config/matugen/templates/btop.theme'
+output_path = '~/.config/btop/themes/matugen.theme'
+post_hook = 'pkill -USR2 btop || true'
+
+[templates.starship]
+input_path = '~/.config/matugen/templates/starship.toml'
+output_path = '~/.config/bspwm/apps/starship/default.toml'
+

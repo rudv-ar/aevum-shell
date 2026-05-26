@@ -1,0 +1,83 @@
+"$schema" = 'https://starship.rs/config-schema.json'
+format = """
+[░▒▓](fg:{{palettes.primary._80.hex}})\
+[ 󰣇 ](bg:{{palettes.primary._80.hex}} fg:{{palettes.neutral._5.hex}})\
+[](fg:{{palettes.primary._80.hex}} bg:{{palettes.primary._60.hex}})\
+$directory\
+[](fg:{{palettes.primary._60.hex}} bg:{{palettes.primary._30.hex}})\
+$git_branch\
+$git_status\
+[](fg:{{palettes.primary._30.hex}} bg:{{palettes.neutral._20.hex}})\
+$nodejs\
+$rust\
+$golang\
+$php\
+[](fg:{{palettes.neutral._20.hex}} bg:{{palettes.neutral._15.hex}})\
+$time\
+[](fg:{{palettes.neutral._15.hex}})\
+\n$character"""
+
+scan_timeout = 500
+command_timeout = 2000
+
+[directory]
+style = "fg:{{palettes.neutral._90.hex}} bg:{{palettes.primary._60.hex}}"
+format = "[ $path ]($style)"
+truncation_length = 3
+truncation_symbol = "…/"
+
+[directory.substitutions]
+"Documents" = "󰈙 "
+"Downloads" = " "
+"Music" = "󰝚 "
+"Pictures" = "󰉏 "
+
+[git_branch]
+symbol = "󰘬"
+style = "bg:{{palettes.primary._30.hex}}"
+format = '[[ $symbol $branch ](fg:{{palettes.primary._60.hex}} bg:{{palettes.primary._30.hex}})]($style)'
+
+[git_status]
+style = "bg:{{palettes.primary._30.hex}}"
+format = '[[($all_status$ahead_behind )](fg:{{palettes.primary._60.hex}} bg:{{palettes.primary._30.hex}})]($style)'
+conflicted = "󰞇 "
+ahead = "󰁝${count} "
+behind = "󰁅${count} "
+diverged = "󰹺 "
+untracked = "󰄱 "
+stashed = "󰆓 "
+modified = "󰷈 "
+staged = "󰐕 "
+renamed = "󰑕 "
+deleted = "󰮉 "
+
+[nodejs]
+symbol = "󰎙"
+style = "bg:{{palettes.neutral._20.hex}}"
+format = '[[ $symbol ($version) ](fg:{{palettes.primary._60.hex}} bg:{{palettes.neutral._20.hex}})]($style)'
+
+[rust]
+symbol = "󱘗"
+style = "bg:{{palettes.neutral._20.hex}}"
+format = '[[ $symbol ($version) ](fg:{{palettes.primary._60.hex}} bg:{{palettes.neutral._20.hex}})]($style)'
+
+[golang]
+symbol = "󰟓"
+style = "bg:{{palettes.neutral._20.hex}}"
+format = '[[ $symbol ($version) ](fg:{{palettes.primary._60.hex}} bg:{{palettes.neutral._20.hex}})]($style)'
+
+[php]
+symbol = "󰌟"
+style = "bg:{{palettes.neutral._20.hex}}"
+format = '[[ $symbol ($version) ](fg:{{palettes.primary._60.hex}} bg:{{palettes.neutral._20.hex}})]($style)'
+
+[time]
+disabled = false
+time_format = "%R"
+style = "bg:{{palettes.neutral._15.hex}}"
+format = '[[  $time ](fg:{{palettes.neutral_variant._70.hex}} bg:{{palettes.neutral._15.hex}})]($style)'
+
+[character]
+success_symbol = "[❯](bold fg:{{palettes.primary._60.hex}})"
+error_symbol = "[❯](bold fg:#ff5f5f)"
+vimcmd_symbol = "[❮](bold fg:{{palettes.primary._60.hex}})"
