@@ -5,8 +5,9 @@
 
 ##################################################### SOURCES ###########################################
 # source the necessary import files...
-source "/home/rudv-ar/.config/bspwm/bspwm.d/exports.sh"
+source "$HOME/.config/bspwm/bspwm.d/exports.sh"
 
+source "$HOME/.config/bspwm/bspwm.d/sources/widget.sh"
 ##################################################### BORDERS ###########################################
 # set the border colors
 bspwm_borders_active_color='#000000'
@@ -42,11 +43,17 @@ bspwm_scheme_automatic_scheme='spiral'
 bspwm_window_gapped_gap=10
 
 # set additional window manager padding
-bspwm_window_padded_bottom=10
-bspwm_window_padded_left=10
-bspwm_window_padded_right=10
-bspwm_window_padded_top=35
-
+if [[ "$is_widget" == "true" && "$widget_bar" == 'quickshell' ]]; then
+  bspwm_window_padded_bottom=10
+  bspwm_window_padded_left=10
+  bspwm_window_padded_right=10
+  bspwm_window_padded_top=35
+else 
+  bspwm_window_padded_bottom=0
+  bspwm_window_padded_left=0
+  bspwm_window_padded_right=0
+  bspwm_window_padded_top=0
+fi
 # set the status prefix
 bspwm_window_prefix=''
 

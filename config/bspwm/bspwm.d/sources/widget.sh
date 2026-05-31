@@ -5,11 +5,16 @@
 
 ############################################# WIDGET ##############################################
 # is widget system enabled?
-is_widget=true
+export is_widget=false
 
 # what widget bar is the system using?
-widget_bar='quickshell'
+export widget_bar='quickshell'
 
+if [[ "$widget_bar" == "quickshell" && "$is_widget" == "true" ]]; then 
+  echo "$widget_bar" > ~/.config/aevum/settings/states/.shell.state
+else 
+  echo "null"  > ~/.config/aevum/settings/states/.shell.state 
+fi
 is_plank=false
 
 # [ tip : the other bars include : polybar, eww, quickshell, lemonbar, etc]
