@@ -48,7 +48,7 @@
     enableDefaultConfig = false;
 
     # match the block in user@<block here>:.... while loggin in via ssh
-    matchBlocks = {
+    settings = {
       # this one matches git@learn:
       "learn" = {
         # hostname is github.com
