@@ -12,5 +12,16 @@
   imports = [
     ./modules/alacritty.nix
     ./modules/fish.nix
+    ./modules/btop.nix 
+    ./modules/dunst.nix 
+    ./modules/bspwm.nix 
+    ./modules/geany.nix 
+    ./modules/matugen.nix 
+    ./modules/neofetch.nix 
+    ./modules/nvim.nix 
+    ./modules/plank.nix 
+    ./modules/ranger.nix 
+    ./modules/rofi.nix 
+    ./modules/vicinae.nix
   ];
 }
