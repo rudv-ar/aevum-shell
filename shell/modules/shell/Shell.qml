@@ -4,12 +4,11 @@ import QtQuick
 import QtQuick.Effects
 import Quickshell
 import qs.config
-import qs.modules.bar          // ← new
+import qs.modules.bar
 
 PanelWindow {
     id: root
 
-    // ── Required ──────────────────────────────────────
     required property ShellScreen screen
 
     // ── Hole margins ──────────────────────────────────
@@ -19,7 +18,6 @@ PanelWindow {
     readonly property int mBottom: Theme.holeBottom
     readonly property int mRadius: Theme.holeRadius
 
-    // ── Color ─────────────────────────────────────────
     readonly property color frameCol: Theme.frameColor
 
     // ── Hole rect ─────────────────────────────────────
@@ -28,13 +26,12 @@ PanelWindow {
     readonly property int hW: width  - mLeft - mRight
     readonly property int hH: height - mTop  - mBottom
 
-    // ── Click mask bounds ─────────────────────────────
+    // ── Click mask ────────────────────────────────────
     readonly property int maskX: hX + Theme.holeTop
     readonly property int maskY: hY + Theme.holeBottom
     readonly property int maskW: hW - Theme.holeRight
     readonly property int maskH: hH - 2 * Theme.holeRight
 
-    // ── Window ────────────────────────────────────────
     screen:         root.screen
     anchors.top:    true
     anchors.bottom: true
@@ -43,7 +40,6 @@ PanelWindow {
     exclusionMode:  ExclusionMode.Ignore
     color:          "transparent"
 
-    // ── Click mask ────────────────────────────────────
     mask: Region {
         item:         clickHole
         intersection: Intersection.Xor
@@ -57,7 +53,7 @@ PanelWindow {
         height: root.maskH
     }
 
-    // ── Frame with hole punched via MultiEffect ────────
+    // ── Frame ─────────────────────────────────────────
     Rectangle {
         anchors.fill: parent
         color:        root.frameCol
@@ -72,7 +68,6 @@ PanelWindow {
         }
     }
 
-    // ── Hole shape source ─────────────────────────────
     Item {
         id:            holeShape
         anchors.fill:  parent
@@ -88,14 +83,22 @@ PanelWindow {
         }
     }
 
-    // ── Launcher pill (left strip, near top) ──────────
-    // x: centered in the 35px left strip
-    // y: mTop + pillTopPad so it breathes below the frame edge
+    // ── Launcher pill ─────────────────────────────────
     Launcher {
         x: Math.round((root.mLeft - Theme.pillWidth)  / 2)
         y: root.mTop + Theme.pillTopPad
-        z: 10   // above frame rectangle
-        onLeftClicked: function () { }
+        z: 10
+        onLeftClicked:  function () { }
         onRightClicked: function () { }
     }
-}
+
+    // ── Workspace indicator ───────────────────────────
+    WsIndicator {
+        x: 0
+        y: root.mTop
+            + Theme.pillTopPad
+            + Theme.pillHeight
+            + Theme.wsIndicatorTopGap
+        z: 10
+    }
+}  
