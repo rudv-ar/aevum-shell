@@ -5,7 +5,7 @@
 
 ############################################# WIDGET ##############################################
 # is widget system enabled?
-export is_widget=true
+export is_widget=false
 
 # what widget bar is the system using?
 export widget_bar='quickshell'
