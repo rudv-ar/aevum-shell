@@ -3,7 +3,6 @@
   programs.fish = {
     enable = true;
 
-    # config.fish
     interactiveShellInit = ''
       if test -e /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.fish
         source /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.fish
@@ -15,14 +14,12 @@
       set -gx LS_COLORS "$LS_COLORS:ow=0:tw=0"
       set -g fish_greeting
 
-      # Starship
       if test "$TERM" != "linux"
         set -x STARSHIP_CONFIG ~/.config/bspwm/apps/starship/default.toml
         starship init fish | source
       end
     '';
 
-    # aliases
     shellAliases = {
       grep = "grep --color=auto";
       cdir = "cd ~/Workspace/C";
@@ -38,132 +35,59 @@
       gp = "git push";
     };
 
-    # functions
     functions = {
-      aevum = {
-        body = ''
-          set -l AEVUM_DIR "$HOME/.config/aevum"
-          set -l INSTALLER "$AEVUM_DIR/cli/installer"
-          set -l SUBCMD "$AEVUM_DIR/cli/subcommands"
+      fish_greeting.body = ''
+        set_color "white"
+        figlet -f slant "Aevum"
+        set_color normal
+      '';
 
-          switch "$argv[1]"
-            case '' --help -h help
-              if test "$argv[1]" = ""
-                cd $AEVUM_DIR
-                return
-              end
-              echo ""
-              echo "  Usage: aevum <command> [args]"
-              echo ""
-              echo "  (no args)                  cd into ~/.config/aevum"
-              echo "  deps <args>                run deps.sh"
-              echo "  link-config <args>         run config-linker.sh"
-              echo "  link-local <args>          run local-linker.sh"
-              echo "  srcrec <args>              run srcrec.sh"
-              echo "  help                       show this message"
-              echo ""
-            case deps
-              bash $INSTALLER/deps.sh $argv[2..]
-            case link-config
-              bash $INSTALLER/config-linker.sh $argv[2..]
-            case link-local
-              bash $INSTALLER/local-linker.sh $argv[2..]
-            case srcrec
-              bash $SUBCMD/srcrec.sh $argv[2..]
-            case '*'
-              echo "  ✗  Unknown command: $argv[1]"
-              echo "     Run 'aevum help' for usage"
-              return 1
-          end
-        '';
-      };
+      initbspwm.body = ''
+        exec startx 1> ~/.startx.log 2>&1
+      '';
 
-      fish_greeting = {
-        body = ''
-          set_color "white"
-          figlet -f slant "Aevum"
-          set_color normal
-        '';
-      };
+      notify-send.body = ''
+        xdo raise -N "qs-notify"
+        xdo raise -N "qs-powermenu"
+        /usr/bin/notify-send $argv
+      '';
 
-      initbspwm = {
-        body = ''
-          exec startx 1> ~/.startx.log 2>&1
-        '';
-      };
+      thunar_pseudo.body = ''
+        bspc rule -a Thunar --one-shot state=pseudo_tiled
+        thunar &
+        set window_id_thun (xdotool search --sync --class Thunar | tail -1)
+        xdotool windowsize $window_id_thun 1000 600
+      '';
 
-      notify-send = {
-        body = ''
-          xdo raise -N "qs-notify"
-          xdo raise -N "qs-powermenu"
-          /usr/bin/notify-send $argv
-        '';
-      };
+      wallpicker.body = ''
+        qs -p ~/.config/bspwm/apps/wallpicker/shell.qml
+      '';
 
-      thunar_pseudo = {
-        body = ''
-          bspc rule -a Thunar --one-shot state=pseudo_tiled
-          thunar &
-          set window_id_thun (xdotool search --sync --class Thunar | tail -1)
-          xdotool windowsize $window_id_thun 1000 600
-        '';
-      };
+      ls.body = ''
+        if test "$TERM" = "linux"
+          command ls $argv
+        else
+          eza --icons $argv
+        end
+      '';
 
-      wallpicker = {
-        body = ''
-          qs -p ~/.config/bspwm/apps/wallpicker/shell.qml
-        '';
-      };
+      ll.body = ''
+        if test "$TERM" = "linux"
+          command ls -l $argv
+        else
+          eza --icons -l $argv
+        end
+      '';
 
-      fenv = {
-        body = ''
-          if count $argv >/dev/null
-            if string trim -- $argv | string length -q
-              fenv.main $argv
-              return $status
-            end
-            return 0
-          else
-            echo (set_color red)'error:' (set_color normal)'parameter missing'
-            echo (set_color cyan)'usage:' (set_color normal)'fenv <bash command>'
-            return 23
-          end
-        '';
-      };
-
-      # TTY vs GUI aliases
-      ls = {
-        body = ''
-          if test "$TERM" = "linux"
-            command ls $argv
-          else
-            eza --icons $argv
-          end
-        '';
-      };
-
-      ll = {
-        body = ''
-          if test "$TERM" = "linux"
-            command ls -l $argv
-          else
-            eza --icons -l $argv
-          end
-        '';
-      };
-
-      la = {
-        body = ''
-          if test "$TERM" = "linux"
-            command ls -la $argv
-          else
-            eza --icons -la $argv
-          end
-        '';
-      };
+      la.body = ''
+        if test "$TERM" = "linux"
+          command ls -la $argv
+        else
+          eza --icons -la $argv
+        end
+      '';
     };
 
-    # plugins
     plugins = [
       {
         name = "foreign-env";
@@ -171,4 +95,15 @@
       }
     ];
   };
+
+  # aevum function as a separate file to avoid Nix string escaping issues
+  home.file.".config/fish/functions/aevum.fish".source =
+    ../config/fish/functions/aevum.fish;
+
+  # fenv functions
+  home.file.".config/fish/functions/fenv.fish".source =
+    ../config/fish/functions/fenv.fish;
+
+  home.file.".config/fish/functions/fenv.main.fish".source =
+    ../config/fish/functions/fenv.main.fish;
 }
