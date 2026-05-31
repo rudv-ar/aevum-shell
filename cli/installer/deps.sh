@@ -1,5 +1,5 @@
 #!/bin/bash
-# ~/.config/aevum/deps.sh
+# ~/.config/aevum/cli/installer/deps.sh
 # Usage: deps <command> [subcommand] [flags]
 
 # ── Colors ────────────────────────────────────────────────────────────────────
@@ -67,7 +67,6 @@ PACMAN_DEPS=(
     xfce-polkit
 
     # mirrorlist + fonts
-    archcraft-mirrorlist
     archcraft-fonts
 
     # archcraft themes
@@ -112,7 +111,7 @@ PACMAN_DEPS=(
     archcraft-cursor-windows
 
     redshift
-    slop 
+    slop
 )
 
 AUR_DEPS=(
@@ -154,7 +153,6 @@ usage() {
 
 # ── Core actions ──────────────────────────────────────────────────────────────
 _setup_repo() {
-    local force="${1:-}"
     section "Archcraft Repo"
     if grep -q "\[archcraft\]" /etc/pacman.conf; then
         success "Archcraft repo already present"
@@ -197,7 +195,6 @@ _remove_keyring() {
     warn "This will remove [archcraft] from /etc/pacman.conf and delete the mirrorlist."
     printf "  Are you sure? [y/N] "; read -r confirm
     [[ "${confirm,,}" != "y" ]] && warn "Aborted." && return
-
     info "Removing [archcraft] block from /etc/pacman.conf..."
     sudo sed -i '/^\[archcraft\]/,/^$/d' /etc/pacman.conf
     sudo rm -f /etc/pacman.d/archcraft-mirrorlist
@@ -205,28 +202,93 @@ _remove_keyring() {
     success "Archcraft repo removed"
 }
 
+# ── Install with retry ────────────────────────────────────────────────────────
+_install_with_retry() {
+    local pkg="$1"
+    local force="${2:-}"
+    local use_yay="${3:-false}"
+    local max_retries=3
+    local attempt=1
+
+    while [[ $attempt -le $max_retries ]]; do
+        info "[$attempt/$max_retries] Installing ${BLD}$pkg${RST}..."
+        if [[ "$use_yay" == "true" ]]; then
+            if [[ "$force" == "-f" ]]; then
+                yay -S "$pkg" --noconfirm && return 0
+            else
+                yay -S --needed "$pkg" --noconfirm && return 0
+            fi
+        else
+            if [[ "$force" == "-f" ]]; then
+                sudo pacman -S "$pkg" --noconfirm && return 0
+            else
+                sudo pacman -S --needed "$pkg" --noconfirm && return 0
+            fi
+        fi
+        warn "Attempt $attempt failed for ${BLD}$pkg${RST}. Retrying in 5s..."
+        sleep 5
+        (( attempt++ ))
+    done
+
+    return 1
+}
+
 _install_pacman() {
     local force="${1:-}"
     section "Installing Pacman Deps"
-    if [[ "$force" == "-f" ]]; then
-        info "Force installing pacman deps..."
-        sudo pacman -S "${PACMAN_DEPS[@]}"
+
+    local failed=()
+    local total=${#PACMAN_DEPS[@]}
+    local current=0
+
+    for pkg in "${PACMAN_DEPS[@]}"; do
+        (( current++ ))
+        echo -e "  ${DIM}[$current/$total]${RST}"
+        if ! _install_with_retry "$pkg" "$force" "false"; then
+            failed+=("$pkg")
+            error "Failed: $pkg — skipping"
+        fi
+    done
+
+    echo ""
+    if [[ ${#failed[@]} -gt 0 ]]; then
+        warn "${#failed[@]} package(s) failed:"
+        for f in "${failed[@]}"; do
+            error "$f"
+        done
+        warn "Retry with: deps install <pkg>"
     else
-        sudo pacman -S --needed "${PACMAN_DEPS[@]}"
+        success "All pacman deps installed"
     fi
-    success "Pacman deps done"
 }
 
 _install_yay() {
     local force="${1:-}"
     section "Installing AUR Deps"
-    if [[ "$force" == "-f" ]]; then
-        info "Force installing AUR deps..."
-        yay -S "${AUR_DEPS[@]}"
+
+    local failed=()
+    local total=${#AUR_DEPS[@]}
+    local current=0
+
+    for pkg in "${AUR_DEPS[@]}"; do
+        (( current++ ))
+        echo -e "  ${DIM}[$current/$total]${RST}"
+        if ! _install_with_retry "$pkg" "$force" "true"; then
+            failed+=("$pkg")
+            error "Failed: $pkg — skipping"
+        fi
+    done
+
+    echo ""
+    if [[ ${#failed[@]} -gt 0 ]]; then
+        warn "${#failed[@]} package(s) failed:"
+        for f in "${failed[@]}"; do
+            error "$f"
+        done
+        warn "Retry with: deps install <pkg>"
     else
-        yay -S --needed "${AUR_DEPS[@]}"
+        success "All AUR deps installed"
     fi
-    success "AUR deps done"
 }
 
 _install_pkg() {
@@ -234,28 +296,17 @@ _install_pkg() {
     local force="${2:-}"
     section "Installing: $pkg"
 
-    # check if it's a known dep
     local known=false
     for d in "${PACMAN_DEPS[@]}" "${AUR_DEPS[@]}"; do
         [[ "$d" == "$pkg" ]] && known=true && break
     done
     [[ "$known" == false ]] && warn "$pkg is not in the aevum dep list — installing anyway"
 
-    if [[ "$force" == "-f" ]]; then
-        info "Force installing $pkg..."
-        if pacman -Si "$pkg" &>/dev/null; then
-            sudo pacman -S "$pkg"
-        else
-            yay -S "$pkg"
-        fi
+    if pacman -Si "$pkg" &>/dev/null; then
+        _install_with_retry "$pkg" "$force" "false" && success "$pkg installed" || error "$pkg failed after retries"
     else
-        if pacman -Si "$pkg" &>/dev/null; then
-            sudo pacman -S --needed "$pkg"
-        else
-            yay -S --needed "$pkg"
-        fi
+        _install_with_retry "$pkg" "$force" "true" && success "$pkg installed" || error "$pkg failed after retries"
     fi
-    success "$pkg installed"
 }
 
 _verify() {
