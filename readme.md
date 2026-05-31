@@ -1,5 +1,8 @@
 # Aevum Shell
 
+> [!NOTE]
+> This is the caelestia version of aevum shell. Do not expect it to work exactly as in caelestia, but I try to make it as similar as possible. 
+
 Have you ever wondered how quickshell works in wayland? But its documentation says — it is not exclusive for wayland alone. Its basic non-wayland features are compatible with x11 as well, but we need to do other logic lifting which is not in x11 that is in wayland via scripts.
 
 ## Why Aevum Shell?
