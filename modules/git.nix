@@ -52,19 +52,21 @@
       # this one matches git@learn:
       "learn" = {
         # hostname is github.com
-        hostname = "github.com";
+        Hostname = "github.com";
         # this is the only user github allows while logging in via ssh
-        user = "git";
-        port = 443;
+        User = "git";
+        Port = 443;
         # ssh key generated and configured via ssh-keygen or github-cli        
-        identityFile = "~/.ssh/github_personal";
+        IdentityFile = "~/.ssh/github_personal";
+        AddressFamily = "inet";
       };
       # this one is for another identity
       "build" = {
-        hostname = "github.com";
-        user = "git";
-        port = 443;
-        identityFile = "~/.ssh/github_work";
+        Hostname = "github.com";
+        User = "git";
+        Port = 443;
+        IdentityFile = "~/.ssh/github_work";
+        AddressFamily = "inet";
       };
     };
   };
