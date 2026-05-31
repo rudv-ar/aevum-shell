@@ -1,3 +1,0 @@
-module qs.services.network
-singleton NetworkService 1.0 NetworkService.qml
-

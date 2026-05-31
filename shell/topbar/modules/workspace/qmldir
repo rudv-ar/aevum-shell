@@ -1,5 +1,0 @@
-module qs.modules.workspace
-WorkspaceIndicator 1.0 WorkspaceIndicator.qml
-WorkspaceDot       1.0 WorkspaceDot.qml
-WorkspaceIcon      1.0 WorkspaceIcon.qml
-

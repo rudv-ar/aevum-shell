@@ -1,4 +1,0 @@
-module qs.modules.clock
-ClockPill 1.0 ClockPill.qml
-ClockPillHover 1.0 ClockPillHover.qml
-
