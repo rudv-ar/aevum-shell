@@ -4,7 +4,10 @@
     username = "cobra";
     homeDirectory = "/home/cobra";
     stateVersion = "24.11";
-    packages = with pkgs; [];
+    packages = with pkgs; [
+      git 
+      ssh 
+    ];
   };
 
   targets.genericLinux.enable = true;
@@ -23,5 +26,6 @@
     ./modules/ranger.nix 
     ./modules/rofi.nix 
     ./modules/vicinae.nix
+    ./modules/git.nix
   ];
 }
