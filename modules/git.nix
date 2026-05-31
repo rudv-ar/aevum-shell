@@ -7,10 +7,9 @@
     # enable the git program
     enable = true;
     # git config --global user.name and user.email
-    userName = "rudv-ar";
-    userEmail = "rudv.ar.base@gmail.com";
-
-    extraConfig = {
+    settings = {
+      user.name = "rudv-ar";
+      user.email = "rudv.ar.base@gmail.com";
       # set default branch for all git inits to be main
       init.defaultBranch = "main";
       # use git merge instead of rebase
@@ -46,9 +45,11 @@
   programs.ssh = {
     # enables ssh in nix
     enable = true;
+    enableDefaultConfig = false;
+
     # match the block in user@<block here>:.... while loggin in via ssh
-    # this one matches user@learn:
     matchBlocks = {
+      # this one matches git@learn:
       "learn" = {
         # hostname is github.com
         hostname = "github.com";
