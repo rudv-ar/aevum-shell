@@ -4,6 +4,7 @@ import QtQuick
 import QtQuick.Effects
 import Quickshell
 import qs.config
+import qs.modules.bar          // ← new
 
 PanelWindow {
     id: root
@@ -22,19 +23,19 @@ PanelWindow {
     readonly property color frameCol: Theme.frameColor
 
     // ── Hole rect ─────────────────────────────────────
-    readonly property int hX: mLeft 
+    readonly property int hX: mLeft
     readonly property int hY: mTop
-    readonly property int hW: width  - mLeft - mRight 
+    readonly property int hW: width  - mLeft - mRight
     readonly property int hH: height - mTop  - mBottom
 
-    // ── Click mask bounds (hole + 20 all sides) ───────
+    // ── Click mask bounds ─────────────────────────────
     readonly property int maskX: hX + Theme.holeTop
     readonly property int maskY: hY + Theme.holeBottom
     readonly property int maskW: hW - Theme.holeRight
     readonly property int maskH: hH - 2 * Theme.holeRight
 
     // ── Window ────────────────────────────────────────
-    screen:        root.screen
+    screen:         root.screen
     anchors.top:    true
     anchors.bottom: true
     anchors.left:   true
@@ -85,5 +86,16 @@ PanelWindow {
             height: root.hH
             radius: root.mRadius
         }
+    }
+
+    // ── Launcher pill (left strip, near top) ──────────
+    // x: centered in the 35px left strip
+    // y: mTop + pillTopPad so it breathes below the frame edge
+    Launcher {
+        x: Math.round((root.mLeft - Theme.pillWidth)  / 2)
+        y: root.mTop + Theme.pillTopPad
+        z: 10   // above frame rectangle
+        onLeftClicked: function () { }
+        onRightClicked: function () { }
     }
 }

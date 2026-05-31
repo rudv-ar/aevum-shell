@@ -17,7 +17,17 @@ Singleton {
     readonly property color surface1: "#45475a"
     readonly property color accent:   "#cba6f7"
     readonly property color text:     "#cdd6f4"
+    readonly property color textColor: "#ffffff"
+    readonly property color launcherBg: Qt.lighter(base, 3.0)
 
     // ── Semantic ──────────────────────────────────────
     readonly property color frameColor: surface0
+
+    // ── Launcher pill ─────────────────────────────────
+    readonly property int    pillWidth:      24
+    readonly property int    pillHeight:     24
+    readonly property int    pillRadius:     12   // width/2 → perfect capsule ends
+    readonly property int    pillIconSize:   16
+    readonly property int    pillTopPad:     0   // gap from mTop to pill top edge
+    readonly property string nerdFontFamily: "JetBrainsMono Nerd Font"
 }
