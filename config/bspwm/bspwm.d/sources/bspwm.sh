@@ -45,9 +45,9 @@ bspwm_window_gapped_gap=10
 # set additional window manager padding
 if [[ "$is_widget" == "true" && "$widget_bar" == 'quickshell' ]]; then
   bspwm_window_padded_bottom=10
-  bspwm_window_padded_left=10
+  bspwm_window_padded_left=35
   bspwm_window_padded_right=10
-  bspwm_window_padded_top=35
+  bspwm_window_padded_top=10
 else 
   bspwm_window_padded_bottom=0
   bspwm_window_padded_left=0
