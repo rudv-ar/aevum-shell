@@ -55,6 +55,7 @@
         hostname = "github.com";
         # this is the only user github allows while logging in via ssh
         user = "git";
+        port = 443;
         # ssh key generated and configured via ssh-keygen or github-cli        
         identityFile = "~/.ssh/github_personal";
       };
@@ -62,6 +63,7 @@
       "build" = {
         hostname = "github.com";
         user = "git";
+        port = 443;
         identityFile = "~/.ssh/github_work";
       };
     };
