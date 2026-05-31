@@ -1,7 +1,15 @@
-{ pkgs, ...}: {
-  home.username = "cobra";
-  home.homeDirectory = "/home/cobra";
-  home.stateVersion = "24.11";
+{ pkgs, ... }:
+{
+  home = {
+    username = "cobra";
+    homeDirectory = "/home/cobra";
+    stateVersion = "24.11";
+    packages = with pkgs; [];
+  };
+
   targets.genericLinux.enable = true;
-  home.packages = with pkgs; [];
+
+  imports = [
+    ./modules/alacritty.nix
+  ];
 }
