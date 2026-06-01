@@ -8,6 +8,12 @@
       git 
       openssh
     ];
+
+    activation.reloadBspwm = lib.hm.dag.entryAfter ["writeBoundary"] ''
+      if command -v bspc &>/dev/null && bspc query -T &>/dev/null 2>&1; then
+        bspc wm -r
+      fi
+    '';    
   };
 
   targets.genericLinux.enable = true;
