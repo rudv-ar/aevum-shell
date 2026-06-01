@@ -10,7 +10,7 @@
     ];
 
     activation.reloadBspwm = lib.hm.dag.entryAfter ["writeBoundary"] ''
-      bspc wm -r;
+      /usr/bin/bspc wm -r;
     '';    
   };
 
