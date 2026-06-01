@@ -4,7 +4,25 @@ import QtQuick
 import Quickshell
 
 Singleton {
-    // ── Hole margins ───────────────────────────────────
+  // ── Hole margins ───────────────────────────────────
+    FontLoader { id: fontLoaderFA6; source: "file://" + Quickshell.shellDir + "/../shared/fonts/Font Awesome 6 Free-Solid-900.otf" }
+    FontLoader { id: fontLoaderAnurati;           source: "file://" + Quickshell.shellDir + "/../shared/fonts/Anurati.otf" }
+    FontLoader { id: fontLoaderPoppins;           source: "file://" + Quickshell.shellDir + "/../shared/fonts/Poppins.ttf" }
+    FontLoader { id: fontLoaderGolgix;            source: "file://" + Quickshell.shellDir + "/../shared/fonts/Golgix-Regular.ttf" }
+    FontLoader { id: fontLoaderAvaporeRound;      source: "file://" + Quickshell.shellDir + "/../shared/fonts/Avapore-Round.otf" }
+    FontLoader { id: fontLoaderBiologicalSystems; source: "file://" + Quickshell.shellDir + "/../shared/fonts/Biological-Systems-Demo.otf" }
+    FontLoader { id: fontLoaderHardcoreImperial;  source: "file://" + Quickshell.shellDir + "/../shared/fonts/Hardcore Imperial.ttf" }
+    FontLoader { id: fontLoaderAssistedSensors;   source: "file://" + Quickshell.shellDir + "/../shared/fonts/Assisted-Sensors-Demo.otf" }
+
+    readonly property string fontAnurati:           fontLoaderAnurati.name
+    readonly property string fontPoppins:           fontLoaderPoppins.name
+    readonly property string fontGolgixRegular:     fontLoaderGolgix.name
+    readonly property string fontAvaporeRound:      fontLoaderAvaporeRound.name
+    readonly property string fontBiologicalSystems: fontLoaderBiologicalSystems.name
+    readonly property string fontHardcoreImperial:  fontLoaderHardcoreImperial.name
+    readonly property string fontAssistedSensors:   fontLoaderAssistedSensors.name
+    readonly property string fontAwesome6: fontLoaderFA6.name
+
     readonly property int holeLeft:   35
     readonly property int holeTop:    10
     readonly property int holeRight:  10
@@ -32,5 +50,7 @@ Singleton {
     readonly property string nerdFontFamily: "Material Design Icons"
     readonly property bool showDesktopNumbers: false // deprecated. don't set to true 
     readonly property bool colorWorkspaceIndicator: true
+
+    property int workspaceNetHeight: 0
 
 }

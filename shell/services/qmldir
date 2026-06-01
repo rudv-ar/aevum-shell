@@ -1,3 +1,4 @@
 module qs.services
 singleton BspwmService 1.0 BspwmService.qml
 singleton WindowService 1.0 WindowService.qml
+singleton XTitleService 1.0 XTitleService.qml

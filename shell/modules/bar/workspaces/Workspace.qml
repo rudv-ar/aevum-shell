@@ -17,7 +17,7 @@ ColumnLayout {
     readonly property real size: implicitHeight
 
     readonly property var windows:  WindowService.windowsByDesktop[desktopName] ?? []
-    readonly property int maxIcons: 2
+    readonly property int maxIcons: 5
     readonly property int overflow: Math.max(0, windows.length - maxIcons)
 
     implicitWidth: Theme.pillWidth
