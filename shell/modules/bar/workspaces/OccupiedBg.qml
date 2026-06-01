@@ -66,8 +66,8 @@ Item {
             color:  Qt.rgba(1, 1, 1, 0.06)
             visible: height > 2
 
-            Behavior on y      { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
-            Behavior on height { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
+            Behavior on y      { NumberAnimation { duration: 0; easing.type: Easing.OutCubic } }
+            Behavior on height { NumberAnimation { duration: 0; easing.type: Easing.OutCubic } }
         }
     }
 }

@@ -43,11 +43,11 @@ Item {
 
     // leading is fast — moves to the target quickly
     Behavior on leading {
-        NumberAnimation { duration: 180; easing.type: Easing.OutCubic }
+        NumberAnimation { duration: 0; easing.type: Easing.OutCubic }
     }
 
     // trailing is slow — lags behind, creating the stretch
     Behavior on trailing {
-        NumberAnimation { duration: 380; easing.type: Easing.OutCubic }
+        NumberAnimation { duration: 0; easing.type: Easing.OutCubic }
     }
 }
