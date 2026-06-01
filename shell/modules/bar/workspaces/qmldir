@@ -1,0 +1,5 @@
+module qs.modules.workspaces
+Workspaces 1.0 Workspaces.qml
+Workspace 1.0 Workspace.qml
+ActiveIndicator 1.0 ActiveIndicator.qml
+OccupiedBg 1.0 OccupiedBg.qml

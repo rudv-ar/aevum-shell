@@ -24,11 +24,12 @@ Singleton {
     readonly property color frameColor: surface0
 
     // ── Launcher pill ─────────────────────────────────
-    readonly property int    pillWidth:      24
-    readonly property int    pillHeight:     24
-    readonly property int    pillRadius:     12
+    readonly property int    pillWidth:      28
+    readonly property int    pillHeight:     28
+    readonly property int    pillRadius:     16
     readonly property int    pillIconSize:   16
     readonly property int    pillTopPad:     0
-    readonly property string nerdFontFamily: "JetBrainsMono Nerd Font"
+    readonly property string nerdFontFamily: "Material Design Icons"
+    readonly property bool showDesktopNumbers: false
 
 }

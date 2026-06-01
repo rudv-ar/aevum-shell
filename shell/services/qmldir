@@ -1,2 +1,3 @@
 module qs.services
-singleton WorkspaceService 1.0 WorkspaceService.qml
+singleton BspwmService 1.0 BspwmService.qml
+singleton WindowService 1.0 WindowService.qml
