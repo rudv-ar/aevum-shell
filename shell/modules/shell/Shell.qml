@@ -104,6 +104,6 @@ PanelWindow {
 
     WindowTitle {
         x: Math.round((root.mLeft - Theme.pillWidth) / 2)
-        y: workspaces.y + workspaces.implicitHeight + 12
+        y: workspaces.y + workspaces.implicitHeight + 38
     }    
 }
