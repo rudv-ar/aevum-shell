@@ -105,7 +105,7 @@ PanelWindow {
     // ── Window title ───────────────────────────────────
     WindowTitle {
         x: Math.round((root.mLeft - Theme.pillWidth) / 2)
-        y: workspaces.y + workspaces.implicitHeight + 38
+        y: workspaces.y + workspaces.implicitHeight + 10
     }
     StatusIcons {
         x: Math.round((root.mLeft - Theme.pillWidth) / 2)
