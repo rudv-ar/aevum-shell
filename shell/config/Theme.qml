@@ -29,6 +29,8 @@ Singleton {
     readonly property int holeBottom: 10
     readonly property int holeRadius: 12
 
+    readonly property int barBottomPad: 16
+
     // ── Palette (Catppuccin Mocha) ─────────────────────
     readonly property color base:      "#181b1f"
     readonly property color surface0:  "#181b1f"
@@ -51,6 +53,24 @@ Singleton {
     readonly property bool showDesktopNumbers: false // deprecated. don't set to true 
     readonly property bool colorWorkspaceIndicator: true
 
-    property int workspaceNetHeight: 0
+
+// ── Power pill ────────────────────────────────────
+    readonly property int    powerPillW:    28
+    readonly property int    powerPillH:    28
+    readonly property int    powerPillR:    16
+    readonly property int    powerIconSize: 16
+    readonly property color  powerBg:       "#3b1f2b"
+    readonly property color  powerIcon:     "#f38ba8"
+    readonly property color  powerRipple:   "#f38ba8"
+    readonly property string powerLeftCmd:  "systemctl poweroff"
+    readonly property string powerRightCmd: "systemctl reboot"
+
+    // ── Fonts ─────────────────────────────────────────
+    readonly property string fontMaterial: "Material Symbols Rounded"
+
+    // ── Animation durations (ms) ──────────────────────
+    readonly property int animFast:   120
+    readonly property int animNormal: 220
+    readonly property int animSlow:   400    
 
 }

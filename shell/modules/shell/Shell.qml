@@ -4,7 +4,7 @@ import QtQuick
 import QtQuick.Effects
 import Quickshell
 import qs.config
-import qs.services                          // ensures BspwmService + WindowService start
+import qs.services
 import qs.modules.bar
 import qs.modules.bar.workspaces
 
@@ -102,8 +102,18 @@ PanelWindow {
         screen: root.screen
     }
 
+    // ── Window title ───────────────────────────────────
     WindowTitle {
         x: Math.round((root.mLeft - Theme.pillWidth) / 2)
         y: workspaces.y + workspaces.implicitHeight + 38
-    }    
+    }
+
+    // ── Power pill ─────────────────────────────────────
+    Power {
+        x: Math.round((root.mLeft - Theme.powerPillW) / 2)
+        y: root.screen.height - root.mBottom - Theme.powerPillH
+        z: 10
+        onLeftClicked:  function () { }
+        onRightClicked: function () { }
+    }
 }
