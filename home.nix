@@ -10,7 +10,7 @@
     ];
 
     activation.reloadBspwm = lib.hm.dag.entryAfter ["writeBoundary"] ''
-      if command -v bspc &>/dev/null && bspc query -T &>/dev/null 2>&1; then
+      if command -v bspc &>/dev/null; then
         bspc wm -r
       fi
     '';    
