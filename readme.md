@@ -5,6 +5,16 @@
 
 Give it a try. The x11 version of caelestia shell. 
 
+## Previews (old)
+
+![desktop](./assets/desktop.png) 
+
+![two-window](./assets/two-window.png)
+
+![terminal-trio](./assets/terminal-trio.png)
+
+![wallpicker](./assets/wallpicker.png)
+
 Have you ever wondered how quickshell works in wayland? But its documentation says — it is not exclusive for wayland alone. Its basic non-wayland features are compatible with x11 as well, but we need to do other logic lifting which is not in x11 that is in wayland via scripts.
 
 ## Why Aevum Shell?
@@ -208,11 +218,26 @@ xprop WM_CLASS
 ```
 
 
+# Features 
+
+These are the features as of now for `caelestia branch`. 
+
+- A full desktop border shell - but dynamic theming not yet wired.
+- A launcher placeholder with icon (non functional : functions are not yet wired - but present for left as well as right click.)
+- A fully functional workspace indicator which shows the nodes present in the workspace as icons. Empty but unfocused ws as dots and empty but focused desktop as pacman icon. Has pilled pagination for windows (grouping). Click to go to the workspace. 
+- A xtitle viewer just below the workspace, shows the title of the focused node. But truncation enabled by default. 
+- A bottom anchored status pill section : wifi, battery, mic, volume, ethernet and bluetooth indicators wired. But they are currently in indicator stage. No functions or popouts wired so far. Wifi uses iwctl (iwd backend) and not network manager backend - currently lacks support for ethernet. 
+- My preview images do not show a battery indicator because I use a PC - automatically capable of infering PC vs laptop. 
+- A power button which shutdowns on left and reboots on right clicks. 
+- The notifications, actions pane features are absent in this branch. Though they are present in the main and dev branches(horizontal bar system). 
+
+
 ## Credits
 
 - [Quickshell](https://quickshell.org) — the shell framework that made this possible on X11
 - [Caelestia Shell](https://github.com/caelestia-dots/shell) — the original inspiration
 - [Archcraft](https://archcraft.io) — for the themes, icons, and fonts
+
 
 
 
