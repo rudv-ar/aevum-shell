@@ -86,30 +86,30 @@ bspc rule -a firefox desktop='^2' follow=on focus=on
 bspc rule -a chromium desktop='^2' follow=on focus=on
 
 
-# Open code apps in workspace 4
+# Open code apps in workspace 3
 for i in ${code[@]}; do
+   bspc rule -a $i desktop='^3' follow=on focus=on 
+done
+
+
+# Open office apps in workspace 4
+for i in ${office[@]}; do
    bspc rule -a $i desktop='^4' follow=on focus=on 
 done
 
 
-# Open office apps in workspace 5
-for i in ${office[@]}; do
-   bspc rule -a $i desktop='^5' follow=on focus=on 
-done
-
-
-# Open media apps in workspace 7
+# Open media apps in workspace 5
 for i in ${media[@]}; do
-   bspc rule -a $i desktop='^7' state=floating follow=on focus=on 
+   bspc rule -a $i desktop='^5' state=floating follow=on focus=on 
 done
 
 
-# Open system settings in workspace 8
-bspc rule -a 'VirtualBox Manager' desktop='^8' follow=on focus=on
-bspc rule -a GParted desktop='^8' follow=on focus=on
+# Open system settings in workspace 6
+bspc rule -a 'VirtualBox Manager' desktop='^6' follow=on focus=on
+bspc rule -a GParted desktop='^6' follow=on focus=on
 
 for i in ${settings[@]}; do
-   bspc rule -a $i desktop='^8' state=floating follow=on focus=on
+   bspc rule -a $i desktop='^6' state=floating follow=on focus=on
 done
 
 

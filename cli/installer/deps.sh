@@ -119,6 +119,8 @@ AUR_DEPS=(
     neofetch
     cmatrix-git
     caffeine-ng
+    ttf-material-design-icons-git 
+    xtitle
 )
 
 # ── Helpers ───────────────────────────────────────────────────────────────────

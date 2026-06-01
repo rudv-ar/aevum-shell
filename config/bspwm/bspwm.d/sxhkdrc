@@ -92,11 +92,11 @@ ctrl + alt + {Left,Right}
 	bspc desktop -f {prev.local,next.local}
 
 # Switch workspace or Send focused Node to another workspace
-super + shift + {1-8}
-	bspc node -d '^{1-8}' '--follow'
+super + shift + {1-6}
+	bspc node -d '^{1-6}' '--follow'
 
 super + {1-8}
-  bspwm-slidefx -w {1-8}
+  bspwm-slidefx -w {1-6}
 
 # Send focused Node to workspace directionally
 super + ctrl + shift + {Left,Right}

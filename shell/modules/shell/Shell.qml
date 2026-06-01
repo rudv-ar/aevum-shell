@@ -92,13 +92,4 @@ PanelWindow {
         onRightClicked: function () { }
     }
 
-    // ── Workspace indicator ───────────────────────────
-    WsIndicator {
-        x: 0
-        y: root.mTop
-            + Theme.pillTopPad
-            + Theme.pillHeight
-            + Theme.wsIndicatorTopGap
-        z: 10
-    }
 }  
