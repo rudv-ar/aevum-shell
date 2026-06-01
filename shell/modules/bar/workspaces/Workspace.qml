@@ -22,12 +22,12 @@ ColumnLayout {
 
     implicitWidth: Theme.pillWidth
     Layout.alignment: Qt.AlignHCenter
-    spacing: 2
+    spacing: 1
 
     // ── Case: occupied → window icons only ────────────
     Column {
         Layout.fillWidth: true
-        spacing: 1
+        spacing: -6
         visible: root.isOccupied
 
         Repeater {

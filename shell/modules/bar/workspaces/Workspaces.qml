@@ -45,15 +45,18 @@ Item {
     implicitHeight: layout.implicitHeight
 // ── Container background pill ──────────────────────
     Rectangle {
+        visible: Theme.colorWorkspaceIndicator
         anchors.top:    layout.top 
         anchors.bottom: layout.bottom 
         anchors.left: parent.left 
         anchors.right: parent.right
         anchors.margins: 0
         anchors.topMargin: 0
+        anchors.rightMargin: 1
+        anchors.leftMargin: 0
         anchors.bottomMargin: 0
         radius:          Theme.pillRadius
-        color:           Qt.rgba(1, 1, 1, 0.07)
+        color:           Theme.colorWorkspaceIndicator ? Qt.rgba(1, 1, 1, 0.07) : "transparent"
     }
     // ── Occupied background pills ──────────────────────
     OccupiedBg {

@@ -30,6 +30,7 @@ Singleton {
     readonly property int    pillIconSize:   16
     readonly property int    pillTopPad:     0
     readonly property string nerdFontFamily: "Material Design Icons"
-    readonly property bool showDesktopNumbers: false
+    readonly property bool showDesktopNumbers: false // deprecated. don't set to true 
+    readonly property bool colorWorkspaceIndicator: true
 
 }
