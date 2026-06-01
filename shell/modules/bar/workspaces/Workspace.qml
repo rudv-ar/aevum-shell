@@ -17,7 +17,7 @@ ColumnLayout {
     readonly property real size: implicitHeight
 
     readonly property var windows:  WindowService.windowsByDesktop[desktopName] ?? []
-    readonly property int maxIcons: 4
+    readonly property int maxIcons: 2
     readonly property int overflow: Math.max(0, windows.length - maxIcons)
 
     implicitWidth: Theme.pillWidth
@@ -36,7 +36,7 @@ ColumnLayout {
             Text {
                 required property int index
 
-                width:               parent.width
+                width:               layout.width
                 height:              Theme.pillWidth - 4
                 text:                Icons.getIcon(root.windows[index])
                 font.family:         Icons.fontFamily

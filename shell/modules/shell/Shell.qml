@@ -97,7 +97,7 @@ PanelWindow {
     // ── Workspaces column ──────────────────────────────
     Workspaces {
         x:      Math.round((root.mLeft - Theme.pillWidth) / 2)
-        y:      root.mTop + Theme.pillHeight + 12
+        y:      root.mTop + Theme.pillHeight + 6
         screen: root.screen
     }
 }
