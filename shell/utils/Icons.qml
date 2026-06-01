@@ -5,7 +5,64 @@ import Quickshell
 
 Singleton {
     id: root
+    function getVolumeIcon(volume: real, muted: bool): string {
+        if (muted)         return "no_sound"
+        if (volume >= 0.5) return "volume_up"
+        if (volume > 0)    return "volume_down"
+        return "volume_mute"
+    }
 
+    function getMicVolumeIcon(volume: real, muted: bool): string {
+        return (!muted && volume > 0) ? "mic" : "mic_off"
+    }
+
+    // ── Network ───────────────────────────────────────
+    function getNetworkIcon(strength: int, isSecure: bool): string {
+        if (isSecure) {
+            if (strength >= 80) return "network_wifi_locked"
+            if (strength >= 60) return "network_wifi_3_bar_locked"
+            if (strength >= 40) return "network_wifi_2_bar_locked"
+            if (strength >= 20) return "network_wifi_1_bar_locked"
+            return "signal_wifi_0_bar"
+        }
+        if (strength >= 80) return "network_wifi"
+        if (strength >= 60) return "network_wifi_3_bar"
+        if (strength >= 40) return "network_wifi_2_bar"
+        if (strength >= 20) return "network_wifi_1_bar"
+        return "signal_wifi_0_bar"
+    }
+
+    // ── Bluetooth ─────────────────────────────────────
+    function getBluetoothIcon(iconHint: string): string {
+        if (!iconHint) return "bluetooth"
+        if (iconHint.includes("headset") || iconHint.includes("headphones")) return "headphones"
+        if (iconHint.includes("audio"))    return "speaker"
+        if (iconHint.includes("phone"))    return "smartphone"
+        if (iconHint.includes("mouse"))    return "mouse"
+        if (iconHint.includes("keyboard")) return "keyboard"
+        return "bluetooth"
+    }
+
+    // ── Battery ───────────────────────────────────────
+    function getBatteryIcon(percentage: real, charging: bool): string {
+        const p = Math.round(percentage * 100)
+        if (charging) {
+            if (p >= 95) return "battery_charging_full"
+            if (p >= 80) return "battery_charging_80"
+            if (p >= 60) return "battery_charging_60"
+            if (p >= 50) return "battery_charging_50"
+            if (p >= 30) return "battery_charging_30"
+            return "battery_charging_20"
+        }
+        if (p >= 95) return "battery_full"
+        if (p >= 80) return "battery_6_bar"
+        if (p >= 65) return "battery_5_bar"
+        if (p >= 50) return "battery_4_bar"
+        if (p >= 35) return "battery_3_bar"
+        if (p >= 20) return "battery_2_bar"
+        if (p >= 5)  return "battery_1_bar"
+        return "battery_0_bar"
+    }
     // Font family name mapped to Google's Material Icons/Symbols font file
     readonly property string fontFamily: "Material Symbols Rounded"
 

@@ -107,7 +107,12 @@ PanelWindow {
         x: Math.round((root.mLeft - Theme.pillWidth) / 2)
         y: workspaces.y + workspaces.implicitHeight + 38
     }
-
+    StatusIcons {
+        x: Math.round((root.mLeft - Theme.pillWidth) / 2)
+        y: root.screen.height - root.mBottom - Theme.barBottomPad
+           - Theme.powerPillH - implicitHeight + 10
+        z: 10
+    }
     // ── Power pill ─────────────────────────────────────
     Power {
         x: Math.round((root.mLeft - Theme.powerPillW) / 2)
