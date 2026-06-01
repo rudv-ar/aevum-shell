@@ -69,7 +69,7 @@ Item {
     ColumnLayout {
         id:      layout
         anchors.horizontalCenter: parent.horizontalCenter
-        spacing: 3
+        spacing: 2
 
         Repeater {
             id: wsRepeater
