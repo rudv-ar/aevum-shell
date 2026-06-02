@@ -13,7 +13,6 @@
       name = "Nordzy";
     };
 
-    gtk4.theme = theme;
     
   };
 }
