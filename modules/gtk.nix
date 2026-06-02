@@ -1,6 +1,6 @@
 { pkgs, ... }:
 {
-  gtk.gtk4.theme = gtk.theme
+  
   gtk = {
     enable = true;
     
@@ -9,6 +9,7 @@
       name = "Nordic";
     };
 
+    gtk4.theme = theme;
     iconTheme = {
       package = pkgs.nordzy-icon-theme;
       name = "Nordzy";
