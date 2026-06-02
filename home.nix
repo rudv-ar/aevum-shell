@@ -7,6 +7,9 @@
     packages = with pkgs; [
       git 
       openssh
+
+      # install the xsetroot. but I have it pacman installed, so do you | uncomment if needed.
+      # xorg.xsetroot
     ];
 
     activation.reloadBspwm = lib.hm.dag.entryAfter ["writeBoundary"] ''
@@ -18,6 +21,7 @@
 
   imports = [
     ./modules/xdg.nix 
+    ./modules/cursor.nix
     ./modules/alacritty.nix
     ./modules/fish.nix
     ./modules/btop.nix 
