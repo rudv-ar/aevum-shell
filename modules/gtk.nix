@@ -1,21 +1,21 @@
 { pkgs, ... }:
+let
+  nordicTheme = {
+    package = pkgs.nordic;
+    name = "Nordic";
+  };
+in
 {
-  
   gtk = {
     enable = true;
     
-    theme = {
-      package = pkgs.nordic;
-      name = "Nordic";
-    };
+    theme = nordicTheme;
+    gtk4.theme = nordicTheme;
 
-    gtk4.theme = theme;
     iconTheme = {
       package = pkgs.nordzy-icon-theme;
       name = "Nordzy";
     };
-
-    
   };
 }
 
