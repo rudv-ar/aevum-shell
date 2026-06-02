@@ -19,45 +19,76 @@ Singleton {
     property bool printEnabled: false
 
     // ════════════════════════════════════════════════════════════════
-    // FILE WATCHER & RELOAD
+    // INTERNAL STATE — only updated on a valid parse
     // ════════════════════════════════════════════════════════════════
-    property bool _ready: false
+    property var  _raw:     null
+    property var  _palette: ({})
+    readonly property string mode: isDark ? "dark" : "light"
 
-    Component.onCompleted: {
-        _ready = true
-        refresh()
-    }
+    // Public palette — always the last good build, never null
+    readonly property var palette: _palette
 
-    Timer {
-        id: reloadTimer
-        interval: 300
-        repeat:   false
-        onTriggered: {
-            jsonFile.reload()
-            root.refresh()
-        }
-    }
-
+    // ════════════════════════════════════════════════════════════════
+    // FILE WATCHER
+    // ════════════════════════════════════════════════════════════════
     FileView {
         id: jsonFile
         path:         Quickshell.env("HOME") + "/.config/aevum/shared/colors.json"
         blockLoading: true
         watchChanges: true
-        onFileChanged: reloadTimer.restart()
-    }
-
-    // ════════════════════════════════════════════════════════════════
-    // RAW JSON PARSE
-    // ════════════════════════════════════════════════════════════════
-    readonly property var raw: {
-        try   { return JSON.parse(jsonFile.text()) }
-        catch (e) {
-            if (_ready) console.debug("[Colors] waiting for write to complete...")
-            return null
+        onFileChanged: {
+            jsonFile.path = jsonFile.path
+            jsonFile.reload()
+            const t = jsonFile.text()
+            if (t && t.trim().length > 0)
+                root._parse()
+            else
+                console.warn("[Colors] file empty on change, waiting for debounce...")
+            debounce.restart()
         }
     }
 
-    readonly property string mode: isDark ? "dark" : "light"
+    // Debounce — second attempt after matugen finishes writing
+    Timer {
+        id: debounce
+        interval: 150
+        repeat:   false
+        onTriggered: {
+            jsonFile.path = jsonFile.path
+            jsonFile.reload()
+            const t = jsonFile.text()
+            if (t && t.trim().length > 0)
+                root._parse()
+            else
+                console.warn("[Colors] file still empty after debounce, keeping last good state")
+        }
+    }
+
+    // Initial load — slight delay so FileView is ready
+    Timer {
+        id: initialLoad
+        interval: 100
+        repeat:   false
+        running:  true
+        onTriggered: root._parse()
+    }
+
+    // ════════════════════════════════════════════════════════════════
+    // PARSE — only commits state if JSON is valid and palettes exist
+    // ════════════════════════════════════════════════════════════════
+    function _parse() {
+        try {
+            const text = jsonFile.text()
+            if (!text || text.trim().length === 0) return
+            const parsed = JSON.parse(text)
+            if (!parsed?.palettes) return
+            _raw     = parsed
+            _palette = _buildPalette()
+            refresh()
+        } catch (e) {
+            console.warn("[Colors] parse failed, keeping last good state:", e)
+        }
+    }
 
     // ════════════════════════════════════════════════════════════════
     // MATERIAL COLORS — active mode
@@ -121,150 +152,165 @@ Singleton {
     readonly property string sourceColor:             _c("source_color")
 
     // ════════════════════════════════════════════════════════════════
-    // PALETTE — full tone map, all tones, no mode logic
-    // palette.primary[10] is always tone 10, period.
+    // PALETTE SHORTCUTS — bound to palette, safe because palette
+    // is only ever updated with a fully valid build
     // ════════════════════════════════════════════════════════════════
-    readonly property var palette: _buildPalette()
 
     // ── Primary ──────────────────────────────────────────────────────
-    readonly property color p0:   palette.primary[0]
-    readonly property color p5:   palette.primary[5]
-    readonly property color p10:  palette.primary[10]
-    readonly property color p15:  palette.primary[15]
-    readonly property color p20:  palette.primary[20]
-    readonly property color p25:  palette.primary[25]
-    readonly property color p30:  palette.primary[30]
-    readonly property color p35:  palette.primary[35]
-    readonly property color p40:  palette.primary[40]
-    readonly property color p50:  palette.primary[50]
-    readonly property color p60:  palette.primary[60]
-    readonly property color p70:  palette.primary[70]
-    readonly property color p80:  palette.primary[80]
-    readonly property color p90:  palette.primary[90]
-    readonly property color p95:  palette.primary[95]
-    readonly property color p98:  palette.primary[98]
-    readonly property color p99:  palette.primary[99]
-    readonly property color p100: palette.primary[100]
+    readonly property color p0:   palette.primary?.[0]   ?? "transparent"
+    readonly property color p5:   palette.primary?.[5]   ?? "transparent"
+    readonly property color p10:  palette.primary?.[10]  ?? "transparent"
+    readonly property color p15:  palette.primary?.[15]  ?? "transparent"
+    readonly property color p20:  palette.primary?.[20]  ?? "transparent"
+    readonly property color p25:  palette.primary?.[25]  ?? "transparent"
+    readonly property color p30:  palette.primary?.[30]  ?? "transparent"
+    readonly property color p35:  palette.primary?.[35]  ?? "transparent"
+    readonly property color p40:  palette.primary?.[40]  ?? "transparent"
+    readonly property color p50:  palette.primary?.[50]  ?? "transparent"
+    readonly property color p60:  palette.primary?.[60]  ?? "transparent"
+    readonly property color p70:  palette.primary?.[70]  ?? "transparent"
+    readonly property color p80:  palette.primary?.[80]  ?? "transparent"
+    readonly property color p90:  palette.primary?.[90]  ?? "transparent"
+    readonly property color p95:  palette.primary?.[95]  ?? "transparent"
+    readonly property color p98:  palette.primary?.[98]  ?? "transparent"
+    readonly property color p99:  palette.primary?.[99]  ?? "transparent"
+    readonly property color p100: palette.primary?.[100] ?? "transparent"
 
     // ── Secondary ────────────────────────────────────────────────────
-    readonly property color s0:   palette.secondary[0]
-    readonly property color s5:   palette.secondary[5]
-    readonly property color s10:  palette.secondary[10]
-    readonly property color s15:  palette.secondary[15]
-    readonly property color s20:  palette.secondary[20]
-    readonly property color s25:  palette.secondary[25]
-    readonly property color s30:  palette.secondary[30]
-    readonly property color s35:  palette.secondary[35]
-    readonly property color s40:  palette.secondary[40]
-    readonly property color s50:  palette.secondary[50]
-    readonly property color s60:  palette.secondary[60]
-    readonly property color s70:  palette.secondary[70]
-    readonly property color s80:  palette.secondary[80]
-    readonly property color s90:  palette.secondary[90]
-    readonly property color s95:  palette.secondary[95]
-    readonly property color s98:  palette.secondary[98]
-    readonly property color s99:  palette.secondary[99]
-    readonly property color s100: palette.secondary[100]
+    readonly property color s0:   palette.secondary?.[0]   ?? "transparent"
+    readonly property color s5:   palette.secondary?.[5]   ?? "transparent"
+    readonly property color s10:  palette.secondary?.[10]  ?? "transparent"
+    readonly property color s15:  palette.secondary?.[15]  ?? "transparent"
+    readonly property color s20:  palette.secondary?.[20]  ?? "transparent"
+    readonly property color s25:  palette.secondary?.[25]  ?? "transparent"
+    readonly property color s30:  palette.secondary?.[30]  ?? "transparent"
+    readonly property color s35:  palette.secondary?.[35]  ?? "transparent"
+    readonly property color s40:  palette.secondary?.[40]  ?? "transparent"
+    readonly property color s50:  palette.secondary?.[50]  ?? "transparent"
+    readonly property color s60:  palette.secondary?.[60]  ?? "transparent"
+    readonly property color s70:  palette.secondary?.[70]  ?? "transparent"
+    readonly property color s80:  palette.secondary?.[80]  ?? "transparent"
+    readonly property color s90:  palette.secondary?.[90]  ?? "transparent"
+    readonly property color s95:  palette.secondary?.[95]  ?? "transparent"
+    readonly property color s98:  palette.secondary?.[98]  ?? "transparent"
+    readonly property color s99:  palette.secondary?.[99]  ?? "transparent"
+    readonly property color s100: palette.secondary?.[100] ?? "transparent"
 
     // ── Tertiary ─────────────────────────────────────────────────────
-    readonly property color t0:   palette.tertiary[0]
-    readonly property color t5:   palette.tertiary[5]
-    readonly property color t10:  palette.tertiary[10]
-    readonly property color t15:  palette.tertiary[15]
-    readonly property color t20:  palette.tertiary[20]
-    readonly property color t25:  palette.tertiary[25]
-    readonly property color t30:  palette.tertiary[30]
-    readonly property color t35:  palette.tertiary[35]
-    readonly property color t40:  palette.tertiary[40]
-    readonly property color t50:  palette.tertiary[50]
-    readonly property color t60:  palette.tertiary[60]
-    readonly property color t70:  palette.tertiary[70]
-    readonly property color t80:  palette.tertiary[80]
-    readonly property color t90:  palette.tertiary[90]
-    readonly property color t95:  palette.tertiary[95]
-    readonly property color t98:  palette.tertiary[98]
-    readonly property color t99:  palette.tertiary[99]
-    readonly property color t100: palette.tertiary[100]
+    readonly property color t0:   palette.tertiary?.[0]   ?? "transparent"
+    readonly property color t5:   palette.tertiary?.[5]   ?? "transparent"
+    readonly property color t10:  palette.tertiary?.[10]  ?? "transparent"
+    readonly property color t15:  palette.tertiary?.[15]  ?? "transparent"
+    readonly property color t20:  palette.tertiary?.[20]  ?? "transparent"
+    readonly property color t25:  palette.tertiary?.[25]  ?? "transparent"
+    readonly property color t30:  palette.tertiary?.[30]  ?? "transparent"
+    readonly property color t35:  palette.tertiary?.[35]  ?? "transparent"
+    readonly property color t40:  palette.tertiary?.[40]  ?? "transparent"
+    readonly property color t50:  palette.tertiary?.[50]  ?? "transparent"
+    readonly property color t60:  palette.tertiary?.[60]  ?? "transparent"
+    readonly property color t70:  palette.tertiary?.[70]  ?? "transparent"
+    readonly property color t80:  palette.tertiary?.[80]  ?? "transparent"
+    readonly property color t90:  palette.tertiary?.[90]  ?? "transparent"
+    readonly property color t95:  palette.tertiary?.[95]  ?? "transparent"
+    readonly property color t98:  palette.tertiary?.[98]  ?? "transparent"
+    readonly property color t99:  palette.tertiary?.[99]  ?? "transparent"
+    readonly property color t100: palette.tertiary?.[100] ?? "transparent"
 
     // ── Neutral ──────────────────────────────────────────────────────
-    readonly property color n0:   palette.neutral[0]
-    readonly property color n5:   palette.neutral[5]
-    readonly property color n10:  palette.neutral[10]
-    readonly property color n15:  palette.neutral[15]
-    readonly property color n20:  palette.neutral[20]
-    readonly property color n25:  palette.neutral[25]
-    readonly property color n30:  palette.neutral[30]
-    readonly property color n35:  palette.neutral[35]
-    readonly property color n40:  palette.neutral[40]
-    readonly property color n50:  palette.neutral[50]
-    readonly property color n60:  palette.neutral[60]
-    readonly property color n70:  palette.neutral[70]
-    readonly property color n80:  palette.neutral[80]
-    readonly property color n90:  palette.neutral[90]
-    readonly property color n95:  palette.neutral[95]
-    readonly property color n98:  palette.neutral[98]
-    readonly property color n99:  palette.neutral[99]
-    readonly property color n100: palette.neutral[100]
+    readonly property color n0:   palette.neutral?.[0]   ?? "transparent"
+    readonly property color n5:   palette.neutral?.[5]   ?? "transparent"
+    readonly property color n10:  palette.neutral?.[10]  ?? "transparent"
+    readonly property color n15:  palette.neutral?.[15]  ?? "transparent"
+    readonly property color n20:  palette.neutral?.[20]  ?? "transparent"
+    readonly property color n25:  palette.neutral?.[25]  ?? "transparent"
+    readonly property color n30:  palette.neutral?.[30]  ?? "transparent"
+    readonly property color n35:  palette.neutral?.[35]  ?? "transparent"
+    readonly property color n40:  palette.neutral?.[40]  ?? "transparent"
+    readonly property color n50:  palette.neutral?.[50]  ?? "transparent"
+    readonly property color n60:  palette.neutral?.[60]  ?? "transparent"
+    readonly property color n70:  palette.neutral?.[70]  ?? "transparent"
+    readonly property color n80:  palette.neutral?.[80]  ?? "transparent"
+    readonly property color n90:  palette.neutral?.[90]  ?? "transparent"
+    readonly property color n95:  palette.neutral?.[95]  ?? "transparent"
+    readonly property color n98:  palette.neutral?.[98]  ?? "transparent"
+    readonly property color n99:  palette.neutral?.[99]  ?? "transparent"
+    readonly property color n100: palette.neutral?.[100] ?? "transparent"
 
     // ── Neutral Variant ───────────────────────────────────────────────
-    readonly property color nv0:   palette.neutral_variant[0]
-    readonly property color nv5:   palette.neutral_variant[5]
-    readonly property color nv10:  palette.neutral_variant[10]
-    readonly property color nv15:  palette.neutral_variant[15]
-    readonly property color nv20:  palette.neutral_variant[20]
-    readonly property color nv25:  palette.neutral_variant[25]
-    readonly property color nv30:  palette.neutral_variant[30]
-    readonly property color nv35:  palette.neutral_variant[35]
-    readonly property color nv40:  palette.neutral_variant[40]
-    readonly property color nv50:  palette.neutral_variant[50]
-    readonly property color nv60:  palette.neutral_variant[60]
-    readonly property color nv70:  palette.neutral_variant[70]
-    readonly property color nv80:  palette.neutral_variant[80]
-    readonly property color nv90:  palette.neutral_variant[90]
-    readonly property color nv95:  palette.neutral_variant[95]
-    readonly property color nv98:  palette.neutral_variant[98]
-    readonly property color nv99:  palette.neutral_variant[99]
-    readonly property color nv100: palette.neutral_variant[100]
+    readonly property color nv0:   palette.neutral_variant?.[0]   ?? "transparent"
+    readonly property color nv5:   palette.neutral_variant?.[5]   ?? "transparent"
+    readonly property color nv10:  palette.neutral_variant?.[10]  ?? "transparent"
+    readonly property color nv15:  palette.neutral_variant?.[15]  ?? "transparent"
+    readonly property color nv20:  palette.neutral_variant?.[20]  ?? "transparent"
+    readonly property color nv25:  palette.neutral_variant?.[25]  ?? "transparent"
+    readonly property color nv30:  palette.neutral_variant?.[30]  ?? "transparent"
+    readonly property color nv35:  palette.neutral_variant?.[35]  ?? "transparent"
+    readonly property color nv40:  palette.neutral_variant?.[40]  ?? "transparent"
+    readonly property color nv50:  palette.neutral_variant?.[50]  ?? "transparent"
+    readonly property color nv60:  palette.neutral_variant?.[60]  ?? "transparent"
+    readonly property color nv70:  palette.neutral_variant?.[70]  ?? "transparent"
+    readonly property color nv80:  palette.neutral_variant?.[80]  ?? "transparent"
+    readonly property color nv90:  palette.neutral_variant?.[90]  ?? "transparent"
+    readonly property color nv95:  palette.neutral_variant?.[95]  ?? "transparent"
+    readonly property color nv98:  palette.neutral_variant?.[98]  ?? "transparent"
+    readonly property color nv99:  palette.neutral_variant?.[99]  ?? "transparent"
+    readonly property color nv100: palette.neutral_variant?.[100] ?? "transparent"
 
     // ── Error ────────────────────────────────────────────────────────
-    readonly property color e0:   palette.error[0]
-    readonly property color e5:   palette.error[5]
-    readonly property color e10:  palette.error[10]
-    readonly property color e15:  palette.error[15]
-    readonly property color e20:  palette.error[20]
-    readonly property color e25:  palette.error[25]
-    readonly property color e30:  palette.error[30]
-    readonly property color e35:  palette.error[35]
-    readonly property color e40:  palette.error[40]
-    readonly property color e50:  palette.error[50]
-    readonly property color e60:  palette.error[60]
-    readonly property color e70:  palette.error[70]
-    readonly property color e80:  palette.error[80]
-    readonly property color e90:  palette.error[90]
-    readonly property color e95:  palette.error[95]
-    readonly property color e98:  palette.error[98]
-    readonly property color e99:  palette.error[99]
-    readonly property color e100: palette.error[100]
+    readonly property color e0:   palette.error?.[0]   ?? "transparent"
+    readonly property color e5:   palette.error?.[5]   ?? "transparent"
+    readonly property color e10:  palette.error?.[10]  ?? "transparent"
+    readonly property color e15:  palette.error?.[15]  ?? "transparent"
+    readonly property color e20:  palette.error?.[20]  ?? "transparent"
+    readonly property color e25:  palette.error?.[25]  ?? "transparent"
+    readonly property color e30:  palette.error?.[30]  ?? "transparent"
+    readonly property color e35:  palette.error?.[35]  ?? "transparent"
+    readonly property color e40:  palette.error?.[40]  ?? "transparent"
+    readonly property color e50:  palette.error?.[50]  ?? "transparent"
+    readonly property color e60:  palette.error?.[60]  ?? "transparent"
+    readonly property color e70:  palette.error?.[70]  ?? "transparent"
+    readonly property color e80:  palette.error?.[80]  ?? "transparent"
+    readonly property color e90:  palette.error?.[90]  ?? "transparent"
+    readonly property color e95:  palette.error?.[95]  ?? "transparent"
+    readonly property color e98:  palette.error?.[98]  ?? "transparent"
+    readonly property color e99:  palette.error?.[99]  ?? "transparent"
+    readonly property color e100: palette.error?.[100] ?? "transparent"
 
     // ════════════════════════════════════════════════════════════════
-    // CATPPUCCIN MOCHA — static overrides
+    // SEMANTIC / COMPONENT COLORS
     // ════════════════════════════════════════════════════════════════
-    readonly property color base:       background
-    readonly property color surface0:   "#181b1f"
-    readonly property color surface1:   "#45475a"
-    readonly property color accent:     pc("primary", 70, 30)
-    readonly property color wsActiveBg: pc("primary", 60, 40)
-    readonly property color xtitleColor: pc("primary", 100, 0)
-    readonly property color wsOccupiedBg: pc("secondary", 25, 70)
-    readonly property color text:       pc("primary", 90, 10)
-    readonly property color textColor:  pc("primary", 90, 10)
-    readonly property color launcherBg: pc("neutral", 10, 100)
-    readonly property color statusIconColor: pc("primary", 90, 10 )
-    readonly property color workspaceBg: isDark ? Qt.lighter(pc("primary", 80, 90), 0.20) : Qt.lighter(pc("primary", 80, 90), 0.7)
-
+    readonly property color base:            background
+    readonly property color surface0:        "#181b1f"
+    readonly property color surface1:        "#45475a"
+    readonly property color accent:          pc("primary",    70, 30)
+    readonly property color wsActiveBg:      pc("primary",    60, 40)
+    readonly property color xtitleColor:     pc("primary",   100,  0)
+    readonly property color wsOccupiedBg:    pc("secondary",  25, 70)
+    readonly property color text:            pc("primary",    90, 10)
+    readonly property color textColor:       pc("primary",    90, 10)
+    readonly property color launcherBg:      pc("neutral",    10, 95)
+    readonly property color statusIconColor: pc("primary",    90, 10)
+    readonly property color workspaceBg:     isDark
+                                                 ? Qt.lighter(pc("primary", 80, 90), 0.20)
+                                                 : Qt.lighter(pc("primary", 80, 90), 0.80)
 
     // ── Semantic aliases ──────────────────────────────────────────────
     readonly property color frameColor: background
+
+    // ════════════════════════════════════════════════════════════════
+    // COMPONENT THEME — Power pill
+    // ════════════════════════════════════════════════════════════════
+    readonly property color  powerBg:       pc("tertiary", 30, 70)
+    readonly property color  powerIcon:     pc("tertiary", 70, 30)
+    readonly property color  powerRipple:   Qt.lighter(pc("tertiary", 30, 70), 2.0)
+    readonly property string powerLeftCmd:  "systemctl poweroff"
+    readonly property string powerRightCmd: "systemctl reboot"
+
+    // ════════════════════════════════════════════════════════════════
+    // COMPONENT THEME — Workspace indicator
+    // ════════════════════════════════════════════════════════════════
+    readonly property bool showDesktopNumbers:      false // deprecated — keep false
+    readonly property bool colorWorkspaceIndicator: true
 
     // ════════════════════════════════════════════════════════════════
     // FONTS
@@ -322,27 +368,12 @@ Singleton {
     readonly property int animSlow:   400
 
     // ════════════════════════════════════════════════════════════════
-    // COMPONENT THEME — Power pill
-    // ════════════════════════════════════════════════════════════════
-    readonly property color  powerBg:       pc("tertiary", 30, 70)
-    readonly property color  powerIcon:     pc("tertiary", 70, 30)
-    readonly property color  powerRipple:   Qt.lighter(pc("tertiary", 30, 70), 2.0)
-    readonly property string powerLeftCmd:  "systemctl poweroff"
-    readonly property string powerRightCmd: "systemctl reboot"
-
-    // ════════════════════════════════════════════════════════════════
-    // COMPONENT THEME — Workspace indicator
-    // ════════════════════════════════════════════════════════════════
-    readonly property bool showDesktopNumbers:      false // deprecated — keep false
-    readonly property bool colorWorkspaceIndicator: true
-
-    // ════════════════════════════════════════════════════════════════
     // HELPERS
     // ════════════════════════════════════════════════════════════════
 
     // Returns the active-mode color for a named Material color token
     function _c(name) {
-        return raw?.colors?.[name]?.[mode]?.color ?? "transparent"
+        return _raw?.colors?.[name]?.[mode]?.color ?? "transparent"
     }
 
     readonly property var _palNames: [
@@ -350,15 +381,15 @@ Singleton {
         "neutral", "neutral_variant", "error"
     ]
 
-    // Builds the full tone map — every tone for every palette, no mode filtering
+    // Builds the full tone map — every tone, no mode filtering, from last good _raw
     function _buildPalette() {
-        if (!raw?.palettes) return {}
+        if (!_raw?.palettes) return {}
         const allTones = [0, 5, 10, 15, 20, 25, 30, 35, 40, 50, 60, 70, 80, 90, 95, 98, 99, 100]
         const out = {}
         for (const pal of _palNames) {
             out[pal] = {}
             for (const t of allTones)
-                out[pal][t] = raw.palettes[pal]?.[String(t)]?.color ?? "transparent"
+                out[pal][t] = _raw.palettes[pal]?.[String(t)]?.color ?? "transparent"
         }
         return out
     }
@@ -366,8 +397,8 @@ Singleton {
     // pc("primary", 10, 90) → isDark ? palette.primary[10] : palette.primary[90]
     function pc(palName, darkTone, lightTone) {
         return isDark
-            ? (palette[palName]?.[darkTone]  ?? "transparent")
-            : (palette[palName]?.[lightTone] ?? "transparent")
+            ? (_palette[palName]?.[darkTone]  ?? "transparent")
+            : (_palette[palName]?.[lightTone] ?? "transparent")
     }
 
     // ════════════════════════════════════════════════════════════════
@@ -375,24 +406,24 @@ Singleton {
     // ════════════════════════════════════════════════════════════════
     function _printColorGroup(label, m) {
         console.log("\n── MATERIAL " + label + " ───────────────────────────────")
-        const c = raw.colors
+        const c = _raw.colors
         for (const k in c)
             console.log("  " + k.padEnd(32) + (c[k]?.[m]?.color ?? "n/a"))
     }
 
-    function _printPaletteGroup(label) {
+    function _printPaletteGroup() {
         const allTones = [0, 5, 10, 15, 20, 25, 30, 35, 40, 50, 60, 70, 80, 90, 95, 98, 99, 100]
         console.log("\n── PALETTE (all tones) ──")
         for (const pal of _palNames) {
             const row = allTones
-                .map(t => t + ":" + (raw.palettes[pal]?.[String(t)]?.color ?? "n/a"))
+                .map(t => t + ":" + (_raw.palettes[pal]?.[String(t)]?.color ?? "n/a"))
                 .join("  ")
             console.log("  " + pal.padEnd(16) + row)
         }
     }
 
     function refresh() {
-        if (!printEnabled || !raw) return
+        if (!printEnabled || !_raw) return
         console.log("\n[Colors] reloaded  active=" + mode)
         _printColorGroup("DARK",  "dark")
         _printColorGroup("LIGHT", "light")
