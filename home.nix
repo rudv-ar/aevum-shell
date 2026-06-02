@@ -22,6 +22,7 @@
   imports = [
     ./modules/xdg.nix 
     ./modules/cursor.nix
+    ./modules/gtk.nix
     ./modules/alacritty.nix
     ./modules/fish.nix
     ./modules/btop.nix 
