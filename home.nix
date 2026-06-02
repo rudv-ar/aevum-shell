@@ -17,6 +17,7 @@
   targets.genericLinux.enable = true;
 
   imports = [
+    ./modules/xdg.nix 
     ./modules/alacritty.nix
     ./modules/fish.nix
     ./modules/btop.nix 
@@ -31,5 +32,6 @@
     ./modules/rofi.nix 
     ./modules/vicinae.nix
     ./modules/git.nix
+    ./modules/mpd.nix 
   ];
 }
