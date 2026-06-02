@@ -222,7 +222,8 @@ xprop WM_CLASS
 
 These are the features as of now for `caelestia branch`. 
 
-- A full desktop border shell - but dynamic theming not yet wired.
+- A full desktop border shell - **with dynamic themeing wired.**
+- Picom transparency and blurs can be enabled in `~/.config/bspwm/bspwm.d/picom/rules.conf` : under the class name `qs-shell`. 
 - A launcher placeholder with icon (non functional : functions are not yet wired - but present for left as well as right click.)
 - A fully functional workspace indicator which shows the nodes present in the workspace as icons. Empty but unfocused ws as dots and empty but focused desktop as pacman icon. Has pilled pagination for windows (grouping). Click to go to the workspace. 
 - A xtitle viewer just below the workspace, shows the title of the focused node. But truncation enabled by default. 
@@ -230,6 +231,11 @@ These are the features as of now for `caelestia branch`.
 - My preview images do not show a battery indicator because I use a PC - automatically capable of infering PC vs laptop. 
 - A power button which shutdowns on left and reboots on right clicks. 
 - The notifications, actions pane features are absent in this branch. Though they are present in the main and dev branches(horizontal bar system). 
+
+
+## Nix Specific Features : 
+
+That said, I love being in this sweet spot : Nix pkg manager + home manager on top of **Arch**, excluding systemwide *systemd services*. At current stage, the nix home manager takes care of linking the configs, git profiles and ssh, mpd service and xdg-user directories. Looking forward for more suggestions. **I use nix on top of arch btw** and *Am learning nix - so mind correct my mistakes.*
 
 
 ## Credits
