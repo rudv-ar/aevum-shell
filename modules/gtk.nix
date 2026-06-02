@@ -1,5 +1,6 @@
 { pkgs, ... }:
 {
+  gtk.gtk4.theme = gtk.theme
   gtk = {
     enable = true;
     
