@@ -4,4 +4,4 @@ singleton WindowService 1.0 WindowService.qml
 singleton XTitleService 1.0 XTitleService.qml
 singleton AudioService 1.0 AudioService.qml 
 singleton NetworkService 1.0 NetworkService.qml 
-
+singleton TimeService 1.0 TimeService.qml

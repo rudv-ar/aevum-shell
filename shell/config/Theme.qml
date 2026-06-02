@@ -312,6 +312,17 @@ Singleton {
     readonly property bool showDesktopNumbers:      false // deprecated — keep false
     readonly property bool colorWorkspaceIndicator: true
 
+    // Time Pill - for the clock : 
+    // ── Clock ─────────────────────────────────────────
+    readonly property bool   clockTwelveHour: false
+    readonly property bool   clockShowIcon:   true
+    readonly property bool   clockShowDate:   false
+    readonly property int    clockTimeSize:   13
+    readonly property int    clockDateSize:   8
+    readonly property int    clockPadV:       10
+    readonly property int    clockSpacing:    0
+    readonly property string fontMono:        "JetBrainsMono Nerd Font"
+
     // ════════════════════════════════════════════════════════════════
     // FONTS
     // ════════════════════════════════════════════════════════════════

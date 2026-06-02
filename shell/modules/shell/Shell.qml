@@ -107,7 +107,14 @@ PanelWindow {
         x: Math.round((root.mLeft - Theme.pillWidth) / 2)
         y: workspaces.y + workspaces.implicitHeight + 10
     }
+
+    Clock {
+        x: Math.round((root.mLeft - Theme.pillWidth) / 2)
+        y: statusIcons.y - implicitHeight + 4
+        z: 10
+    }    
     StatusIcons {
+        id: statusIcons
         x: Math.round((root.mLeft - Theme.pillWidth) / 2)
         y: root.screen.height - root.mBottom - Theme.barBottomPad
            - Theme.powerPillH - implicitHeight + 10

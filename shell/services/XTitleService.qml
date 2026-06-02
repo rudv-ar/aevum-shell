@@ -15,7 +15,7 @@ Singleton {
     // ── Format title for display ──────────────────────
     function _formatTitle(raw) {
         var s = (!raw || !raw.trim().length) ? "Desktop" : raw.trim()
-        displayTitle = s.length > 5 ? s.substring(0, 5) + "…" : s
+        displayTitle = s.length > 7 ? s.substring(0, 7) + "…" : s
     }
 
     // ── Live title stream (xtitle -s) ─────────────────

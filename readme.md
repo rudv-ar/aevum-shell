@@ -231,11 +231,30 @@ These are the features as of now for `caelestia branch`.
 - My preview images do not show a battery indicator because I use a PC - automatically capable of infering PC vs laptop. 
 - A power button which shutdowns on left and reboots on right clicks. 
 - The notifications, actions pane features are absent in this branch. Though they are present in the main and dev branches(horizontal bar system). 
+- A time pill. A minimal clock which shows the curren time, date or day if enabled. (only time is enabled by default). Time has both international + AM, PM format. 
 
 
 ## Nix Specific Features : 
 
 That said, I love being in this sweet spot : Nix pkg manager + home manager on top of **Arch**, excluding systemwide *systemd services*. At current stage, the nix home manager takes care of linking the configs, git profiles and ssh, mpd service and xdg-user directories. Looking forward for more suggestions. **I use nix on top of arch btw** and *Am learning nix - so mind correct my mistakes.*
+
+- Currently added : home-manager's gtk theme modulation : icons, cursors and theme pack. 
+
+
+# Customising the shell : 
+
+>[!IMPORTANT]
+> **Making modifications to shell properties :** At this point of the config, there is not any `config` file you can edit to change the properties of the shell. But **there is a `Theme.qml`** file in `~/.config/aevum/shell/config` directory. You can edit those values to tune your shell. There are those `togglable boolean values : true / false`, which you can try to change to see how the shell reacts. 
+
+
+Examples : 
+
+- you can change if the workspace indicator shows the number or not. 
+- if the workspace pill should be colored or not. 
+- if the time pill should show day also. 
+- light and dark mode of the shell. 
+- etc stuffs, more on the way. 
+
 
 
 ## Credits
