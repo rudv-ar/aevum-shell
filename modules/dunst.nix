@@ -1,6 +1,4 @@
-{ ... }: {
-  home.file.".config/dunst" = {
-    source = ../config/dunst;
-    recursive = true;
-  };
+{ config, ... }: {
+  home.file.".config/dunst".source =
+    config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/.config/aevum/config/dunst";
 }

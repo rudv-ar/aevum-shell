@@ -1,6 +1,4 @@
-{ ... }: {
-  home.file.".config/rofi" = {
-    source = ../config/rofi;
-    recursive = true;
-  };
+{ config, ... }: {
+  home.file.".config/rofi".source =
+    config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/.config/aevum/config/rofi";
 }

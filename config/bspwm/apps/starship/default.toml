@@ -1,13 +1,13 @@
 "$schema" = 'https://starship.rs/config-schema.json'
 format = """
-[░▒▓](fg:#9ecaff)\
-[ 󰣇 ](bg:#9ecaff fg:#0f1114)\
-[](fg:#9ecaff bg:#5195da)\
+[░▒▓](fg:#a1c9ff)\
+[ 󰣇 ](bg:#a1c9ff fg:#0f1114)\
+[](fg:#a1c9ff bg:#5594db)\
 $directory\
-[](fg:#5195da bg:#00497d)\
+[](fg:#5594db bg:#004880)\
 $git_branch\
 $git_status\
-[](fg:#00497d bg:#2f3033)\
+[](fg:#004880 bg:#2f3033)\
 $nodejs\
 $rust\
 $golang\
@@ -21,7 +21,7 @@ scan_timeout = 500
 command_timeout = 2000
 
 [directory]
-style = "fg:#e2e2e6 bg:#5195da"
+style = "fg:#e3e2e6 bg:#5594db"
 format = "[ $path ]($style)"
 truncation_length = 3
 truncation_symbol = "…/"
@@ -34,12 +34,12 @@ truncation_symbol = "…/"
 
 [git_branch]
 symbol = "󰘬"
-style = "bg:#00497d"
-format = '[[ $symbol $branch ](fg:#5195da bg:#00497d)]($style)'
+style = "bg:#004880"
+format = '[[ $symbol $branch ](fg:#5594db bg:#004880)]($style)'
 
 [git_status]
-style = "bg:#00497d"
-format = '[[($all_status$ahead_behind )](fg:#5195da bg:#00497d)]($style)'
+style = "bg:#004880"
+format = '[[($all_status$ahead_behind )](fg:#5594db bg:#004880)]($style)'
 conflicted = "󰞇 "
 ahead = "󰁝${count} "
 behind = "󰁅${count} "
@@ -54,22 +54,22 @@ deleted = "󰮉 "
 [nodejs]
 symbol = "󰎙"
 style = "bg:#2f3033"
-format = '[[ $symbol ($version) ](fg:#5195da bg:#2f3033)]($style)'
+format = '[[ $symbol ($version) ](fg:#5594db bg:#2f3033)]($style)'
 
 [rust]
 symbol = "󱘗"
 style = "bg:#2f3033"
-format = '[[ $symbol ($version) ](fg:#5195da bg:#2f3033)]($style)'
+format = '[[ $symbol ($version) ](fg:#5594db bg:#2f3033)]($style)'
 
 [golang]
 symbol = "󰟓"
 style = "bg:#2f3033"
-format = '[[ $symbol ($version) ](fg:#5195da bg:#2f3033)]($style)'
+format = '[[ $symbol ($version) ](fg:#5594db bg:#2f3033)]($style)'
 
 [php]
 symbol = "󰌟"
 style = "bg:#2f3033"
-format = '[[ $symbol ($version) ](fg:#5195da bg:#2f3033)]($style)'
+format = '[[ $symbol ($version) ](fg:#5594db bg:#2f3033)]($style)'
 
 [time]
 disabled = false
@@ -78,6 +78,6 @@ style = "bg:#242629"
 format = '[[  $time ](fg:#a7abb4 bg:#242629)]($style)'
 
 [character]
-success_symbol = "[❯](bold fg:#5195da)"
+success_symbol = "[❯](bold fg:#5594db)"
 error_symbol = "[❯](bold fg:#ff5f5f)"
-vimcmd_symbol = "[❮](bold fg:#5195da)"
+vimcmd_symbol = "[❮](bold fg:#5594db)"
