@@ -12,6 +12,9 @@
       package = pkgs.nordzy-icon-theme;
       name = "Nordzy";
     };
+
+    gtk4.theme = config.gtk.theme;
+    
   };
 }
 
