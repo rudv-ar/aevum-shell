@@ -14,7 +14,7 @@ Item {
     // ── Dimension tokens ──────────────────────────────
     readonly property int   pillW:    Theme.pillWidth
     readonly property int   iconSize: Theme.pillIconSize
-    readonly property color iconCol:  Theme.accent
+    readonly property color iconCol:  Theme.statusIconColor
     readonly property color errorCol: Theme.powerIcon
     readonly property string fontMat: Theme.fontMaterial
 
@@ -33,7 +33,7 @@ Item {
         anchors.left:  parent.left
         anchors.right: parent.right
         radius:        width / 2
-        color:         Theme.launcherBg
+        color:         Theme.workspaceBg
         clip:          true
 
         implicitHeight: iconCol.implicitHeight + 16

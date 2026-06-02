@@ -56,7 +56,7 @@ Item {
         anchors.leftMargin: 0
         anchors.bottomMargin: 0
         radius:          Theme.pillRadius
-        color:           Theme.colorWorkspaceIndicator ? Qt.rgba(1, 1, 1, 0.07) : "transparent"
+        color:           Theme.colorWorkspaceIndicator ? Theme.workspaceBg : "transparent"
     }
     // ── Occupied background pills ──────────────────────
     OccupiedBg {

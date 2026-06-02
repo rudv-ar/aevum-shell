@@ -33,7 +33,7 @@ Item {
         width:   Theme.pillWidth - 4
         height:  Math.abs(root.leading - root.trailing) + root._targetH
         radius:  Theme.pillRadius
-        color:   Theme.accent
+        color:   Theme.wsActiveBg
         opacity: 0.28
 
         Behavior on height {

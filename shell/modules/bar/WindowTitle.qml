@@ -17,7 +17,7 @@ Item {
         text:                     Icons.getIcon(XTitleService.className)
         font.family:              Icons.fontFamily
         font.pixelSize:           15
-        color:                    "white"
+        color:                    Theme.xtitleColor
     }
 
     // ── Rotated title container ───────────────────────
@@ -40,7 +40,7 @@ Item {
             y:      -(implicitHeight - titleContainer.height) / 2
 
             text:               XTitleService.displayTitle
-            color:              "white"
+            color:              Theme.xtitleColor
             font.pixelSize:     12
             font.family:        Theme.fontPoppins
             font.letterSpacing: 2

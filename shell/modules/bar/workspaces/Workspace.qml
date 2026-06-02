@@ -45,10 +45,8 @@ ColumnLayout {
                 verticalAlignment:   Text.AlignVCenter
 
                 color: root.isActive
-                       ? Theme.accent
-                       : Qt.rgba(Theme.text.r,
-                                 Theme.text.g,
-                                 Theme.text.b, 0.55)
+                      ? Theme.accent
+                      : Theme.text
 
                 Behavior on color {
                     ColorAnimation { duration: 150; easing.type: Easing.OutCubic }

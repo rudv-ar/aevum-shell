@@ -63,7 +63,7 @@ Item {
                     ? endItem.y + endItem.implicitHeight - startItem.y + 2
                     : 0
             radius: Theme.pillRadius
-            color:  Qt.rgba(1, 1, 1, 0.06)
+            color:  Theme.wsOccupiedBg
             visible: height > 2
 
             Behavior on y      { NumberAnimation { duration: 0; easing.type: Easing.OutCubic } }
