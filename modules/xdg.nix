@@ -5,6 +5,7 @@
     userDirs = {
       enable = true;
       createDirectories = true;
+      setSessionVariables = false;
       music    = "${config.home.homeDirectory}/Music";
       download = "${config.home.homeDirectory}/Downloads";
       documents= "${config.home.homeDirectory}/Documents";
