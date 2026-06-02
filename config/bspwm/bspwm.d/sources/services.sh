@@ -8,7 +8,7 @@
 is_svc_dunst=true
 
 # is mpd active?
-is_svc_mpd=true
+is_svc_mpd=false
 
 # is picom active?
 is_svc_picom=true
