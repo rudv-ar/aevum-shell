@@ -10,6 +10,8 @@ source "$BSPDIR/bspwm.d/sources/wallpaper.sh"
 source "$BSPDIR/bspwm.d/sources/widget.sh"
 source "$BSPDIR/bspwm.d/sources/network.sh"
 source "$HOME/.nix-profile/etc/profile.d/hm-session-vars.sh"
+
+systemctl --user import-environment QT_QPA_PLATFORMTHEME QT_STYLE_OVERRIDE
 # ── Kill existing instances ───────────────────────────────────────────────────
 killall -9 xsettingsd sxhkd dunst ksuperkey xfce4-power-manager \
             bspc polybar quickshell qs snapserver picom tor vicinae plank
