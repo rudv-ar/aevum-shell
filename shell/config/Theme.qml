@@ -84,6 +84,11 @@ Singleton {
             if (!parsed?.palettes) return
             _raw     = parsed
             _palette = _buildPalette()
+
+            // ── Sync dark mode from JSON ──────────────────────────
+            if (parsed.is_dark_mode !== undefined)
+                isDark = parsed.is_dark_mode   // true/false boolean from matugen            
+                
             refresh()
         } catch (e) {
             console.warn("[Colors] parse failed, keeping last good state:", e)
