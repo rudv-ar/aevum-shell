@@ -8,11 +8,13 @@
 source "$HOME/.config/bspwm/bspwm.d/exports.sh"
 
 source "$HOME/.config/bspwm/bspwm.d/sources/widget.sh"
+source "$HOME/.config/bspwm/bspwm.d/sources/colors.sh"
 ##################################################### BORDERS ###########################################
 # set the border colors
-bspwm_borders_active_color='#000000'
-bspwm_borders_focused_color='#414868'
-bspwm_borders_normal_color='#1e1e2e'
+bspwm_borders_active_color=${active_color:-'#ffffff'}
+bspwm_borders_focused_color=${focused_color:-'#ffffff'}
+# border becomes white if something goes wrong
+bspwm_borders_normal_color=${normal_color:-'#ffffff'}
 
 # set the border style
 bspwm_borders_style='solid'
@@ -29,7 +31,7 @@ bspwm_monocle_single=false
 #################################################### PRESEL ##############################################
 
 # setting the color for presel feedback
-bspwm_presel_pfc='#000000'
+bspwm_presel_pfc=${pfc_color:-'#ffffff'}
 
 # is bspwm having presel enabled? --> [ tip : see the BOOLEANS section...]
 
@@ -68,7 +70,7 @@ bspwm_window_sr_ratio=0.5
 is_bspwm_borders=true
 
 # is bspwm showing presel feedback?
-is_bspwm_presel=false
+is_bspwm_presel=true
 
 # is bspwm set to automatic scheme?
 is_bspwm_scheme_automatic=true

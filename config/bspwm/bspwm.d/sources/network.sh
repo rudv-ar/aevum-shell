@@ -17,7 +17,7 @@ is_net_ethernet=true
 is_net_firewall=true
 
 # is tor enabled?
-is_net_tor=false
+is_net_tor=false # no longer using tor. 
 
 # is wifi enabled?
 is_net_wifi=true

@@ -60,8 +60,7 @@ if [[ $is_svc_vicinae == true ]]; then
 fi
 
 # ── Dunst ─────────────────────────────────────────────────────────────────────
-[[ $is_svc_dunst == true ]] && [[ $widget_bar != "quickshell" ]] && bspdunst &
-
+# nope, dunst has been replaced by shell native notify manager
 # ── Bspfloat ──────────────────────────────────────────────────────────────────
 bspfloat &
 
@@ -69,25 +68,25 @@ bspfloat &
 
 
 # ── Tor ───────────────────────────────────────────────────────────────────────
-if [[ $is_net_tor == true ]]; then
-    mkdir -p "$net_tor_torerrors"
-    mkdir -p "$net_tor_torlogs"
-    echo -e "\n\n=== TOR Started: $(date) ===\n\n" \
-        >> "$net_tor_torlogs/log-$(date +%Y-%m-%d).log"
-    tor -f "$net_tor_torrc" \
-        2>> "$net_tor_torerrors/error-$(date +%Y-%m-%d).log" \
-        1>> "$net_tor_torlogs/log-$(date +%Y-%m-%d).log" &
-    notify-send "Tor" "Your internet is tunneled through Tor." -t 30000 -u normal
-else
-    notify-send "Tor" "Tor not enabled. You are on public network." -t 30000 -u normal
-fi
+#if [[ $is_net_tor == true ]]; then
+#    mkdir -p "$net_tor_torerrors"
+#    mkdir -p "$net_tor_torlogs"
+#    echo -e "\n\n=== TOR Started: $(date) ===\n\n" \
+#        >> "$net_tor_torlogs/log-$(date +%Y-%m-%d).log"
+#    tor -f "$net_tor_torrc" \
+#        2>> "$net_tor_torerrors/error-$(date +%Y-%m-%d).log" \
+#        1>> "$net_tor_torlogs/log-$(date +%Y-%m-%d).log" &
+#    notify-send "Tor" "Your internet is tunneled through Tor." -t 30000 -u normal
+#else
+#    notify-send "Tor" "Tor not enabled. You are on public network." -t 30000 -u normal
+#fi
 
 # ── Snapserver ────────────────────────────────────────────────────────────────
-if [[ $is_svc_snapserver == true ]]; then
-    pactl load-module module-pipe-sink sink_name=snapfifo file=/tmp/snapfifo
-    pactl set-default-sink snapfifo
-    snapserver &
-fi
+#if [[ $is_svc_snapserver == true ]]; then
+#    pactl load-module module-pipe-sink sink_name=snapfifo file=/tmp/snapfifo
+#    pactl set-default-sink snapfifo
+#    snapserver &
+#fi
 
 
 
@@ -97,5 +96,5 @@ fi
 [[ $is_plank == true ]] && plank &
 
 ##---------------------------------------- Manager Scripts : All those use bspc subscribe to bring about some action----------------------------
-bash "$BSPDIR/bspwm.d/exter_rules/raise_plank.sh" &
+bash "$BSPDIR/bspwm.d/exter_rules/raise_widgets.sh" &
 
