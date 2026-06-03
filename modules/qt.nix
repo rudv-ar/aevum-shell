@@ -22,8 +22,7 @@
   };
 
   home.packages = with pkgs; [
-    libsForQt5.qtstyleplugin-kvantum # Qt5 Kvantum (covers legacy Qt5 apps)
-    qt5ct
-    qt6ct
+    libsForQt5.qtstyleplugin-kvantum
+    kdePackages.qtstyleplugin-kvantum
   ];
 }
