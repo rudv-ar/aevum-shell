@@ -18,4 +18,4 @@ wall_disfree_dir="$HOME/Pictures/Wallpapers"
 wall_single=true
 
 # the path of that single wallpaper
-wall_wallpaper="$wall_dir/bhal-shogan.png"
+wall_wallpaper="$wall_dir/ign_batman.png"
