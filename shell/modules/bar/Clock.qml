@@ -30,7 +30,7 @@ Item {
         anchors.left:  parent.left
         anchors.right: parent.right
         radius:        width / 2
-        color:         "transparent"
+        color:         Theme.colorClockPill ? Theme.workspaceBg : "transparent"
         clip:          true
 
         implicitHeight: col.implicitHeight + root.padV * 2

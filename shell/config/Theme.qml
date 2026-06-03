@@ -318,9 +318,10 @@ Singleton {
     readonly property bool   clockShowIcon:   true
     readonly property bool   clockShowDate:   false
     readonly property int    clockTimeSize:   13
-    readonly property int    clockDateSize:   8
-    readonly property int    clockPadV:       10
-    readonly property int    clockSpacing:    0
+    readonly property int    clockDateSize:   12
+    readonly property int    clockPadV:       5
+    readonly property int    clockSpacing:    1
+    readonly property bool colorClockPill: false
     readonly property string fontMono:        "JetBrainsMono Nerd Font"
 
     // ════════════════════════════════════════════════════════════════

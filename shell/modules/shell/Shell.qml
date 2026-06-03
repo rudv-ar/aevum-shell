@@ -110,7 +110,7 @@ PanelWindow {
 
     Clock {
         x: Math.round((root.mLeft - Theme.pillWidth) / 2)
-        y: statusIcons.y - implicitHeight + 4
+        y: statusIcons.y - implicitHeight - 5
         z: 10
     }    
     StatusIcons {

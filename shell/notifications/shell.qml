@@ -3,6 +3,8 @@ import Quickshell
 import qs.modules
 import qs.settings
 
+// currently, this is a substitute shell. I should be able to port the caelestia's notification system soon. 
+
 ShellRoot {
     PanelWindow {
         id: win
