@@ -1,0 +1,2 @@
+module qs.services.notifs
+singleton NotifServer 1.0 NotifServer.qml
