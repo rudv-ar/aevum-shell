@@ -41,8 +41,8 @@ red = '{{colors.error.default.hex}}'
 green = '{{palettes.primary._40.hex}}' 
 yellow = '{{palettes.secondary._25.hex}}' 
 blue = '{{palettes.primary._70.hex}}' 
-magenta = '{{palettes.tertiary._40.hex}}' 
-cyan = '{{palettes.tertiary._70.hex}}' 
+magenta = '{{palettes.primary._80.hex}}' 
+cyan = '{{palettes.tertiary._60.hex}}' 
 white = '{{colors.on_background.default.hex}}' 
  
  
