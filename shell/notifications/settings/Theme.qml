@@ -28,7 +28,7 @@ Singleton {
     // ── Layer A: File watcher ─────────────────────────────────────────────────
     FileView {
         id: colorFile
-        path: Quickshell.env("HOME") + "/.config/bspwm/shell/shared/colors.json"
+        path: Quickshell.env("HOME") + "/.config/aevum/shared/colors.json"
         blockLoading: true
         watchChanges: true
         onFileChanged: {
