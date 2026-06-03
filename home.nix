@@ -12,6 +12,11 @@
       # xorg.xsetroot
     ];
 
+    sessionVariables = {
+      QT_QPA_PLATFORMTHEME = "qt5ct";
+      QT_STYLE_OVERRIDE = "kvantum";
+    };
+
     activation.reloadBspwm = lib.hm.dag.entryAfter ["writeBoundary"] ''
       /usr/bin/bspc wm -r;
     '';    
