@@ -1,6 +1,6 @@
 [colors.primary]
 background = '{{colors.background.default.hex}}'
-foreground = '{{palettes.primary._70.hex}}'
+foreground = '{{colors.on_background.default.hex}}'
  
 [colors.cursor]
 text = '{{colors.on_surface.default.hex}}'
@@ -38,12 +38,12 @@ background = '{{colors.primary.default.hex}}'
 [colors.normal]
 black = '#181818' 
 red = '{{colors.error.default.hex}}' 
-green = '{{colors.primary.default.hex}}' 
-yellow = '{{colors.inverse_primary.default.hex}}' 
-blue = '{{colors.primary.default.hex}}' 
-magenta = '{{colors.tertiary.default.hex}}' 
-cyan = '{{colors.secondary.default.hex}}' 
-white = '#BAC2DE' 
+green = '{{palettes.primary._40.hex}}' 
+yellow = '{{palettes.secondary._25.hex}}' 
+blue = '{{palettes.primary._70.hex}}' 
+magenta = '{{palettes.tertiary._40.hex}}' 
+cyan = '{{palettes.tertiary._70.hex}}' 
+white = '{{colors.on_background.default.hex}}' 
  
  
 [colors.bright]
