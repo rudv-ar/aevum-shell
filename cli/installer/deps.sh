@@ -32,7 +32,7 @@ header() {
 # ── Deps ──────────────────────────────────────────────────────────────────────
 PACMAN_DEPS=(
     # essentials
-    bspwm sxhkd picom xorg-xsetroot
+    bspwm sxhkd picom xorg-xsetroot ksuperkey
 
     # bars
     quickshell polybar

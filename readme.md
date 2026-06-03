@@ -264,5 +264,6 @@ Examples :
 - [Archcraft](https://archcraft.io) — for the themes, icons, and fonts
 
 
+## Star History
 
-
+[![Star History Chart](https://api.star-history.com/chart?repos=rudv-ar/aevum-shell&type=timeline&logscale&legend=bottom-right)](https://www.star-history.com/?repos=rudv-ar%2Faevum-shell&type=timeline&logscale=&legend=bottom-right)
