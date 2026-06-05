@@ -38,6 +38,9 @@ function aevum
         case srcrec
             bash $SUBCMD/srcrec.sh $argv[2..]
 
+        case theme
+            bash $SUBCMD/theme.sh $argv[2..]
+
         case '*'
             echo "  ✗  Unknown command: $argv[1]"
             echo "     Run 'aevum help' for usage"
