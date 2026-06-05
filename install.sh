@@ -94,6 +94,12 @@ _link_verified "$INSTALLER/config-linker.sh"
 section "Local Symlinks"
 _link_verified "$INSTALLER/local-linker.sh"
 
+section "Set Wallpaper"
+mkdir -p "$HOME/Pictures/Wallpapers"
+cp -r "$AEVUM/assets/ign_batman.png" "$HOME/Pictures/Wallpapers/ign_batman.png"
+bash "$HOME/.config/aevum/config/bspwm/apps/wallpicker/generate-cache.sh" "$HOME/.config/aevum/config/bspwm/apps/wallpicker"
+bash "$HOME/.config/aevum/config/bspwm/apps/wallpicker/set-wallpaper.sh" "$HOME/Pictures/Wallpapers/ign_batman.png"
+
 # ── Done ──────────────────────────────────────────────────────────────────────
 echo ""
 echo -e "  \033[0;32m✓\033[0m  Aevum fully installed. Open a new fish shell and you're good."
