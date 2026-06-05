@@ -35,7 +35,7 @@ PACMAN_DEPS=(
     bspwm sxhkd picom xorg-xsetroot ksuperkey
 
     # bars
-    quickshell polybar
+    quickshell fzf
 
     # dunst
     dunst archcraft-dunst-icons
