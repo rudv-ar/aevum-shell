@@ -1,21 +1,358 @@
+// Usage from other QML files:
+//   Colors.primary                  → active mode Material color string
+//   Colors.palette.primary[30]      → tone 30 of primary, always
+//   Colors.pc("primary", 10, 90)    → isDark ? palette.primary[10] : palette.primary[90]
+
 pragma Singleton
+
+import QtQuick
 import Quickshell
 import Quickshell.Io
-import QtQuick
 
 Singleton {
     id: root
 
-// ── Fonts ─────────────────────────────────────────────────────────────────
-    FontLoader { id: fontLoaderFA6; source: "file://" + Quickshell.shellDir + "/../assets/fonts/Font Awesome 6 Free-Solid-900.otf" }
-    FontLoader { id: fontLoaderAnurati;           source: "file://" + Quickshell.shellDir + "/../assets/fonts/Anurati.otf" }
-    FontLoader { id: fontLoaderPoppins;           source: "file://" + Quickshell.shellDir + "/../assets/fonts/Poppins.ttf" }
-    FontLoader { id: fontLoaderGolgix;            source: "file://" + Quickshell.shellDir + "/../assets/fonts/Golgix-Regular.ttf" }
-    FontLoader { id: fontLoaderAvaporeRound;      source: "file://" + Quickshell.shellDir + "/../assets/fonts/Avapore-Round.otf" }
-    FontLoader { id: fontLoaderBiologicalSystems; source: "file://" + Quickshell.shellDir + "/../assets/fonts/Biological-Systems-Demo.otf" }
-    FontLoader { id: fontLoaderHardcoreImperial;  source: "file://" + Quickshell.shellDir + "/../assets/fonts/Hardcore Imperial.ttf" }
-    FontLoader { id: fontLoaderAssistedSensors;   source: "file://" + Quickshell.shellDir + "/../assets/fonts/Assisted-Sensors-Demo.otf" }
+    // ════════════════════════════════════════════════════════════════
+    // FLAGS
+    // ════════════════════════════════════════════════════════════════
+    property bool isDark:       true
+    property bool printEnabled: false
 
+    // ════════════════════════════════════════════════════════════════
+    // INTERNAL STATE — only updated on a valid parse
+    // ════════════════════════════════════════════════════════════════
+    property var  _raw:     null
+    property var  _palette: ({})
+    readonly property string mode: isDark ? "dark" : "light"
+
+    // Public palette — always the last good build, never null
+    readonly property var palette: _palette
+
+    // ════════════════════════════════════════════════════════════════
+    // FILE WATCHER
+    // ════════════════════════════════════════════════════════════════
+    FileView {
+        id: jsonFile
+        path:         Quickshell.env("HOME") + "/.config/aevum/shared/colors.json"
+        blockLoading: true
+        watchChanges: true
+        onFileChanged: {
+            jsonFile.path = jsonFile.path
+            jsonFile.reload()
+            const t = jsonFile.text()
+            if (t && t.trim().length > 0)
+                root._parse()
+            else
+                console.warn("[Colors] file empty on change, waiting for debounce...")
+            debounce.restart()
+        }
+    }
+
+    // Debounce — second attempt after matugen finishes writing
+    Timer {
+        id: debounce
+        interval: 150
+        repeat:   false
+        onTriggered: {
+            jsonFile.path = jsonFile.path
+            jsonFile.reload()
+            const t = jsonFile.text()
+            if (t && t.trim().length > 0)
+                root._parse()
+            else
+                console.warn("[Colors] file still empty after debounce, keeping last good state")
+        }
+    }
+
+    // Initial load — slight delay so FileView is ready
+    Timer {
+        id: initialLoad
+        interval: 100
+        repeat:   false
+        running:  true
+        onTriggered: root._parse()
+    }
+
+    // ════════════════════════════════════════════════════════════════
+    // PARSE — only commits state if JSON is valid and palettes exist
+    // ════════════════════════════════════════════════════════════════
+    function _parse() {
+        try {
+            const text = jsonFile.text()
+            if (!text || text.trim().length === 0) return
+            const parsed = JSON.parse(text)
+            if (!parsed?.palettes) return
+            _raw     = parsed
+            _palette = _buildPalette()
+
+            // ── Sync dark mode from JSON ──────────────────────────
+            if (parsed.is_dark_mode !== undefined)
+                isDark = parsed.is_dark_mode   // true/false boolean from matugen            
+                
+            refresh()
+        } catch (e) {
+            console.warn("[Colors] parse failed, keeping last good state:", e)
+        }
+    }
+
+    // ════════════════════════════════════════════════════════════════
+    // MATERIAL COLORS — active mode
+    // ════════════════════════════════════════════════════════════════
+
+    // ── Background & Surface ─────────────────────────────────────────
+    readonly property string background:              _c("background")
+    readonly property string onBackground:            _c("on_background")
+
+    readonly property string surface:                 _c("surface")
+    readonly property string surfaceVariant:          _c("surface_variant")
+    readonly property string surfaceContainer:        _c("surface_container")
+    readonly property string surfaceContainerHigh:    _c("surface_container_high")
+    readonly property string surfaceContainerHighest: _c("surface_container_highest")
+    readonly property string surfaceContainerLow:     _c("surface_container_low")
+    readonly property string surfaceContainerLowest:  _c("surface_container_lowest")
+    readonly property string surfaceBright:           _c("surface_bright")
+    readonly property string surfaceDim:              _c("surface_dim")
+    readonly property string surfaceTint:             _c("surface_tint")
+    readonly property string onSurface:               _c("on_surface")
+    readonly property string onSurfaceVariant:        _c("on_surface_variant")
+    readonly property string inverseSurface:          _c("inverse_surface")
+    readonly property string inverseOnSurface:        _c("inverse_on_surface")
+
+    // ── Primary ──────────────────────────────────────────────────────
+    readonly property string primary:                 _c("primary")
+    readonly property string onPrimary:               _c("on_primary")
+    readonly property string primaryContainer:        _c("primary_container")
+    readonly property string onPrimaryContainer:      _c("on_primary_container")
+    readonly property string primaryFixed:            _c("primary_fixed")
+    readonly property string primaryFixedDim:         _c("primary_fixed_dim")
+    readonly property string inversePrimary:          _c("inverse_primary")
+
+    // ── Secondary ────────────────────────────────────────────────────
+    readonly property string secondary:               _c("secondary")
+    readonly property string onSecondary:             _c("on_secondary")
+    readonly property string secondaryContainer:      _c("secondary_container")
+    readonly property string onSecondaryContainer:    _c("on_secondary_container")
+    readonly property string secondaryFixed:          _c("secondary_fixed")
+    readonly property string secondaryFixedDim:       _c("secondary_fixed_dim")
+
+    // ── Tertiary ─────────────────────────────────────────────────────
+    readonly property string tertiary:                _c("tertiary")
+    readonly property string onTertiary:              _c("on_tertiary")
+    readonly property string tertiaryContainer:       _c("tertiary_container")
+    readonly property string onTertiaryContainer:     _c("on_tertiary_container")
+    readonly property string tertiaryFixed:           _c("tertiary_fixed")
+    readonly property string tertiaryFixedDim:        _c("tertiary_fixed_dim")
+
+    // ── Error ────────────────────────────────────────────────────────
+    readonly property string error:                   _c("error")
+    readonly property string onError:                 _c("on_error")
+    readonly property string errorContainer:          _c("error_container")
+    readonly property string onErrorContainer:        _c("on_error_container")
+
+    // ── Outline / Scrim / Shadow ──────────────────────────────────────
+    readonly property string outline:                 _c("outline")
+    readonly property string outlineVariant:          _c("outline_variant")
+    readonly property string scrim:                   _c("scrim")
+    readonly property string shadow:                  _c("shadow")
+    readonly property string sourceColor:             _c("source_color")
+
+    // ════════════════════════════════════════════════════════════════
+    // PALETTE SHORTCUTS — bound to palette, safe because palette
+    // is only ever updated with a fully valid build
+    // ════════════════════════════════════════════════════════════════
+
+    // ── Primary ──────────────────────────────────────────────────────
+    readonly property color p0:   palette.primary?.[0]   ?? "transparent"
+    readonly property color p5:   palette.primary?.[5]   ?? "transparent"
+    readonly property color p10:  palette.primary?.[10]  ?? "transparent"
+    readonly property color p15:  palette.primary?.[15]  ?? "transparent"
+    readonly property color p20:  palette.primary?.[20]  ?? "transparent"
+    readonly property color p25:  palette.primary?.[25]  ?? "transparent"
+    readonly property color p30:  palette.primary?.[30]  ?? "transparent"
+    readonly property color p35:  palette.primary?.[35]  ?? "transparent"
+    readonly property color p40:  palette.primary?.[40]  ?? "transparent"
+    readonly property color p50:  palette.primary?.[50]  ?? "transparent"
+    readonly property color p60:  palette.primary?.[60]  ?? "transparent"
+    readonly property color p70:  palette.primary?.[70]  ?? "transparent"
+    readonly property color p80:  palette.primary?.[80]  ?? "transparent"
+    readonly property color p90:  palette.primary?.[90]  ?? "transparent"
+    readonly property color p95:  palette.primary?.[95]  ?? "transparent"
+    readonly property color p98:  palette.primary?.[98]  ?? "transparent"
+    readonly property color p99:  palette.primary?.[99]  ?? "transparent"
+    readonly property color p100: palette.primary?.[100] ?? "transparent"
+
+    // ── Secondary ────────────────────────────────────────────────────
+    readonly property color s0:   palette.secondary?.[0]   ?? "transparent"
+    readonly property color s5:   palette.secondary?.[5]   ?? "transparent"
+    readonly property color s10:  palette.secondary?.[10]  ?? "transparent"
+    readonly property color s15:  palette.secondary?.[15]  ?? "transparent"
+    readonly property color s20:  palette.secondary?.[20]  ?? "transparent"
+    readonly property color s25:  palette.secondary?.[25]  ?? "transparent"
+    readonly property color s30:  palette.secondary?.[30]  ?? "transparent"
+    readonly property color s35:  palette.secondary?.[35]  ?? "transparent"
+    readonly property color s40:  palette.secondary?.[40]  ?? "transparent"
+    readonly property color s50:  palette.secondary?.[50]  ?? "transparent"
+    readonly property color s60:  palette.secondary?.[60]  ?? "transparent"
+    readonly property color s70:  palette.secondary?.[70]  ?? "transparent"
+    readonly property color s80:  palette.secondary?.[80]  ?? "transparent"
+    readonly property color s90:  palette.secondary?.[90]  ?? "transparent"
+    readonly property color s95:  palette.secondary?.[95]  ?? "transparent"
+    readonly property color s98:  palette.secondary?.[98]  ?? "transparent"
+    readonly property color s99:  palette.secondary?.[99]  ?? "transparent"
+    readonly property color s100: palette.secondary?.[100] ?? "transparent"
+
+    // ── Tertiary ─────────────────────────────────────────────────────
+    readonly property color t0:   palette.tertiary?.[0]   ?? "transparent"
+    readonly property color t5:   palette.tertiary?.[5]   ?? "transparent"
+    readonly property color t10:  palette.tertiary?.[10]  ?? "transparent"
+    readonly property color t15:  palette.tertiary?.[15]  ?? "transparent"
+    readonly property color t20:  palette.tertiary?.[20]  ?? "transparent"
+    readonly property color t25:  palette.tertiary?.[25]  ?? "transparent"
+    readonly property color t30:  palette.tertiary?.[30]  ?? "transparent"
+    readonly property color t35:  palette.tertiary?.[35]  ?? "transparent"
+    readonly property color t40:  palette.tertiary?.[40]  ?? "transparent"
+    readonly property color t50:  palette.tertiary?.[50]  ?? "transparent"
+    readonly property color t60:  palette.tertiary?.[60]  ?? "transparent"
+    readonly property color t70:  palette.tertiary?.[70]  ?? "transparent"
+    readonly property color t80:  palette.tertiary?.[80]  ?? "transparent"
+    readonly property color t90:  palette.tertiary?.[90]  ?? "transparent"
+    readonly property color t95:  palette.tertiary?.[95]  ?? "transparent"
+    readonly property color t98:  palette.tertiary?.[98]  ?? "transparent"
+    readonly property color t99:  palette.tertiary?.[99]  ?? "transparent"
+    readonly property color t100: palette.tertiary?.[100] ?? "transparent"
+
+    // ── Neutral ──────────────────────────────────────────────────────
+    readonly property color n0:   palette.neutral?.[0]   ?? "transparent"
+    readonly property color n5:   palette.neutral?.[5]   ?? "transparent"
+    readonly property color n10:  palette.neutral?.[10]  ?? "transparent"
+    readonly property color n15:  palette.neutral?.[15]  ?? "transparent"
+    readonly property color n20:  palette.neutral?.[20]  ?? "transparent"
+    readonly property color n25:  palette.neutral?.[25]  ?? "transparent"
+    readonly property color n30:  palette.neutral?.[30]  ?? "transparent"
+    readonly property color n35:  palette.neutral?.[35]  ?? "transparent"
+    readonly property color n40:  palette.neutral?.[40]  ?? "transparent"
+    readonly property color n50:  palette.neutral?.[50]  ?? "transparent"
+    readonly property color n60:  palette.neutral?.[60]  ?? "transparent"
+    readonly property color n70:  palette.neutral?.[70]  ?? "transparent"
+    readonly property color n80:  palette.neutral?.[80]  ?? "transparent"
+    readonly property color n90:  palette.neutral?.[90]  ?? "transparent"
+    readonly property color n95:  palette.neutral?.[95]  ?? "transparent"
+    readonly property color n98:  palette.neutral?.[98]  ?? "transparent"
+    readonly property color n99:  palette.neutral?.[99]  ?? "transparent"
+    readonly property color n100: palette.neutral?.[100] ?? "transparent"
+
+    // ── Neutral Variant ───────────────────────────────────────────────
+    readonly property color nv0:   palette.neutral_variant?.[0]   ?? "transparent"
+    readonly property color nv5:   palette.neutral_variant?.[5]   ?? "transparent"
+    readonly property color nv10:  palette.neutral_variant?.[10]  ?? "transparent"
+    readonly property color nv15:  palette.neutral_variant?.[15]  ?? "transparent"
+    readonly property color nv20:  palette.neutral_variant?.[20]  ?? "transparent"
+    readonly property color nv25:  palette.neutral_variant?.[25]  ?? "transparent"
+    readonly property color nv30:  palette.neutral_variant?.[30]  ?? "transparent"
+    readonly property color nv35:  palette.neutral_variant?.[35]  ?? "transparent"
+    readonly property color nv40:  palette.neutral_variant?.[40]  ?? "transparent"
+    readonly property color nv50:  palette.neutral_variant?.[50]  ?? "transparent"
+    readonly property color nv60:  palette.neutral_variant?.[60]  ?? "transparent"
+    readonly property color nv70:  palette.neutral_variant?.[70]  ?? "transparent"
+    readonly property color nv80:  palette.neutral_variant?.[80]  ?? "transparent"
+    readonly property color nv90:  palette.neutral_variant?.[90]  ?? "transparent"
+    readonly property color nv95:  palette.neutral_variant?.[95]  ?? "transparent"
+    readonly property color nv98:  palette.neutral_variant?.[98]  ?? "transparent"
+    readonly property color nv99:  palette.neutral_variant?.[99]  ?? "transparent"
+    readonly property color nv100: palette.neutral_variant?.[100] ?? "transparent"
+
+    // ── Error ────────────────────────────────────────────────────────
+    readonly property color e0:   palette.error?.[0]   ?? "transparent"
+    readonly property color e5:   palette.error?.[5]   ?? "transparent"
+    readonly property color e10:  palette.error?.[10]  ?? "transparent"
+    readonly property color e15:  palette.error?.[15]  ?? "transparent"
+    readonly property color e20:  palette.error?.[20]  ?? "transparent"
+    readonly property color e25:  palette.error?.[25]  ?? "transparent"
+    readonly property color e30:  palette.error?.[30]  ?? "transparent"
+    readonly property color e35:  palette.error?.[35]  ?? "transparent"
+    readonly property color e40:  palette.error?.[40]  ?? "transparent"
+    readonly property color e50:  palette.error?.[50]  ?? "transparent"
+    readonly property color e60:  palette.error?.[60]  ?? "transparent"
+    readonly property color e70:  palette.error?.[70]  ?? "transparent"
+    readonly property color e80:  palette.error?.[80]  ?? "transparent"
+    readonly property color e90:  palette.error?.[90]  ?? "transparent"
+    readonly property color e95:  palette.error?.[95]  ?? "transparent"
+    readonly property color e98:  palette.error?.[98]  ?? "transparent"
+    readonly property color e99:  palette.error?.[99]  ?? "transparent"
+    readonly property color e100: palette.error?.[100] ?? "transparent"
+
+    // ════════════════════════════════════════════════════════════════
+    // SEMANTIC / COMPONENT COLORS
+    // ════════════════════════════════════════════════════════════════
+    readonly property color base:            background
+    readonly property color surface0:        "#181b1f"
+    readonly property color surface1:        "#45475a"
+    readonly property color accent:          pc("primary",    70, 30)
+    readonly property color wsActiveBg:      pc("primary",    60, 40)
+    readonly property color xtitleColor:     pc("primary",   100,  0)
+    readonly property color wsOccupiedBg:    pc("secondary",  25, 70)
+    readonly property color text:            pc("primary",    90, 10)
+    readonly property color textColor:       pc("primary",    90, 10)
+    readonly property color launcherBg:      pc("neutral",    10, 95)
+    readonly property color statusIconColor: pc("primary",    90, 10)
+    readonly property color workspaceBg:     isDark
+                                                 ? Qt.lighter(pc("primary", 80, 90), 0.20)
+                                                 : Qt.lighter(pc("primary", 80, 90), 0.80)
+
+
+// ── Audio / BasePill ──────────────────────────────────────────────────────
+    readonly property color audioError: error   // #ffb4ab — tracks theme now   
+
+
+    readonly property color notifBackgroundBg: background
+    readonly property color notifNormalBg:     workspaceBg
+    readonly property color notifCriticalBg:   wsOccupiedBg
+    readonly property color notifLowBg:        workspaceBg
+    readonly property color notifToastBg:      background
+                                                 
+    // ── Semantic aliases ──────────────────────────────────────────────
+    readonly property color frameColor: background
+
+    // ════════════════════════════════════════════════════════════════
+    // COMPONENT THEME — Power pill
+    // ════════════════════════════════════════════════════════════════
+    readonly property color  powerBg:       pc("tertiary", 30, 70)
+    readonly property color  powerIcon:     pc("tertiary", 70, 30)
+    readonly property color  powerRipple:   Qt.lighter(pc("tertiary", 30, 70), 2.0)
+    readonly property string powerLeftCmd:  "systemctl poweroff"
+    readonly property string powerRightCmd: "systemctl reboot"
+
+    // ════════════════════════════════════════════════════════════════
+    // COMPONENT THEME — Workspace indicator
+    // ════════════════════════════════════════════════════════════════
+    readonly property bool showDesktopNumbers:      false // deprecated — keep false
+    readonly property bool colorWorkspaceIndicator: true
+
+    // Time Pill - for the clock : 
+    // ── Clock ─────────────────────────────────────────
+    readonly property bool   clockTwelveHour: false
+    readonly property bool   clockShowIcon:   true
+    readonly property bool   clockShowDate:   false
+    readonly property int    clockTimeSize:   13
+    readonly property int    clockDateSize:   12
+    readonly property int    clockPadV:       5
+    readonly property int    clockSpacing:    1
+    readonly property bool colorClockPill: false
+    readonly property string fontMono:        "JetBrainsMono Nerd Font"
+
+    // ════════════════════════════════════════════════════════════════
+    // FONTS
+    // ════════════════════════════════════════════════════════════════
+    FontLoader { id: fontLoaderFA6;               source: "file://" + Quickshell.shellDir + "/../../shared/fonts/Font Awesome 6 Free-Solid-900.otf" }
+    FontLoader { id: fontLoaderAnurati;           source: "file://" + Quickshell.shellDir + "/../../shared/fonts/Anurati.otf" }
+    FontLoader { id: fontLoaderPoppins;           source: "file://" + Quickshell.shellDir + "/../../shared/fonts/Poppins.ttf" }
+    FontLoader { id: fontLoaderGolgix;            source: "file://" + Quickshell.shellDir + "/../../shared/fonts/Golgix-Regular.ttf" }
+    FontLoader { id: fontLoaderAvaporeRound;      source: "file://" + Quickshell.shellDir + "/../../shared/fonts/Avapore-Round.otf" }
+    FontLoader { id: fontLoaderBiologicalSystems; source: "file://" + Quickshell.shellDir + "/../../shared/fonts/Biological-Systems-Demo.otf" }
+    FontLoader { id: fontLoaderHardcoreImperial;  source: "file://" + Quickshell.shellDir + "/../../shared/fonts/Hardcore Imperial.ttf" }
+    FontLoader { id: fontLoaderAssistedSensors;   source: "file://" + Quickshell.shellDir + "/../../shared/fonts/Assisted-Sensors-Demo.otf" }
+
+    readonly property string fontAwesome6:          fontLoaderFA6.name
     readonly property string fontAnurati:           fontLoaderAnurati.name
     readonly property string fontPoppins:           fontLoaderPoppins.name
     readonly property string fontGolgixRegular:     fontLoaderGolgix.name
@@ -23,374 +360,105 @@ Singleton {
     readonly property string fontBiologicalSystems: fontLoaderBiologicalSystems.name
     readonly property string fontHardcoreImperial:  fontLoaderHardcoreImperial.name
     readonly property string fontAssistedSensors:   fontLoaderAssistedSensors.name
-    readonly property string fontAwesome6: fontLoaderFA6.name
+    readonly property string fontMaterial:          "Material Symbols Rounded"
+    readonly property string nerdFontFamily:        "Material Design Icons"
 
-    // ── Layer A: File watcher ─────────────────────────────────────────────────
-    FileView {
-        id: colorFile
-        path: Quickshell.env("HOME") + "/.config/aevum/shared/colors.json"
-        blockLoading: true
-        watchChanges: true
-        onFileChanged: {
-            colorFile.path = colorFile.path
-            colorFile.reload()
-            const t = colorFile.text()
-            if (t && t.trim().length > 0)
-                root._parse()
-            else
-                console.warn("Theme: file empty on first attempt, waiting for debounce...")
-            debounce.restart()
+    // ════════════════════════════════════════════════════════════════
+    // SIZES & LAYOUT
+    // ════════════════════════════════════════════════════════════════
+
+    // ── Notch / hole margins ──────────────────────────────────────────
+    readonly property int holeLeft:   35
+    readonly property int holeTop:    10
+    readonly property int holeRight:  10
+    readonly property int holeBottom: 10
+    readonly property int holeRadius: 12
+
+    // ── Bar ───────────────────────────────────────────────────────────
+    readonly property int barBottomPad: 16
+
+    // ── Launcher pill ─────────────────────────────────────────────────
+    readonly property int pillWidth:    28
+    readonly property int pillHeight:   28
+    readonly property int pillRadius:   16
+    readonly property int pillIconSize: 16
+    readonly property int pillTopPad:   0
+
+    // ── Power pill ────────────────────────────────────────────────────
+    readonly property int powerPillW:    28
+    readonly property int powerPillH:    28
+    readonly property int powerPillR:    16
+    readonly property int powerIconSize: 16
+
+    // ── Animation durations (ms) ──────────────────────────────────────
+    readonly property int animFast:   120
+    readonly property int animNormal: 220
+    readonly property int animSlow:   400
+
+
+    
+    // ════════════════════════════════════════════════════════════════
+    // HELPERS
+    // ════════════════════════════════════════════════════════════════
+
+    // Returns the active-mode color for a named Material color token
+    function _c(name) {
+        return _raw?.colors?.[name]?.[mode]?.color ?? "transparent"
+    }
+
+    readonly property var _palNames: [
+        "primary", "secondary", "tertiary",
+        "neutral", "neutral_variant", "error"
+    ]
+
+    // Builds the full tone map — every tone, no mode filtering, from last good _raw
+    function _buildPalette() {
+        if (!_raw?.palettes) return {}
+        const allTones = [0, 5, 10, 15, 20, 25, 30, 35, 40, 50, 60, 70, 80, 90, 95, 98, 99, 100]
+        const out = {}
+        for (const pal of _palNames) {
+            out[pal] = {}
+            for (const t of allTones)
+                out[pal][t] = _raw.palettes[pal]?.[String(t)]?.color ?? "transparent"
+        }
+        return out
+    }
+
+    // pc("primary", 10, 90) → isDark ? palette.primary[10] : palette.primary[90]
+    function pc(palName, darkTone, lightTone) {
+        return isDark
+            ? (_palette[palName]?.[darkTone]  ?? "transparent")
+            : (_palette[palName]?.[lightTone] ?? "transparent")
+    }
+
+    // ════════════════════════════════════════════════════════════════
+    // DEBUG PRINT
+    // ════════════════════════════════════════════════════════════════
+    function _printColorGroup(label, m) {
+        console.log("\n── MATERIAL " + label + " ───────────────────────────────")
+        const c = _raw.colors
+        for (const k in c)
+            console.log("  " + k.padEnd(32) + (c[k]?.[m]?.color ?? "n/a"))
+    }
+
+    function _printPaletteGroup() {
+        const allTones = [0, 5, 10, 15, 20, 25, 30, 35, 40, 50, 60, 70, 80, 90, 95, 98, 99, 100]
+        console.log("\n── PALETTE (all tones) ──")
+        for (const pal of _palNames) {
+            const row = allTones
+                .map(t => t + ":" + (_raw.palettes[pal]?.[String(t)]?.color ?? "n/a"))
+                .join("  ")
+            console.log("  " + pal.padEnd(16) + row)
         }
     }
 
-    Timer {
-        id: debounce
-        interval: 150
-        repeat: false
-        onTriggered: {
-            colorFile.path = colorFile.path
-            colorFile.reload()
-            const t = colorFile.text()
-            if (t && t.trim().length > 0)
-                root._parse()
-            else
-                console.warn("Theme: file still empty after debounce, keeping last good state")
-        }
+    function refresh() {
+        if (!printEnabled || !_raw) return
+        console.log("\n[Colors] reloaded  active=" + mode)
+        _printColorGroup("DARK",  "dark")
+        _printColorGroup("LIGHT", "light")
+        _printPaletteGroup()
     }
 
-    Timer {
-        id: initialLoad
-        interval: 100
-        repeat: false
-        running: true
-        onTriggered: root._parse()
-    }
-
-    // ── Layer B: Parser ───────────────────────────────────────────────────────
-    property var _data: ({})
-
-    function _parse() {
-        const raw = colorFile.text()
-        if (!raw || raw.trim().length === 0) {
-            console.warn("Theme: _parse called but file is empty, skipping")
-            return
-        }
-        try {
-            root._data = JSON.parse(raw)
-            console.log("Theme: parsed OK — mode:", root._data?.mode, "| wallpaper:", root._data?.image)
-        } catch (e) {
-            console.warn("Theme: parse FAILED —", e)
-            console.warn("Theme: raw text (first 80):", raw.substring(0, 80))
-        }
-    }
-
-    // ── Layer C: Accessors ────────────────────────────────────────────────────
-    readonly property bool   isDarkMode: root._data?.is_dark_mode ?? true
-    readonly property string mode:       root._data?.mode         ?? "dark"
-    readonly property string wallpaper:  root._data?.image        ?? ""
-
-    property bool darkMode: true
-
-    function _c(key) {
-        const m = root.darkMode ? "dark" : "light"
-        return root._data?.colors?.[key]?.[m]?.color ?? "transparent"
-    }
-
-    function _b(key) {
-        const m = root.darkMode ? "dark" : "light"
-        return root._data?.base16?.[key]?.[m]?.color ?? "transparent"
-    }
-
-    function _p(palette, tone) {
-        return root._data?.palettes?.[palette]?.[String(tone)]?.color ?? "transparent"
-    }
-
-    // ── Material Colors ───────────────────────────────────────────────────────
-    readonly property color primary:                 (root._data, root.darkMode, root._c("primary"))
-    readonly property color onPrimary:               (root._data, root.darkMode, root._c("on_primary"))
-    readonly property color primaryContainer:        (root._data, root.darkMode, root._c("primary_container"))
-    readonly property color onPrimaryContainer:      (root._data, root.darkMode, root._c("on_primary_container"))
-    readonly property color primaryFixed:            (root._data, root.darkMode, root._c("primary_fixed"))
-    readonly property color primaryFixedDim:         (root._data, root.darkMode, root._c("primary_fixed_dim"))
-    readonly property color onPrimaryFixed:          (root._data, root.darkMode, root._c("on_primary_fixed"))
-    readonly property color onPrimaryFixedVariant:   (root._data, root.darkMode, root._c("on_primary_fixed_variant"))
-
-    readonly property color secondary:               (root._data, root.darkMode, root._c("secondary"))
-    readonly property color onSecondary:             (root._data, root.darkMode, root._c("on_secondary"))
-    readonly property color secondaryContainer:      (root._data, root.darkMode, root._c("secondary_container"))
-    readonly property color onSecondaryContainer:    (root._data, root.darkMode, root._c("on_secondary_container"))
-    readonly property color secondaryFixed:          (root._data, root.darkMode, root._c("secondary_fixed"))
-    readonly property color secondaryFixedDim:       (root._data, root.darkMode, root._c("secondary_fixed_dim"))
-    readonly property color onSecondaryFixed:        (root._data, root.darkMode, root._c("on_secondary_fixed"))
-    readonly property color onSecondaryFixedVariant: (root._data, root.darkMode, root._c("on_secondary_fixed_variant"))
-
-    readonly property color tertiary:                (root._data, root.darkMode, root._c("tertiary"))
-    readonly property color onTertiary:              (root._data, root.darkMode, root._c("on_tertiary"))
-    readonly property color tertiaryContainer:       (root._data, root.darkMode, root._c("tertiary_container"))
-    readonly property color onTertiaryContainer:     (root._data, root.darkMode, root._c("on_tertiary_container"))
-    readonly property color tertiaryFixed:           (root._data, root.darkMode, root._c("tertiary_fixed"))
-    readonly property color tertiaryFixedDim:        (root._data, root.darkMode, root._c("tertiary_fixed_dim"))
-    readonly property color onTertiaryFixed:         (root._data, root.darkMode, root._c("on_tertiary_fixed"))
-    readonly property color onTertiaryFixedVariant:  (root._data, root.darkMode, root._c("on_tertiary_fixed_variant"))
-
-    readonly property color error:                   (root._data, root.darkMode, root._c("error"))
-    readonly property color onError:                 (root._data, root.darkMode, root._c("on_error"))
-    readonly property color errorContainer:          (root._data, root.darkMode, root._c("error_container"))
-    readonly property color onErrorContainer:        (root._data, root.darkMode, root._c("on_error_container"))
-
-    readonly property color surface:                 (root._data, root.darkMode, root._c("surface"))
-    readonly property color onSurface:               (root._data, root.darkMode, root._c("on_surface"))
-    readonly property color surfaceVariant:          (root._data, root.darkMode, root._c("surface_variant"))
-    readonly property color onSurfaceVariant:        (root._data, root.darkMode, root._c("on_surface_variant"))
-    readonly property color surfaceBright:           (root._data, root.darkMode, root._c("surface_bright"))
-    readonly property color surfaceDim:              (root._data, root.darkMode, root._c("surface_dim"))
-    readonly property color surfaceTint:             (root._data, root.darkMode, root._c("surface_tint"))
-    readonly property color surfaceContainerLowest:  (root._data, root.darkMode, root._c("surface_container_lowest"))
-    readonly property color surfaceContainerLow:     (root._data, root.darkMode, root._c("surface_container_low"))
-    readonly property color surfaceContainer:        (root._data, root.darkMode, root._c("surface_container"))
-    readonly property color surfaceContainerHigh:    (root._data, root.darkMode, root._c("surface_container_high"))
-    readonly property color surfaceContainerHighest: (root._data, root.darkMode, root._c("surface_container_highest"))
-
-    readonly property color background:              (root._data, root.darkMode, root._c("background"))
-    readonly property color onBackground:            (root._data, root.darkMode, root._c("on_background"))
-
-    readonly property color outline:                 (root._data, root.darkMode, root._c("outline"))
-    readonly property color outlineVariant:          (root._data, root.darkMode, root._c("outline_variant"))
-
-    readonly property color shadow:                  (root._data, root.darkMode, root._c("shadow"))
-    readonly property color scrim:                   (root._data, root.darkMode, root._c("scrim"))
-    readonly property color sourceColor:             (root._data, root.darkMode, root._c("source_color"))
-    readonly property color inverseSurface:          (root._data, root.darkMode, root._c("inverse_surface"))
-    readonly property color inverseOnSurface:        (root._data, root.darkMode, root._c("inverse_on_surface"))
-    readonly property color inversePrimary:          (root._data, root.darkMode, root._c("inverse_primary"))
-
-    // ── Base16 ────────────────────────────────────────────────────────────────
-    readonly property color base00: (root._data, root.darkMode, root._b("base00"))
-    readonly property color base01: (root._data, root.darkMode, root._b("base01"))
-    readonly property color base02: (root._data, root.darkMode, root._b("base02"))
-    readonly property color base03: (root._data, root.darkMode, root._b("base03"))
-    readonly property color base04: (root._data, root.darkMode, root._b("base04"))
-    readonly property color base05: (root._data, root.darkMode, root._b("base05"))
-    readonly property color base06: (root._data, root.darkMode, root._b("base06"))
-    readonly property color base07: (root._data, root.darkMode, root._b("base07"))
-    readonly property color base08: (root._data, root.darkMode, root._b("base08"))
-    readonly property color base09: (root._data, root.darkMode, root._b("base09"))
-    readonly property color base0A: (root._data, root.darkMode, root._b("base0a"))
-    readonly property color base0B: (root._data, root.darkMode, root._b("base0b"))
-    readonly property color base0C: (root._data, root.darkMode, root._b("base0c"))
-    readonly property color base0D: (root._data, root.darkMode, root._b("base0d"))
-    readonly property color base0E: (root._data, root.darkMode, root._b("base0e"))
-    readonly property color base0F: (root._data, root.darkMode, root._b("base0f"))
-
-    // ── Palettes ──────────────────────────────────────────────────────────────
-    readonly property color primaryP0:   (root._data, root._p("primary",  0))
-    readonly property color primaryP5:   (root._data, root._p("primary",  5))
-    readonly property color primaryP10:  (root._data, root._p("primary", 10))
-    readonly property color primaryP15:  (root._data, root._p("primary", 15))
-    readonly property color primaryP20:  (root._data, root._p("primary", 20))
-    readonly property color primaryP25:  (root._data, root._p("primary", 25))
-    readonly property color primaryP30:  (root._data, root._p("primary", 30))
-    readonly property color primaryP35:  (root._data, root._p("primary", 35))
-    readonly property color primaryP40:  (root._data, root._p("primary", 40))
-    readonly property color primaryP50:  (root._data, root._p("primary", 50))
-    readonly property color primaryP60:  (root._data, root._p("primary", 60))
-    readonly property color primaryP70:  (root._data, root._p("primary", 70))
-    readonly property color primaryP80:  (root._data, root._p("primary", 80))
-    readonly property color primaryP90:  (root._data, root._p("primary", 90))
-    readonly property color primaryP95:  (root._data, root._p("primary", 95))
-    readonly property color primaryP98:  (root._data, root._p("primary", 98))
-    readonly property color primaryP99:  (root._data, root._p("primary", 99))
-    readonly property color primaryP100: (root._data, root._p("primary", 100))
-
-    readonly property color secondaryP0:   (root._data, root._p("secondary",  0))
-    readonly property color secondaryP5:   (root._data, root._p("secondary",  5))
-    readonly property color secondaryP10:  (root._data, root._p("secondary", 10))
-    readonly property color secondaryP15:  (root._data, root._p("secondary", 15))
-    readonly property color secondaryP20:  (root._data, root._p("secondary", 20))
-    readonly property color secondaryP25:  (root._data, root._p("secondary", 25))
-    readonly property color secondaryP30:  (root._data, root._p("secondary", 30))
-    readonly property color secondaryP35:  (root._data, root._p("secondary", 35))
-    readonly property color secondaryP40:  (root._data, root._p("secondary", 40))
-    readonly property color secondaryP50:  (root._data, root._p("secondary", 50))
-    readonly property color secondaryP60:  (root._data, root._p("secondary", 60))
-    readonly property color secondaryP70:  (root._data, root._p("secondary", 70))
-    readonly property color secondaryP80:  (root._data, root._p("secondary", 80))
-    readonly property color secondaryP90:  (root._data, root._p("secondary", 90))
-    readonly property color secondaryP95:  (root._data, root._p("secondary", 95))
-    readonly property color secondaryP98:  (root._data, root._p("secondary", 98))
-    readonly property color secondaryP99:  (root._data, root._p("secondary", 99))
-    readonly property color secondaryP100: (root._data, root._p("secondary", 100))
-
-    readonly property color tertiaryP0:   (root._data, root._p("tertiary",  0))
-    readonly property color tertiaryP5:   (root._data, root._p("tertiary",  5))
-    readonly property color tertiaryP10:  (root._data, root._p("tertiary", 10))
-    readonly property color tertiaryP15:  (root._data, root._p("tertiary", 15))
-    readonly property color tertiaryP20:  (root._data, root._p("tertiary", 20))
-    readonly property color tertiaryP25:  (root._data, root._p("tertiary", 25))
-    readonly property color tertiaryP30:  (root._data, root._p("tertiary", 30))
-    readonly property color tertiaryP35:  (root._data, root._p("tertiary", 35))
-    readonly property color tertiaryP40:  (root._data, root._p("tertiary", 40))
-    readonly property color tertiaryP50:  (root._data, root._p("tertiary", 50))
-    readonly property color tertiaryP60:  (root._data, root._p("tertiary", 60))
-    readonly property color tertiaryP70:  (root._data, root._p("tertiary", 70))
-    readonly property color tertiaryP80:  (root._data, root._p("tertiary", 80))
-    readonly property color tertiaryP90:  (root._data, root._p("tertiary", 90))
-    readonly property color tertiaryP95:  (root._data, root._p("tertiary", 95))
-    readonly property color tertiaryP98:  (root._data, root._p("tertiary", 98))
-    readonly property color tertiaryP99:  (root._data, root._p("tertiary", 99))
-    readonly property color tertiaryP100: (root._data, root._p("tertiary", 100))
-
-    readonly property color neutralP0:   (root._data, root._p("neutral",  0))
-    readonly property color neutralP5:   (root._data, root._p("neutral",  5))
-    readonly property color neutralP10:  (root._data, root._p("neutral", 10))
-    readonly property color neutralP15:  (root._data, root._p("neutral", 15))
-    readonly property color neutralP20:  (root._data, root._p("neutral", 20))
-    readonly property color neutralP25:  (root._data, root._p("neutral", 25))
-    readonly property color neutralP30:  (root._data, root._p("neutral", 30))
-    readonly property color neutralP35:  (root._data, root._p("neutral", 35))
-    readonly property color neutralP40:  (root._data, root._p("neutral", 40))
-    readonly property color neutralP50:  (root._data, root._p("neutral", 50))
-    readonly property color neutralP60:  (root._data, root._p("neutral", 60))
-    readonly property color neutralP70:  (root._data, root._p("neutral", 70))
-    readonly property color neutralP80:  (root._data, root._p("neutral", 80))
-    readonly property color neutralP90:  (root._data, root._p("neutral", 90))
-    readonly property color neutralP95:  (root._data, root._p("neutral", 95))
-    readonly property color neutralP98:  (root._data, root._p("neutral", 98))
-    readonly property color neutralP99:  (root._data, root._p("neutral", 99))
-    readonly property color neutralP100: (root._data, root._p("neutral", 100))
-
-    readonly property color neutralVariantP0:   (root._data, root._p("neutral_variant",  0))
-    readonly property color neutralVariantP5:   (root._data, root._p("neutral_variant",  5))
-    readonly property color neutralVariantP10:  (root._data, root._p("neutral_variant", 10))
-    readonly property color neutralVariantP15:  (root._data, root._p("neutral_variant", 15))
-    readonly property color neutralVariantP20:  (root._data, root._p("neutral_variant", 20))
-    readonly property color neutralVariantP25:  (root._data, root._p("neutral_variant", 25))
-    readonly property color neutralVariantP30:  (root._data, root._p("neutral_variant", 30))
-    readonly property color neutralVariantP35:  (root._data, root._p("neutral_variant", 35))
-    readonly property color neutralVariantP40:  (root._data, root._p("neutral_variant", 40))
-    readonly property color neutralVariantP50:  (root._data, root._p("neutral_variant", 50))
-    readonly property color neutralVariantP60:  (root._data, root._p("neutral_variant", 60))
-    readonly property color neutralVariantP70:  (root._data, root._p("neutral_variant", 70))
-    readonly property color neutralVariantP80:  (root._data, root._p("neutral_variant", 80))
-    readonly property color neutralVariantP90:  (root._data, root._p("neutral_variant", 90))
-    readonly property color neutralVariantP95:  (root._data, root._p("neutral_variant", 95))
-    readonly property color neutralVariantP98:  (root._data, root._p("neutral_variant", 98))
-    readonly property color neutralVariantP99:  (root._data, root._p("neutral_variant", 99))
-    readonly property color neutralVariantP100: (root._data, root._p("neutral_variant", 100))
-
-    readonly property color errorP0:   (root._data, root._p("error",  0))
-    readonly property color errorP5:   (root._data, root._p("error",  5))
-    readonly property color errorP10:  (root._data, root._p("error", 10))
-    readonly property color errorP15:  (root._data, root._p("error", 15))
-    readonly property color errorP20:  (root._data, root._p("error", 20))
-    readonly property color errorP25:  (root._data, root._p("error", 25))
-    readonly property color errorP30:  (root._data, root._p("error", 30))
-    readonly property color errorP35:  (root._data, root._p("error", 35))
-    readonly property color errorP40:  (root._data, root._p("error", 40))
-    readonly property color errorP50:  (root._data, root._p("error", 50))
-    readonly property color errorP60:  (root._data, root._p("error", 60))
-    readonly property color errorP70:  (root._data, root._p("error", 70))
-    readonly property color errorP80:  (root._data, root._p("error", 80))
-    readonly property color errorP90:  (root._data, root._p("error", 90))
-    readonly property color errorP95:  (root._data, root._p("error", 95))
-    readonly property color errorP98:  (root._data, root._p("error", 98))
-    readonly property color errorP99:  (root._data, root._p("error", 99))
-    readonly property color errorP100: (root._data, root._p("error", 100))
-
-    // ── Constants ─────────────────────────────────────────────────────────────
-    readonly property color black:        "#000000"
-    readonly property color white:        "#ffffff"
-    readonly property color transparent_: "transparent"
-
-    // ── Catppuccin compat aliases ─────────────────────────────────────────────
-    readonly property color crust:      background
-    readonly property color mantle:     background
-    readonly property color base:       surface
-    readonly property color surface0:   surfaceContainer
-    readonly property color surface1:   surfaceContainerHigh
-    readonly property color surface2:   surfaceContainerHighest
-    readonly property color overlay0:   outline
-    readonly property color overlay1:   outlineVariant
-    readonly property color overlay2:   onSurfaceVariant
-    readonly property color subtext0:   onSurfaceVariant
-    readonly property color subtext1:   onSurface
-    readonly property color text:       onSurface
-    readonly property color mauve:      tertiary
-    readonly property color red:        error
-    readonly property color maroon:     errorContainer
-    readonly property color blue:       primary
-    readonly property color sapphire:   primary
-    readonly property color sky:        secondary
-    readonly property color teal:       secondary
-    readonly property color green:      secondary
-    readonly property color peach:      tertiary
-    readonly property color yellow:     tertiary
-    readonly property color pink:       tertiary
-    readonly property color flamingo:   tertiary
-    readonly property color rosewater:  tertiary
-    readonly property color lavender:   inversePrimary
-
-    // ── Nord compat aliases ───────────────────────────────────────────────────
-// ── Nord palette ──────────────────────────────────────────────────────────
-    readonly property color nord0:  "#2E3440"
-    readonly property color nord1:  "#3B4252"
-    readonly property color nord2:  "#434C5E"
-    readonly property color nord3:  "#4C566A"
-    readonly property color nord4:  "#D8DEE9"
-    readonly property color nord5:  "#E5E9F0"
-    readonly property color nord6:  "#ECEFF4"
-    readonly property color nord7:  "#8FBCBB"
-    readonly property color nord8:  "#88C0D0"
-    readonly property color nord9:  "#81A1C1"
-    readonly property color nord10: "#5E81AC"
-
-
- // ── Bar ───────────────────────────────────────────────────────────────────
-readonly property color barBackground: background    // #101418 — deep navy black
-readonly property color barBorder:     base02        // #4c5c69 — subtle rim
-
-// ── PillHover ─────────────────────────────────────────────────────────────
-readonly property color pillHoverBackground:        secondaryP15//base00  // #3d4855 — clear lift off bar
-readonly property color pillHoverBackgroundHovered: secondaryP20  // #4c5c69 — step up on hover
-readonly property color pillHoverPrimaryText:       base07  // #96becf — cool blue-white
-readonly property color pillHoverSecondaryText:     base05  // #7897a6 — dimmer, same hue
-readonly property color pillHoverSeparator:         base03  // #5b6f7e — mid-tone divider
-
-// ── PillStatic ────────────────────────────────────────────────────────────
-readonly property color pillStaticBackground:      secondaryP15   // #3d4855
-readonly property color pillStaticHoverBackground: secondaryP20   // #4c5c69
-readonly property color pillStaticText:            base07   // #96becf
-
-// ── Clock ─────────────────────────────────────────────────────────────────
-readonly property color clockPillBackground:     secondaryP15     // #3d4855
-readonly property color clockPillTimeColor:      primaryP90     // #96becf — primary label
-readonly property color clockPillDateColor:      primaryP70    // #9ccbfb — brightest accent pop
-readonly property color clockPillSeparatorColor: tertiaryP60     // #5b6f7e
-
-// ── Workspace dots ────────────────────────────────────────────────────────
-readonly property color workspaceDotFocusedColor:            primaryP80   // #9ccbfb — full accent
-readonly property color workspaceDotOccupiedColor:           primaryP90    // #87aabb — warm occupied
-readonly property color workspaceDotEmptyColor:              secondaryP20    // #4c5c69 — recessive, not invisible
-readonly property color workspaceIndicatorBackground:        secondaryP15    // #3d4855
-readonly property color workspaceIndicatorBackgroundHovered: secondaryP20    // #4c5c69
-
-// ── Workspace icon ────────────────────────────────────────────────────────
-readonly property color workspaceIconBackground:        secondaryP15   // #3d4855
-readonly property color workspaceIconBackgroundHovered: secondaryP20   // #4c5c69
-readonly property color workspaceIconColor:             primaryP90  // #9ccbfb
-
-// ── Audio / BasePill ──────────────────────────────────────────────────────
-readonly property color audioError: error   // #ffb4ab — tracks theme now   
-
-readonly property color basePillAccentColor: primaryP80
-readonly property color basePillAccentOnColor: secondaryP15
-readonly property color basePillPopoutOpenColor: secondaryP15
-readonly property color basePillOnSurface: primaryP90
-
-    readonly property color notifBackgroundBg: background
-    readonly property color notifNormalBg:     primaryP60
-    readonly property color notifCriticalBg:   errorP60
-    readonly property color notifLowBg:        tertiaryP60
-    readonly property color notifToastBg:      surface0
-
+    onIsDarkChanged: refresh()
 }

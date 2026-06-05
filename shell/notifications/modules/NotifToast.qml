@@ -61,8 +61,8 @@ Item {
     // ── Urgency ───────────────────────────────────────────────────────────
     readonly property color urgencyColor: {
         if (!notif) return Theme.notifNormalBg
-        if (notif.urgency === NotificationUrgency.Critical) return Properties.notifCriticalBg
-        if (notif.urgency === NotificationUrgency.Low)      return Properties.notifLowBg
+        if (notif.urgency === NotificationUrgency.Critical) return Theme.notifCriticalBg
+        if (notif.urgency === NotificationUrgency.Low)      return Theme.notifLowBg
         return Theme.notifNormalBg
     }
     readonly property bool isCritical: !!notif && notif.urgency === NotificationUrgency.Critical
