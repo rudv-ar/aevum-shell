@@ -3,6 +3,7 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Effects
 import Quickshell
+import Quickshell.Io
 import qs.config
 import qs.services
 import qs.modules.bar
@@ -31,8 +32,16 @@ PanelWindow {
     // ── Click mask ─────────────────────────────────────
     readonly property int maskX: hX + Theme.holeTop
     readonly property int maskY: hY + Theme.holeBottom
-    readonly property int maskW: hW - Theme.holeRight
+    readonly property int maskW: hW - Theme.holeRight - (paneOpen ? Math.round(animatedRight) : 0)
     readonly property int maskH: hH - 2 * Theme.holeRight
+
+    // ── Right pane state ───────────────────────────────
+    property bool paneOpen: false
+    property real animatedRight: paneOpen ? 400 : 2  // paneWidth : borderThickness
+
+    Behavior on animatedRight {
+        NumberAnimation { duration: 300; easing.type: Easing.OutQuart }
+    }
 
     screen:         root.screen
     anchors.top:    true
@@ -45,6 +54,13 @@ PanelWindow {
     mask: Region {
         item:         clickHole
         intersection: Intersection.Xor
+    }
+
+    IpcHandler {
+        target: "rightpane"
+        function toggle(): void { root.paneOpen = !root.paneOpen }
+        function open(): void   { root.paneOpen = true }
+        function close(): void  { root.paneOpen = false }
     }
 
     Item {
@@ -108,11 +124,14 @@ PanelWindow {
         y: workspaces.y + workspaces.implicitHeight + 10
     }
 
+    // ── Clock ──────────────────────────────────────────
     Clock {
         x: Math.round((root.mLeft - Theme.pillWidth) / 2)
         y: statusIcons.y - implicitHeight - 5
         z: 10
-    }    
+    }
+
+    // ── Status icons ───────────────────────────────────
     StatusIcons {
         id: statusIcons
         x: Math.round((root.mLeft - Theme.pillWidth) / 2)
@@ -120,6 +139,7 @@ PanelWindow {
            - Theme.powerPillH - implicitHeight + 10
         z: 10
     }
+
     // ── Power pill ─────────────────────────────────────
     Power {
         x: Math.round((root.mLeft - Theme.powerPillW) / 2)
@@ -127,5 +147,44 @@ PanelWindow {
         z: 10
         onLeftClicked:  function () { }
         onRightClicked: function () { }
+    }
+
+    // ── Right pane surface ─────────────────────────────
+    Rectangle {
+        anchors.fill:         parent
+        anchors.topMargin:    Theme.holeTop   // Properties.marginCover — adjust
+        anchors.rightMargin:  0    // Properties.borderThickness
+        anchors.bottomMargin: Theme.holeBottom    // Properties.borderThickness
+        color:                Theme.frameColor
+        visible:              root.paneOpen
+        topRightRadius:       Theme.holeRadius   // Properties.cornerRadius + 1 — adjust
+        bottomRightRadius:    Theme.holeRadius    // Properties.cornerRadius - 3 — adjust
+        layer.enabled:        true
+        layer.effect: MultiEffect {
+            maskSource:       paneInnerMask
+            maskEnabled:      true
+            maskInverted:     true
+            maskThresholdMin: 0.5
+            maskSpreadAtMin:  1.0
+        }
+    }
+
+    // ── PaneContent placeholder ────────────────────────
+    // PaneContent {}
+
+    Item {
+        id:            paneInnerMask
+        anchors.fill:  parent
+        layer.enabled: true
+        visible:       false
+
+        Rectangle {
+            anchors.fill:         parent
+            anchors.topMargin:    0    // Properties.topOffset — adjust
+            anchors.leftMargin:   0    // Properties.borderThickness
+            anchors.rightMargin:  root.animatedRight
+            anchors.bottomMargin: 0
+            radius:               Theme.holeRadius   // Properties.cornerRadius — adjust
+        }
     }
 }
