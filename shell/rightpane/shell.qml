@@ -15,9 +15,9 @@ ShellRoot {
         color:          "transparent"
         mask:           Region{
             x:      Screen.width - win.animatedRight - Properties.borderThickness - Properties.borderThickness
-            y:      Properties.marginCover + Properties.topOffset
+            y:      0
             width:  win.animatedRight + Properties.borderThickness + Properties.borderThickness
-            height: Screen.height - Properties.marginCover
+            height: Screen.height 
         }
 
         property bool paneOpen: false
@@ -42,13 +42,13 @@ ShellRoot {
         // ── Visible surface ───────────────────────────────────
         Rectangle {
             anchors.fill:      parent
-            anchors.topMargin: Properties.marginCover
+            anchors.topMargin: Properties.borderThickness
             anchors.rightMargin: Properties.borderThickness
             anchors.bottomMargin: Properties.borderThickness
             color:             Theme.borderColor
             visible: win.paneOpen
-            topRightRadius: Properties.cornerRadius + 1
-            bottomRightRadius: Properties.cornerRadius - 3
+            topRightRadius: Properties.cornerRadius - 6
+            bottomRightRadius: Properties.cornerRadius -6
             layer.enabled: true
             layer.effect: MultiEffect {
                 maskSource:       innerMask
@@ -70,7 +70,7 @@ ShellRoot {
 
             Rectangle {
                 anchors.fill:         parent
-                anchors.topMargin:    Properties.topOffset
+                anchors.topMargin:    0
                 anchors.leftMargin:   Properties.borderThickness
                 anchors.rightMargin:  win.animatedRight
                 anchors.bottomMargin: 0

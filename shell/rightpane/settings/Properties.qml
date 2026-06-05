@@ -7,9 +7,9 @@ Singleton {
     id: root
 
     property int  borderThickness: 10
-    property int  topOffset:       4
-    property real cornerRadius:    18.0
-    property int  marginCover:     32
+    property int  topOffset:       0
+    property real cornerRadius:    13.0
+    property int  marginCover:     0
     property int  paneWidth:       350
 
     property real pillWidth:    40
