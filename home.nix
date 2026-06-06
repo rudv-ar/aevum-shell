@@ -44,5 +44,6 @@
     ./modules/vicinae.nix
     ./modules/git.nix
     ./modules/mpd.nix 
+    ./modules/zathura.nix
   ];
 }

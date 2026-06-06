@@ -1,0 +1,41 @@
+# --- Recolor (dark mode) ---
+set recolor                  true
+set recolor-keephue          false
+set recolor-darkcolor        "#FFFFFF"
+set recolor-lightcolor       "#000000"
+
+# --- Appearance ---
+set font                     "JetBrains Mono 11"
+set default-bg               "#000000"
+set default-fg               "#FFFFFF"
+set statusbar-bg             "#000000"
+set statusbar-fg             "#FFFFFF"
+set inputbar-bg              "#000000"
+set inputbar-fg              "#FFFFFF"
+set highlight-color          "#FF0000"
+set highlight-active-color   "#00FF00"
+set completion-bg            "#000000"
+set completion-fg            "#FFFFFF"
+set completion-highlight-bg  "#000000"
+set completion-highlight-fg  "#00FFFF"
+set notification-bg          "#000000"
+set notification-fg          "#FFFFFF"
+set notification-error-bg    "#000000"
+set notification-error-fg    "#FF0000"
+set notification-warning-bg  "#000000"
+set notification-warning-fg  "#00FFFF"
+
+# --- Behaviour ---
+set selection-clipboard      clipboard
+set scroll-step              50
+set zoom-step                10
+set render-loading           true
+
+# --- Arrow key navigation ---
+map <Up>    scroll up
+map <Down>  scroll down
+map <Left>  navigate previous
+map <Right> navigate next
+
+map <S-Left>  scroll full-left
+map <S-Right> scroll full-right

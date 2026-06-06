@@ -44,7 +44,7 @@ PACMAN_DEPS=(
     # dunst archcraft-dunst-icons
 
     # install # tui zathura, gui atril
-    zathura atril
+    zathura atril zathura-pdf-mupdf
 
     # terminal things
     alacritty fish
