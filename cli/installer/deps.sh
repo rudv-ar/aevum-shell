@@ -40,8 +40,11 @@ PACMAN_DEPS=(
     # for the purpose of nvim
     luarocks lazygit clang
 
-    # dunst
-    dunst archcraft-dunst-icons
+    # dunst : not required any more
+    # dunst archcraft-dunst-icons
+
+    # install # tui zathura, gui atril
+    zathura atril
 
     # terminal things
     alacritty fish
