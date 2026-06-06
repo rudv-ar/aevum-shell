@@ -16,111 +16,114 @@ RST='\033[0m'
 
 # ── Header ────────────────────────────────────────────────────────────────────
 header() {
-  clear
-  echo -e "${PRP}"
-  echo -e "  ░█████╗░███████╗██╗░░░██╗██╗░░░██╗███╗░░░███╗"
-  echo -e "  ██╔══██╗██╔════╝██║░░░██║██║░░░██║████╗░████║"
-  echo -e "  ███████║█████╗░░╚██╗░██╔╝██║░░░██║██╔████╔██║"
-  echo -e "  ██╔══██║██╔══╝░░░╚████╔╝░██║░░░██║██║╚██╔╝██║"
-  echo -e "  ██║░░██║███████╗░░╚██╔╝░░╚██████╔╝██║░╚═╝░██║"
-  echo -e "  ╚═╝░░╚═╝╚══════╝░░░╚═╝░░░╚═════╝░╚═╝░░░░╚═╝${RST}"
-  echo -e "  ${DIM}<<shell — dependency manager @ bspwm >>${RST}"
-  echo -e "  ${DIM}──────────────────────────────────────────${RST}"
-  echo ""
+    clear
+    echo -e "${PRP}"
+    echo -e "  ░█████╗░███████╗██╗░░░██╗██╗░░░██╗███╗░░░███╗"
+    echo -e "  ██╔══██╗██╔════╝██║░░░██║██║░░░██║████╗░████║"
+    echo -e "  ███████║█████╗░░╚██╗░██╔╝██║░░░██║██╔████╔██║"
+    echo -e "  ██╔══██║██╔══╝░░░╚████╔╝░██║░░░██║██║╚██╔╝██║"
+    echo -e "  ██║░░██║███████╗░░╚██╔╝░░╚██████╔╝██║░╚═╝░██║"
+    echo -e "  ╚═╝░░╚═╝╚══════╝░░░╚═╝░░░╚═════╝░╚═╝░░░░╚═╝${RST}"
+    echo -e "  ${DIM}<<shell — dependency manager @ bspwm >>${RST}"
+    echo -e "  ${DIM}──────────────────────────────────────────${RST}"
+    echo ""
 }
 
 # ── Deps ──────────────────────────────────────────────────────────────────────
 PACMAN_DEPS=(
-  # essentials
-  bspwm sxhkd picom xorg-xsetroot ksuperkey
+    # essentials
+    bspwm sxhkd picom xorg-xsetroot ksuperkey
 
-  # bars
-  quickshell fzf ripgrep fd nvim
+    # bars
+    quickshell fzf ripgrep fd nvim
 
-  # dunst
-  dunst archcraft-dunst-icons
+    # for the purpose of nvim
+    luarocks lazygit
 
-  # terminal things
-  alacritty fish
-  starship zoxide eza
+    # dunst
+    dunst archcraft-dunst-icons
 
-  # tools
-  btop geany geany-plugins mpv neovim plank ranger rofi
+    # terminal things
+    alacritty fish
+    starship zoxide eza
 
-  # image and theming
-  feh matugen imagemagick inotify-tools
+    # tools
+    btop geany geany-plugins mpv neovim plank ranger rofi
 
-  # xorg deps
-  xdo xdotool xclip xorg-xrandr
+    # image and theming
+    feh matugen imagemagick inotify-tools
 
-  # media
-  mpd mpc ncmpcpp pulsemixer pavucontrol
+    # xorg deps
+    xdo xdotool xclip xorg-xrandr
 
-  # appearance
-  lxappearance qt5ct qt6ct kvantum kvantum-qt5 xsettingsd
+    # media
+    mpd mpc ncmpcpp pulsemixer pavucontrol
 
-  # lockscreen
-  betterlockscreen
+    # appearance
+    lxappearance qt5ct qt6ct kvantum kvantum-qt5 xsettingsd
 
-  # network and auth
-  network-manager-applet
-  xfce-polkit
+    # lockscreen
+    betterlockscreen
 
-  # mirrorlist + fonts
-  archcraft-fonts
+    # network and auth
+    network-manager-applet
+    xfce-polkit
 
-  # archcraft themes
-  archcraft-gtk-theme-adapta archcraft-gtk-theme-arc
-  archcraft-gtk-theme-blade archcraft-gtk-theme-catppuccin
-  archcraft-gtk-theme-cyberpunk archcraft-gtk-theme-dracula
-  archcraft-gtk-theme-easy archcraft-gtk-theme-everforest
-  archcraft-gtk-theme-fluent archcraft-gtk-theme-groot
-  archcraft-gtk-theme-gruvbox archcraft-gtk-theme-hack
-  archcraft-gtk-theme-juno archcraft-gtk-theme-kanagawa
-  archcraft-gtk-theme-kripton archcraft-gtk-theme-manhattan
-  archcraft-gtk-theme-material archcraft-gtk-theme-nightfox
-  archcraft-gtk-theme-nordic archcraft-gtk-theme-orchis
-  archcraft-gtk-theme-qogir archcraft-gtk-theme-rick
-  archcraft-gtk-theme-slime archcraft-gtk-theme-spark
-  archcraft-gtk-theme-sweet archcraft-gtk-theme-tokyonight
-  archcraft-gtk-theme-valyrian archcraft-gtk-theme-wave
-  archcraft-gtk-theme-white archcraft-gtk-theme-windows
+    # mirrorlist + fonts
+    archcraft-fonts
 
-  # archcraft icons
-  archcraft-icons-arc archcraft-icons-ars
-  archcraft-icons-azure archcraft-icons-beautyline
-  archcraft-icons-breeze archcraft-icons-candy
-  archcraft-icons-colloid archcraft-icons-fluent
-  archcraft-icons-glassy archcraft-icons-hack
-  archcraft-icons-luna archcraft-icons-luv
-  archcraft-icons-mojavecircle archcraft-icons-nordic
-  archcraft-icons-numix archcraft-icons-papirus
-  archcraft-icons-qogir archcraft-icons-sweetfolders
-  archcraft-icons-tela archcraft-icons-vimix
-  archcraft-icons-white archcraft-icons-win11
-  archcraft-icons-zafiro archcraft-icons-zafironord
+    # archcraft themes
+    archcraft-gtk-theme-adapta archcraft-gtk-theme-arc
+    archcraft-gtk-theme-blade archcraft-gtk-theme-catppuccin
+    archcraft-gtk-theme-cyberpunk archcraft-gtk-theme-dracula
+    archcraft-gtk-theme-easy archcraft-gtk-theme-everforest
+    archcraft-gtk-theme-fluent archcraft-gtk-theme-groot
+    archcraft-gtk-theme-gruvbox archcraft-gtk-theme-hack
+    archcraft-gtk-theme-juno archcraft-gtk-theme-kanagawa
+    archcraft-gtk-theme-kripton archcraft-gtk-theme-manhattan
+    archcraft-gtk-theme-material archcraft-gtk-theme-nightfox
+    archcraft-gtk-theme-nordic archcraft-gtk-theme-orchis
+    archcraft-gtk-theme-qogir archcraft-gtk-theme-rick
+    archcraft-gtk-theme-slime archcraft-gtk-theme-spark
+    archcraft-gtk-theme-sweet archcraft-gtk-theme-tokyonight
+    archcraft-gtk-theme-valyrian archcraft-gtk-theme-wave
+    archcraft-gtk-theme-white archcraft-gtk-theme-windows
 
-  # archcraft cursors
-  archcraft-cursor-bibata archcraft-cursor-breezex
-  archcraft-cursor-colloid archcraft-cursor-fluent
-  archcraft-cursor-future archcraft-cursor-layan
-  archcraft-cursor-lyra archcraft-cursor-material
-  archcraft-cursor-nordic archcraft-cursor-pear
-  archcraft-cursor-qogirr archcraft-cursor-simple
-  archcraft-cursor-sweet archcraft-cursor-vimix
-  archcraft-cursor-windows
+    # archcraft icons
+    archcraft-icons-arc archcraft-icons-ars
+    archcraft-icons-azure archcraft-icons-beautyline
+    archcraft-icons-breeze archcraft-icons-candy
+    archcraft-icons-colloid archcraft-icons-fluent
+    archcraft-icons-glassy archcraft-icons-hack
+    archcraft-icons-luna archcraft-icons-luv
+    archcraft-icons-mojavecircle archcraft-icons-nordic
+    archcraft-icons-numix archcraft-icons-papirus
+    archcraft-icons-qogir archcraft-icons-sweetfolders
+    archcraft-icons-tela archcraft-icons-vimix
+    archcraft-icons-white archcraft-icons-win11
+    archcraft-icons-zafiro archcraft-icons-zafironord
 
-  redshift
-  slop
+    # archcraft cursors
+    archcraft-cursor-bibata archcraft-cursor-breezex
+    archcraft-cursor-colloid archcraft-cursor-fluent
+    archcraft-cursor-future archcraft-cursor-layan
+    archcraft-cursor-lyra archcraft-cursor-material
+    archcraft-cursor-nordic archcraft-cursor-pear
+    archcraft-cursor-qogirr archcraft-cursor-simple
+    archcraft-cursor-sweet archcraft-cursor-vimix
+    archcraft-cursor-windows
+
+    redshift
+    slop
 )
 
 AUR_DEPS=(
-  vicinae-bin
-  neofetch
-  cmatrix-git
-  caffeine-ng
-  xtitle
-  taskwarrior-tui
+    vicinae-bin
+    neofetch
+    cmatrix-git
+    caffeine-ng
+    xtitle
+    taskwarrior-tui
 )
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
@@ -131,340 +134,340 @@ error() { echo -e "  ${RED}✗${RST}  $1"; }
 section() { echo -e "\n  ${PRP}▸${RST} ${BLD}$1${RST}\n"; }
 
 usage() {
-  header
-  echo -e "  ${WHT}Usage:${RST} deps <command> [subcommand] [flags]\n"
-  echo -e "  ${PRP}install${RST}"
-  echo -e "    ${DIM}deps install all${RST}            install everything ${DIM}(--needed)${RST}"
-  echo -e "    ${DIM}deps install pacman${RST}         install pacman deps ${DIM}(--needed)${RST}"
-  echo -e "    ${DIM}deps install yay${RST}            install AUR deps ${DIM}(--needed)${RST}"
-  echo -e "    ${DIM}deps install <pkg> [-f]${RST}     install specific package ${DIM}(-f to force)${RST}"
-  echo ""
-  echo -e "  ${PRP}verify${RST}"
-  echo -e "    ${DIM}deps verify all${RST}             verify all deps"
-  echo -e "    ${DIM}deps verify pacman${RST}          verify pacman deps only"
-  echo -e "    ${DIM}deps verify yay${RST}             verify AUR deps only"
-  echo ""
-  echo -e "  ${PRP}setup${RST}"
-  echo -e "    ${DIM}deps setup keyring${RST}          setup repo + keyring ${DIM}(--needed)${RST}"
-  echo -e "    ${DIM}deps setup keyring -f${RST}       force reinstall keyring"
-  echo -e "    ${DIM}deps setup keyring -r${RST}       remove archcraft repo + keyring"
-  echo ""
-  echo -e "  ${DIM}Run without arguments to open interactive menu.${RST}"
-  echo ""
+    header
+    echo -e "  ${WHT}Usage:${RST} deps <command> [subcommand] [flags]\n"
+    echo -e "  ${PRP}install${RST}"
+    echo -e "    ${DIM}deps install all${RST}            install everything ${DIM}(--needed)${RST}"
+    echo -e "    ${DIM}deps install pacman${RST}         install pacman deps ${DIM}(--needed)${RST}"
+    echo -e "    ${DIM}deps install yay${RST}            install AUR deps ${DIM}(--needed)${RST}"
+    echo -e "    ${DIM}deps install <pkg> [-f]${RST}     install specific package ${DIM}(-f to force)${RST}"
+    echo ""
+    echo -e "  ${PRP}verify${RST}"
+    echo -e "    ${DIM}deps verify all${RST}             verify all deps"
+    echo -e "    ${DIM}deps verify pacman${RST}          verify pacman deps only"
+    echo -e "    ${DIM}deps verify yay${RST}             verify AUR deps only"
+    echo ""
+    echo -e "  ${PRP}setup${RST}"
+    echo -e "    ${DIM}deps setup keyring${RST}          setup repo + keyring ${DIM}(--needed)${RST}"
+    echo -e "    ${DIM}deps setup keyring -f${RST}       force reinstall keyring"
+    echo -e "    ${DIM}deps setup keyring -r${RST}       remove archcraft repo + keyring"
+    echo ""
+    echo -e "  ${DIM}Run without arguments to open interactive menu.${RST}"
+    echo ""
 }
 
 # ── Core actions ──────────────────────────────────────────────────────────────
 _setup_repo() {
-  section "Archcraft Repo"
-  if grep -q "\[archcraft\]" /etc/pacman.conf; then
-    success "Archcraft repo already present"
-  else
-    info "Writing mirrorlist → /etc/pacman.d/archcraft-mirrorlist"
-    sudo tee /etc/pacman.d/archcraft-mirrorlist >/dev/null <<'EOF'
+    section "Archcraft Repo"
+    if grep -q "\[archcraft\]" /etc/pacman.conf; then
+        success "Archcraft repo already present"
+    else
+        info "Writing mirrorlist → /etc/pacman.d/archcraft-mirrorlist"
+        sudo tee /etc/pacman.d/archcraft-mirrorlist >/dev/null <<'EOF'
 ############### Archcraft Mirrorlist ###############
 
 ## Worldwide (Github)
 Server = https://packages.archcraft.io/$arch
 EOF
-    info "Appending [archcraft] to /etc/pacman.conf"
-    sudo tee -a /etc/pacman.conf >/dev/null <<'EOF'
+        info "Appending [archcraft] to /etc/pacman.conf"
+        sudo tee -a /etc/pacman.conf >/dev/null <<'EOF'
 
 [archcraft]
 SigLevel = Optional TrustAll
 Include = /etc/pacman.d/archcraft-mirrorlist
 EOF
-    info "Syncing databases..."
-    sudo pacman -Syu
-    success "Repo configured"
-  fi
+        info "Syncing databases..."
+        sudo pacman -Syu
+        success "Repo configured"
+    fi
 }
 
 _setup_keyring() {
-  local force="${1:-}"
-  section "Keyrings"
-  if [[ "$force" == "-f" ]]; then
-    info "Force reinstalling keyrings..."
-    sudo pacman -S archlinux-keyring
-  else
-    info "Installing keyrings..."
-    sudo pacman -S --needed archlinux-keyring
-  fi
-  success "Keyrings ready"
+    local force="${1:-}"
+    section "Keyrings"
+    if [[ "$force" == "-f" ]]; then
+        info "Force reinstalling keyrings..."
+        sudo pacman -S archlinux-keyring
+    else
+        info "Installing keyrings..."
+        sudo pacman -S --needed archlinux-keyring
+    fi
+    success "Keyrings ready"
 }
 
 _remove_keyring() {
-  section "Remove Archcraft Repo + Keyring"
-  warn "This will remove [archcraft] from /etc/pacman.conf and delete the mirrorlist."
-  printf "  Are you sure? [y/N] "
-  read -r confirm
-  [[ "${confirm,,}" != "y" ]] && warn "Aborted." && return
-  info "Removing [archcraft] block from /etc/pacman.conf..."
-  sudo sed -i '/^\[archcraft\]/,/^$/d' /etc/pacman.conf
-  sudo rm -f /etc/pacman.d/archcraft-mirrorlist
-  sudo pacman -Sy
-  success "Archcraft repo removed"
+    section "Remove Archcraft Repo + Keyring"
+    warn "This will remove [archcraft] from /etc/pacman.conf and delete the mirrorlist."
+    printf "  Are you sure? [y/N] "
+    read -r confirm
+    [[ "${confirm,,}" != "y" ]] && warn "Aborted." && return
+    info "Removing [archcraft] block from /etc/pacman.conf..."
+    sudo sed -i '/^\[archcraft\]/,/^$/d' /etc/pacman.conf
+    sudo rm -f /etc/pacman.d/archcraft-mirrorlist
+    sudo pacman -Sy
+    success "Archcraft repo removed"
 }
 
 # ── Install with retry ────────────────────────────────────────────────────────
 _install_with_retry() {
-  local pkg="$1"
-  local force="${2:-}"
-  local use_yay="${3:-false}"
-  local max_retries=3
-  local attempt=1
+    local pkg="$1"
+    local force="${2:-}"
+    local use_yay="${3:-false}"
+    local max_retries=3
+    local attempt=1
 
-  while [[ $attempt -le $max_retries ]]; do
-    info "[$attempt/$max_retries] Installing ${BLD}$pkg${RST}..."
-    if [[ "$use_yay" == "true" ]]; then
-      if [[ "$force" == "-f" ]]; then
-        yay -S "$pkg" --noconfirm && return 0
-      else
-        yay -S --needed "$pkg" --noconfirm && return 0
-      fi
-    else
-      if [[ "$force" == "-f" ]]; then
-        sudo pacman -S "$pkg" --noconfirm && return 0
-      else
-        sudo pacman -S --needed "$pkg" --noconfirm && return 0
-      fi
-    fi
-    warn "Attempt $attempt failed for ${BLD}$pkg${RST}. Retrying in 5s..."
-    sleep 5
-    ((attempt++))
-  done
+    while [[ $attempt -le $max_retries ]]; do
+        info "[$attempt/$max_retries] Installing ${BLD}$pkg${RST}..."
+        if [[ "$use_yay" == "true" ]]; then
+            if [[ "$force" == "-f" ]]; then
+                yay -S "$pkg" --noconfirm && return 0
+            else
+                yay -S --needed "$pkg" --noconfirm && return 0
+            fi
+        else
+            if [[ "$force" == "-f" ]]; then
+                sudo pacman -S "$pkg" --noconfirm && return 0
+            else
+                sudo pacman -S --needed "$pkg" --noconfirm && return 0
+            fi
+        fi
+        warn "Attempt $attempt failed for ${BLD}$pkg${RST}. Retrying in 5s..."
+        sleep 5
+        ((attempt++))
+    done
 
-  return 1
+    return 1
 }
 
 _install_pacman() {
-  local force="${1:-}"
-  section "Installing Pacman Deps"
+    local force="${1:-}"
+    section "Installing Pacman Deps"
 
-  local failed=()
-  local total=${#PACMAN_DEPS[@]}
-  local current=0
+    local failed=()
+    local total=${#PACMAN_DEPS[@]}
+    local current=0
 
-  for pkg in "${PACMAN_DEPS[@]}"; do
-    ((current++))
-    echo -e "  ${DIM}[$current/$total]${RST}"
-    if ! _install_with_retry "$pkg" "$force" "false"; then
-      failed+=("$pkg")
-      error "Failed: $pkg — skipping"
-    fi
-  done
-
-  echo ""
-  if [[ ${#failed[@]} -gt 0 ]]; then
-    warn "${#failed[@]} package(s) failed:"
-    for f in "${failed[@]}"; do
-      error "$f"
+    for pkg in "${PACMAN_DEPS[@]}"; do
+        ((current++))
+        echo -e "  ${DIM}[$current/$total]${RST}"
+        if ! _install_with_retry "$pkg" "$force" "false"; then
+            failed+=("$pkg")
+            error "Failed: $pkg — skipping"
+        fi
     done
-    warn "Retry with: deps install <pkg>"
-  else
-    success "All pacman deps installed"
-  fi
+
+    echo ""
+    if [[ ${#failed[@]} -gt 0 ]]; then
+        warn "${#failed[@]} package(s) failed:"
+        for f in "${failed[@]}"; do
+            error "$f"
+        done
+        warn "Retry with: deps install <pkg>"
+    else
+        success "All pacman deps installed"
+    fi
 }
 
 _install_yay() {
-  local force="${1:-}"
-  section "Installing AUR Deps"
+    local force="${1:-}"
+    section "Installing AUR Deps"
 
-  local failed=()
-  local total=${#AUR_DEPS[@]}
-  local current=0
+    local failed=()
+    local total=${#AUR_DEPS[@]}
+    local current=0
 
-  for pkg in "${AUR_DEPS[@]}"; do
-    ((current++))
-    echo -e "  ${DIM}[$current/$total]${RST}"
-    if ! _install_with_retry "$pkg" "$force" "true"; then
-      failed+=("$pkg")
-      error "Failed: $pkg — skipping"
-    fi
-  done
-
-  echo ""
-  if [[ ${#failed[@]} -gt 0 ]]; then
-    warn "${#failed[@]} package(s) failed:"
-    for f in "${failed[@]}"; do
-      error "$f"
+    for pkg in "${AUR_DEPS[@]}"; do
+        ((current++))
+        echo -e "  ${DIM}[$current/$total]${RST}"
+        if ! _install_with_retry "$pkg" "$force" "true"; then
+            failed+=("$pkg")
+            error "Failed: $pkg — skipping"
+        fi
     done
-    warn "Retry with: deps install <pkg>"
-  else
-    success "All AUR deps installed"
-  fi
+
+    echo ""
+    if [[ ${#failed[@]} -gt 0 ]]; then
+        warn "${#failed[@]} package(s) failed:"
+        for f in "${failed[@]}"; do
+            error "$f"
+        done
+        warn "Retry with: deps install <pkg>"
+    else
+        success "All AUR deps installed"
+    fi
 }
 
 _install_pkg() {
-  local pkg="$1"
-  local force="${2:-}"
-  section "Installing: $pkg"
+    local pkg="$1"
+    local force="${2:-}"
+    section "Installing: $pkg"
 
-  local known=false
-  for d in "${PACMAN_DEPS[@]}" "${AUR_DEPS[@]}"; do
-    [[ "$d" == "$pkg" ]] && known=true && break
-  done
-  [[ "$known" == false ]] && warn "$pkg is not in the aevum dep list — installing anyway"
+    local known=false
+    for d in "${PACMAN_DEPS[@]}" "${AUR_DEPS[@]}"; do
+        [[ "$d" == "$pkg" ]] && known=true && break
+    done
+    [[ "$known" == false ]] && warn "$pkg is not in the aevum dep list — installing anyway"
 
-  if pacman -Si "$pkg" &>/dev/null; then
-    _install_with_retry "$pkg" "$force" "false" && success "$pkg installed" || error "$pkg failed after retries"
-  else
-    _install_with_retry "$pkg" "$force" "true" && success "$pkg installed" || error "$pkg failed after retries"
-  fi
+    if pacman -Si "$pkg" &>/dev/null; then
+        _install_with_retry "$pkg" "$force" "false" && success "$pkg installed" || error "$pkg failed after retries"
+    else
+        _install_with_retry "$pkg" "$force" "true" && success "$pkg installed" || error "$pkg failed after retries"
+    fi
 }
 
 _verify() {
-  local scope="${1:-all}"
-  section "Verifying Deps — $scope"
-  local missing=()
-  local check_pacman=false
-  local check_yay=false
+    local scope="${1:-all}"
+    section "Verifying Deps — $scope"
+    local missing=()
+    local check_pacman=false
+    local check_yay=false
 
-  [[ "$scope" == "all" || "$scope" == "pacman" ]] && check_pacman=true
-  [[ "$scope" == "all" || "$scope" == "yay" ]] && check_yay=true
+    [[ "$scope" == "all" || "$scope" == "pacman" ]] && check_pacman=true
+    [[ "$scope" == "all" || "$scope" == "yay" ]] && check_yay=true
 
-  if $check_pacman; then
-    for dep in "${PACMAN_DEPS[@]}"; do
-      pacman -Qq "$dep" &>/dev/null || missing+=("${YLW}[pacman]${RST} $dep")
-    done
-  fi
-  if $check_yay; then
-    for dep in "${AUR_DEPS[@]}"; do
-      pacman -Qq "$dep" &>/dev/null || missing+=("${CYN}[aur]${RST}    $dep")
-    done
-  fi
+    if $check_pacman; then
+        for dep in "${PACMAN_DEPS[@]}"; do
+            pacman -Qq "$dep" &>/dev/null || missing+=("${YLW}[pacman]${RST} $dep")
+        done
+    fi
+    if $check_yay; then
+        for dep in "${AUR_DEPS[@]}"; do
+            pacman -Qq "$dep" &>/dev/null || missing+=("${CYN}[aur]${RST}    $dep")
+        done
+    fi
 
-  if [[ ${#missing[@]} -eq 0 ]]; then
-    success "All checked deps are installed"
-  else
-    warn "${#missing[@]} missing package(s):"
-    for m in "${missing[@]}"; do
-      echo -e "    ${RED}✗${RST}  $m"
-    done
-  fi
+    if [[ ${#missing[@]} -eq 0 ]]; then
+        success "All checked deps are installed"
+    else
+        warn "${#missing[@]} missing package(s):"
+        for m in "${missing[@]}"; do
+            echo -e "    ${RED}✗${RST}  $m"
+        done
+    fi
 }
 
 # ── Interactive menu ──────────────────────────────────────────────────────────
 preview_deps() {
-  local label="$1"
-  shift
-  local deps=("$@")
-  section "Queued for install — $label"
-  local i=0
-  for dep in "${deps[@]}"; do
-    printf "  \033[2m%-35s\033[0m" "$dep"
-    ((++i % 2 == 0)) && echo
-  done
-  [[ $((i % 2)) -ne 0 ]] && echo
-  echo ""
-  printf "  Proceed? [Y/n] "
-  read -r confirm
-  [[ "${confirm,,}" == "n" ]] && warn "Skipped." && return 1
-  return 0
+    local label="$1"
+    shift
+    local deps=("$@")
+    section "Queued for install — $label"
+    local i=0
+    for dep in "${deps[@]}"; do
+        printf "  \033[2m%-35s\033[0m" "$dep"
+        ((++i % 2 == 0)) && echo
+    done
+    [[ $((i % 2)) -ne 0 ]] && echo
+    echo ""
+    printf "  Proceed? [Y/n] "
+    read -r confirm
+    [[ "${confirm,,}" == "n" ]] && warn "Skipped." && return 1
+    return 0
 }
 
 menu() {
-  while true; do
-    header
-    echo -e "  ${WHT}What do you want to do?${RST}\n"
-    echo -e "  ${PRP}1.${RST}  Setup repo + keyrings"
-    echo -e "  ${PRP}2.${RST}  Install pacman deps"
-    echo -e "  ${PRP}3.${RST}  Install AUR deps        ${DIM}(yay)${RST}"
-    echo -e "  ${PRP}4.${RST}  Install everything"
-    echo -e "  ${PRP}5.${RST}  Verify all deps"
-    echo -e "  ${PRP}6.${RST}  Reinstall everything    ${DIM}(force)${RST}"
-    echo -e "  ${PRP}q.${RST}  Quit"
-    echo ""
-    printf "  \033[2m→ \033[0m"
-    read -r choice
-    echo ""
-    case "$choice" in
-    1)
-      _setup_repo
-      _setup_keyring
-      ;;
-    2) preview_deps "pacman" "${PACMAN_DEPS[@]}" && _install_pacman ;;
-    3) preview_deps "yay" "${AUR_DEPS[@]}" && _install_yay ;;
-    4)
-      _setup_repo
-      _setup_keyring
-      preview_deps "pacman" "${PACMAN_DEPS[@]}" && _install_pacman
-      preview_deps "yay" "${AUR_DEPS[@]}" && _install_yay
-      ;;
-    5) _verify all ;;
-    6)
-      _install_pacman -f
-      _install_yay -f
-      ;;
-    q | Q)
-      info "Bye."
-      exit 0
-      ;;
-    *) warn "Invalid option" ;;
-    esac
-    echo ""
-    printf "  \033[2mPress Enter to return to menu...\033[0m"
-    read -r
-  done
+    while true; do
+        header
+        echo -e "  ${WHT}What do you want to do?${RST}\n"
+        echo -e "  ${PRP}1.${RST}  Setup repo + keyrings"
+        echo -e "  ${PRP}2.${RST}  Install pacman deps"
+        echo -e "  ${PRP}3.${RST}  Install AUR deps        ${DIM}(yay)${RST}"
+        echo -e "  ${PRP}4.${RST}  Install everything"
+        echo -e "  ${PRP}5.${RST}  Verify all deps"
+        echo -e "  ${PRP}6.${RST}  Reinstall everything    ${DIM}(force)${RST}"
+        echo -e "  ${PRP}q.${RST}  Quit"
+        echo ""
+        printf "  \033[2m→ \033[0m"
+        read -r choice
+        echo ""
+        case "$choice" in
+        1)
+            _setup_repo
+            _setup_keyring
+            ;;
+        2) preview_deps "pacman" "${PACMAN_DEPS[@]}" && _install_pacman ;;
+        3) preview_deps "yay" "${AUR_DEPS[@]}" && _install_yay ;;
+        4)
+            _setup_repo
+            _setup_keyring
+            preview_deps "pacman" "${PACMAN_DEPS[@]}" && _install_pacman
+            preview_deps "yay" "${AUR_DEPS[@]}" && _install_yay
+            ;;
+        5) _verify all ;;
+        6)
+            _install_pacman -f
+            _install_yay -f
+            ;;
+        q | Q)
+            info "Bye."
+            exit 0
+            ;;
+        *) warn "Invalid option" ;;
+        esac
+        echo ""
+        printf "  \033[2mPress Enter to return to menu...\033[0m"
+        read -r
+    done
 }
 
 # ── CLI dispatcher ────────────────────────────────────────────────────────────
 case "${1:-}" in
 install)
-  case "${2:-}" in
-  all)
-    _install_pacman "${3:-}"
-    _install_yay "${3:-}"
-    ;;
-  pacman) _install_pacman "${3:-}" ;;
-  yay) _install_yay "${3:-}" ;;
-  "")
-    error "Specify: all, pacman, yay, or <package>"
-    exit 1
-    ;;
-  *) _install_pkg "${2}" "${3:-}" ;;
-  esac
-  ;;
-verify)
-  case "${2:-}" in
-  all | pacman | yay) _verify "${2}" ;;
-  "") _verify all ;;
-  *)
-    error "Unknown scope: ${2}. Use all, pacman, or yay."
-    exit 1
-    ;;
-  esac
-  ;;
-setup)
-  case "${2:-}" in
-  keyring)
-    case "${3:-}" in
-    -f)
-      _setup_repo
-      _setup_keyring -f
-      ;;
-    -r) _remove_keyring ;;
-    *)
-      _setup_repo
-      _setup_keyring
-      ;;
+    case "${2:-}" in
+    all)
+        _install_pacman "${3:-}"
+        _install_yay "${3:-}"
+        ;;
+    pacman) _install_pacman "${3:-}" ;;
+    yay) _install_yay "${3:-}" ;;
+    "")
+        error "Specify: all, pacman, yay, or <package>"
+        exit 1
+        ;;
+    *) _install_pkg "${2}" "${3:-}" ;;
     esac
     ;;
-  "")
-    error "Specify: keyring"
-    exit 1
+verify)
+    case "${2:-}" in
+    all | pacman | yay) _verify "${2}" ;;
+    "") _verify all ;;
+    *)
+        error "Unknown scope: ${2}. Use all, pacman, or yay."
+        exit 1
+        ;;
+    esac
     ;;
-  *)
-    error "Unknown setup target: ${2}"
-    exit 1
+setup)
+    case "${2:-}" in
+    keyring)
+        case "${3:-}" in
+        -f)
+            _setup_repo
+            _setup_keyring -f
+            ;;
+        -r) _remove_keyring ;;
+        *)
+            _setup_repo
+            _setup_keyring
+            ;;
+        esac
+        ;;
+    "")
+        error "Specify: keyring"
+        exit 1
+        ;;
+    *)
+        error "Unknown setup target: ${2}"
+        exit 1
+        ;;
+    esac
     ;;
-  esac
-  ;;
 help | --help | -h) usage ;;
 "") menu ;;
 *)
-  error "Unknown command: ${1}"
-  echo ""
-  usage
-  exit 1
-  ;;
+    error "Unknown command: ${1}"
+    echo ""
+    usage
+    exit 1
+    ;;
 esac
