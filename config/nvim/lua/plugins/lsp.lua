@@ -6,7 +6,7 @@ return {
         enabled = true,
         opts = {
             servers = {
-                clangd = {},                  -- only for by beloved C
+                clangd = { enabled = true },                  -- only for by beloved C
                 lua_ls = { enabled = false }, -- disable lua lsp server
             },
         },
