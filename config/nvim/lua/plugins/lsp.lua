@@ -6,7 +6,13 @@ return {
         enabled = true,
         opts = {
             servers = {
-                clangd = { enabled = true },                  -- only for by beloved C
+                clangd = {
+                    enable = true, 
+                    on_attach = function(client)
+                        client.server_capabilities.documentFormattingProvider = false
+                        client.server_capabilities.documentRangeFormattingProvider = false
+                    end,                    
+                },  -- only for by beloved C
                 lua_ls = { enabled = false }, -- disable lua lsp server
             },
         },
