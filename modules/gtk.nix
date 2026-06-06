@@ -14,8 +14,8 @@ in
     gtk4.theme = nordicTheme;
 
     iconTheme = {
-      package = pkgs.nordzy-icon-theme;
-      name = "Nordzy";
+      package = pkgs.zafiro-icons;
+      name = "Zafiro-Nord-Black";
     };
   };
 }
