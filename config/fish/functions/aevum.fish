@@ -11,7 +11,7 @@ function aevum
 
     switch "$argv[1]"
         case '' --help -h help
-            if test "$argv[1]" = '' 
+            if test "$argv[1]" = ''
                 cd $AEVUM_DIR
                 return
             end
@@ -23,6 +23,8 @@ function aevum
             echo "  link-config <args>         run config-linker.sh"
             echo "  link-local <args>          run local-linker.sh"
             echo "  srcrec <args>              run srcrec.sh"
+            echo "  theme <args>               run theme.sh"
+            echo "  tasker <args>              run tasker.sh"
             echo "  help                       show this message"
             echo ""
 
@@ -40,6 +42,9 @@ function aevum
 
         case theme
             bash $SUBCMD/theme.sh $argv[2..]
+
+        case tasker
+            bash $SUBCMD/tasker.sh $argv[2..]
 
         case '*'
             echo "  ✗  Unknown command: $argv[1]"
