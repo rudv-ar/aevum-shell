@@ -160,7 +160,7 @@ Item {
     Rectangle {
         anchors.fill: parent
         radius: 12
-        color:  Theme.notifToastBg
+        color:  Theme.isDark ? Qt.lighter(Theme.notifNormalBg, 0.7) : Qt.lighter(Theme.wsOccupiedBg, 1.4)
         border {
             color: isCritical ? urgencyColor : Qt.rgba(1, 1, 1, 0.05)
             width: isCritical ? 1.5 : 1
@@ -212,7 +212,7 @@ Item {
                     if (notif && notif.appName.length > 0) return notif.appName[0].toUpperCase()
                     return "●"
                 }
-                color: "#ffffff"
+                color: Theme.text
                 font {
                     family:    "JetBrainsMono Nerd Font"
                     pixelSize: parent.glyph !== "" ? 18 : 15
@@ -240,7 +240,7 @@ Item {
             id: countLabel
             anchors.centerIn: parent
             text:  toastRoot.notifCount > 99 ? "99+" : toastRoot.notifCount.toString()
-            color: "#ffffff"
+            color: Theme.text 
             font { pixelSize: 10; bold: true }
         }
     }
@@ -255,7 +255,7 @@ Item {
 
         Text {
             anchors.centerIn: parent
-            text: "✕"; color: "#888a9a"; font.pixelSize: 10
+            text: "✕"; color: Theme.accent; font.pixelSize: 10
         }
         HoverHandler { id: closeBtnHover }
         TapHandler {
@@ -276,7 +276,7 @@ Item {
         Text {
             width: parent.width
             text:  notif ? notif.appName : ""
-            color: "#72748a"
+            color: Theme.accent 
             font { pixelSize: 10; letterSpacing: 0.5 }
             elide: Text.ElideRight
         }
@@ -284,7 +284,7 @@ Item {
         Text {
             width: parent.width
             text:  notif ? notif.summary : ""
-            color: "#e2e4ee"
+            color: Theme.textColor 
             font { pixelSize: 13; bold: true }
             elide: Text.ElideRight
         }
@@ -295,7 +295,7 @@ Item {
             visible: !!notif && notif.body !== ""
 
             text:       notif ? notif.body : ""
-            color:      "#a8abb8"
+            color:      Theme.text 
             font.pixelSize: 12
             wrapMode:   Text.WordWrap
             textFormat: Text.MarkdownText
@@ -380,7 +380,7 @@ Item {
         }
         Rectangle {
             anchors.fill: parent; radius: 1.5
-            color: Qt.rgba(1, 1, 1, 0.06)
+            color: Qt.lighter(Theme.accent, 1.5)
         }
         Rectangle {
             width:   Math.max(0, toastRoot.timerFraction * parent.width)
