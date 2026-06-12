@@ -13,3 +13,10 @@ vim.opt.expandtab = true
 
 -- disable the animations : annoys me. 
 vim.g.snacks_animate = false
+
+-- enable wrap and linebreaks 
+
+vim.opt.wrap = true
+vim.opt.linebreak = true
+
+
